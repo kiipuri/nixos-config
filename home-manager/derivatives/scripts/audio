@@ -1,0 +1,56 @@
+#!/usr/bin/env bash
+
+# MADE FOR ARCH BASED DISTROS
+# For this scrip to work you need:
+# ffmpeg
+# libnotify
+# xclip
+
+# Use 'pactl list sources' in your terminal to get your audio source's name
+# and replace 'AUDIOSOURCE' with your audio source.
+# Run the command while playing something in the background and then run the
+# command with nothing playing to be sure you have the right audio source.
+# Use 'chmod +x scriptname.sh' to make it executable.
+
+# folder=/home/kiipuri/scripts/audio/$(date +%Y.%m) # Ex: /home/[user]/Audio/Folder/$(date +%Y.%m)
+folder=/tmp # Ex: /home/[user]/Audio/Folder/$(date +%Y.%m)
+file=audio_$(date +%y%m%d%H%M%S).mp3
+full_path=$folder/$file
+# checktxt_path=/home/kiipuri/scripts/$filecheck.txt # Recommend same path as script
+checktxt_path=/tmp/audio_check.txt # Recommend same path as script
+check_for="ffmpeg -f pulse -ac 2 -ar 48000 -i alsa_output.usb-Kingston_HyperX_Cloud_II_Wireless_000000000001-00.analog-stereo.monitor -filter:a loudnorm -f mp3 "
+script_path=/home/kiipuri/scripts/audio # Use the path you place the script in
+
+ps -eaf | grep "$check_for" | grep -v grep > "$checktxt_path"
+
+mkdir -p $folder
+
+if grep -q "$check_for" "$checktxt_path"; then
+    sleep 3
+    pkill -SIGTERM ffmpeg
+    notify-send -t 2000 "Recording has stopped."
+else
+    notify-send -t 2000 "Recording has started."
+
+    ffmpeg \
+        -f pulse -ac 2 -ar 48000 \
+        -i alsa_output.usb-Kingston_HyperX_Cloud_II_Wireless_000000000001-00.analog-stereo.monitor -filter:a loudnorm -f mp3 "$full_path"
+
+    if [[ -f $full_path ]]; then
+        notify-send "File has been saved." "<i>$file</i>"
+
+        echo "file://$full_path" |
+            xclip -f -t text/uri-list -i |
+            xclip -sel clip -t text/uri-list -i
+    else
+        notify-send -u critical -t 0 \
+            "FFMPEG FAILED TO START!" \
+            "Check the script for human error:\n<i>$script_path</i>"
+    fi
+fi
+
+[[ -s $full_path ]] || rm "$full_path"
+
+if [[ ! $(ls -A $folder) ]]; then
+    rmdir $folder
+fi

@@ -1,0 +1,97 @@
+set ratios 1:2:3
+set cleaner ~/.config/lf/cleaner
+set previewer ~/.config/lf/preview
+set hidden true
+set drawbox true
+set icons true
+set ignorecase true
+set shell sh
+set ifs "\n"
+
+cmd trash %trash-put $fx
+
+cmd sudotrash ${{
+    sudo trash-put $fx
+}}
+
+cmd sudopaste ${{
+    set -- $(cat ~/.local/share/lf/files)
+    mode="$1"
+    shift
+    case "$mode" in
+        copy) sudo cp -r "$@" .;;
+        move)
+            sudo mv "$@" .;;
+    esac
+}}
+
+cmd open ${{
+    test -L $f && f=$(readlink -f $f)
+    case $(file --mime-type $f -b) in
+        text/*|application/json|application/x-subrip) $EDITOR $fx;;
+        *) for f in $fx; do setsid $OPENER $f > /dev/null 2> /dev/null & done;;
+    esac
+}}
+
+cmd unarchive ${{
+    case "$f" in
+        *.zip) unzip "$f" ;;
+        *.tar.gz) tar -xzf "$f" ;;
+        *.tar.bz2) tar -xjf "$f" ;;
+        *.tar.xz) tar -xf "$f" ;;
+        *.tar.zst) tar --use-compress-program=unzstd -xf "$f" ;;
+        *.tar|*.tgz) tar -xvf "$f" ;;
+        *.rar) unrar e "$f" ;;
+        *) echo "Unsupported format" ;;
+    esac
+}}
+
+cmd mkdir ${{
+    printf "Directory Name: "
+    read ans
+    mkdir $ans
+}}
+
+cmd mkfile ${{
+    printf "File Name: "
+    read ans
+    $EDITOR $ans
+}}
+
+cmd zip ${{
+    files=()
+    absfiles=("$fx")
+    for f in $absfiles; do
+        bname=$(basename $f)
+        files+=($bname)
+    done
+    zip -r "$f" ${files[@]}
+}}
+
+cmd z %{{
+    printf "Directory search string: "
+    read dir
+    #result="$(zoxide query --exclude "${PWD}" -- "$1")"
+    result="$(zoxide query $dir)"
+    lf -remote "send ${id} cd '${result}'"
+}}
+
+cmd zi ${{
+    result="$(zoxide query -i -- "$1")"
+    lf -remote "send ${id} cd '${result}'"
+}}
+
+map m
+map mm mark-save
+map ml mark-load
+map mr mark-remove
+map au unarchive
+map x trash
+map sx sudotrash
+map sp sudopaste
+map <enter> shell
+map mf mkfile
+map md mkdir
+map az zip
+map zz z
+map zi zi

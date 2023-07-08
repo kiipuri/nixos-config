@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+
+ops=(Shutdown Reboot Hibernate)
+selected=$(printf "%s\n" "${ops[@]}" | rofi -p "Select option: " -dmenu -c -l 3 -i)
+
+if [ -z "$selected" ]; then
+    exit
+elif [ "$selected" = "Shutdown" ]; then
+    loginctl poweroff
+elif [ "$selected" = "Reboot" ]; then
+    loginctl reboot
+elif [ "$selected" = "Hibernate" ]; then
+    loginctl hibernate
+fi
