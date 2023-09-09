@@ -50,12 +50,15 @@
   ];
 
   # Use the GRUB 2 boot loader.
-  boot.loader.grub.enable = true;
+  boot.loader.systemd-boot.enable = true;
+  boot.loader.efi.canTouchEfiVariables = true;
+  boot.resumeDevice = "/dev/disk/by-partlabel/SWAP";
+  #boot.loader.grub.enable = true;
   # boot.loader.grub.efiSupport = true;
   # boot.loader.grub.efiInstallAsRemovable = true;
   # boot.loader.efi.efiSysMountPoint = "/boot/efi";
   # Define on which hard drive you want to install Grub.
-  boot.loader.grub.device = "/dev/vda"; # or "nodev" for efi only
+  #boot.loader.grub.device = "/dev/vda"; # or "nodev" for efi only
 
   networking.hostName = "nixos"; # Define your hostname.
   # Pick only one of the below networking options.
@@ -82,29 +85,93 @@
 
   services.openssh.enable = true;
 
-  services.xserver.enable = true;
   services.xserver = {
+    enable = true;
     layout = "us";
     xkbVariant = "de_se_fi";
     xkbOptions = "caps:escape";
+    videoDrivers = ["nvidia"];
   };
 
-  services.xserver.displayManager = {
-    lightdm.enable = true;
-    startx.enable = true;
-    setupCommands = "${pkgs.xorg.xrandr}/bin/xrandr --output Virtual-1 --primary --mode 1920x1080";
+  #services.xserver.displayManager = {
+  #lightdm.enable = true;
+  #startx.enable = true;
+  #setupCommands = "${pkgs.xorg.xrandr}/bin/xrandr --output Virtual-1 --primary --mode 1920x1080";
+  #};
+
+  services.xserver.displayManager.sddm = {
+    enable = true;
+    theme = "tokyo-night-sddm";
   };
+
+  hardware = {
+    opengl.enable = true;
+    nvidia.modesetting.enable = true;
+  };
+
   services.xserver.windowManager = {
     awesome.enable = true;
     awesome.package = pkgs.awesome-git;
   };
 
+  programs.hyprland = {
+    enable = true;
+    nvidiaPatches = true;
+    xwayland.enable = false;
+  };
+
+  programs.waybar = {
+    enable = true;
+    package = inputs.waybar-git.packages.${pkgs.system}.default;
+  };
+
+  programs.noisetorch.enable = true;
+
   security.rtkit.enable = true;
+  security.polkit.enable = true;
+  security.protectKernelImage = false;
+  security.pam.services.swaylock.text = ''
+    auth include login
+  '';
   services.pipewire = {
     enable = true;
     alsa.enable = true;
     alsa.support32Bit = true;
     pulse.enable = true;
+  };
+
+  programs.steam = {
+    enable = true;
+    gamescopeSession.enable = true;
+  };
+  programs.gamescope.enable = true;
+
+  environment.sessionVariables = {
+    GDK_BACKEND = "wayland,x11";
+    QT_QPA_PLATFORM = "wayland;xcb";
+    #SDL_VIDEODRIVER = "x11";
+    CLUTTER_BACKEND = "wayland";
+    XDG_CURRENT_DESKTOP = "Hyprland";
+    XDG_SESSION_TYPE = "wayland";
+    XDG_SESSION_DESKTOP = "Hyprland";
+    WLR_NO_HARDWARE_CURSORS = "1";
+  };
+  nixpkgs.config.packageOverrides = pkgs: {
+    steam = pkgs.steam.override {
+      extraPkgs = pkgs:
+        with pkgs; [
+          xorg.libXcursor
+          xorg.libXi
+          xorg.libXinerama
+          xorg.libXScrnSaver
+          libpng
+          libpulseaudio
+          libvorbis
+          stdenv.cc.cc.lib
+          libkrb5
+          keyutils
+        ];
+    };
   };
 
   # Enable touchpad support (enabled default in most desktopManager).
@@ -124,12 +191,14 @@
   # $ nix search wget
   environment.systemPackages = with pkgs; [
     (builtins.getFlake "github:fortuneteller2k/nixpkgs-f2k/9773e93c3b81d645aabb95b8635a8c512e17aa3b").packages.${system}.awesome-git
+    home-manager
     dunst
     fd
     ffmpeg
     file
     git
     inputs.agenix.packages.${system}.default
+    htop
     killall
     lf
     libnotify
@@ -142,6 +211,21 @@
     vim
     wget
     xclip
+    neovim
+    virt-manager
+    lxsession
+    pavucontrol
+    wofi
+    (libsForQt5.callPackage ../derivatives/tokyo-night-sddm.nix {})
+    libsForQt5.qt5.qtgraphicaleffects
+    libsForQt5.qt5.qtbase
+    libsForQt5.qt5.qtquickcontrols2
+    libsForQt5.qt5.qtsvg
+    wl-clipboard
+    swaybg
+    alsa-utils
+    wlogout
+    xdg-desktop-portal-hyprland
   ];
 
   fonts.fonts = with pkgs; [
@@ -152,7 +236,10 @@
     terminus_font
   ];
 
-  environment.variables.EDITOR = "nvim";
+  environment.variables = {
+    EDITOR = "nvim";
+    WLR_NO_HARDWARE_CURSORS = "1";
+  };
 
   programs.zsh = {
     enable = true;
@@ -209,17 +296,26 @@
     shellAliases = {
       sudo = "doas";
       update = "sudo nixos-rebuild switch --flake .#nixos";
+      hmupdate = "home-manager switch --flake .#kiipuri@nixos";
     };
   };
 
   users.mutableUsers = false;
   users.users.root.password = "pass";
+  age.secrets.password.file = ../secrets/password.age;
+  age.secrets.id_ed25519 = {
+    file = ../secrets/id_ed25519.age;
+    path = "/home/kiipuri/.ssh";
+    owner = "kiipuri";
+    group = "users";
+  };
+
   users.users.kiipuri = {
     isNormalUser = true;
     shell = pkgs.zsh;
+    password = "pass";
+    # passwordFile = config.age.secrets.password.path;
     extraGroups = ["wheel"];
-    passwordFile = config.age.secrets.password.path;
-    # passwordFile = "/home/kiipuri/password.txt";
   };
 
   security.sudo.enable = false;
@@ -240,31 +336,11 @@
     };
   };
 
-  services.libreddit = {
-    enable = true;
-    port = 10001;
-    address = "127.0.0.1";
-  };
+  virtualisation.libvirtd.enable = true;
 
-  age.secrets.password.file = ../secrets/password.age;
-  age.secrets.searxng.file = ../secrets/searxng.age;
-  age.secrets.id_ed25519 = {
-    file = ../secrets/id_ed25519.age;
-    path = "/home/kiipuri/.ssh/";
-    owner = "kiipuri";
-    group = "users";
-  };
-
-  services.searx = {
-    enable = true;
-    package = pkgs.searxng;
-    environmentFile = /. + config.age.secrets.searxng.path;
-    settings = {
-      server.port = 10000;
-      server.bind_address = "127.0.0.1";
-      server.secret_key = "@SEARX_SECRET_KEY@";
-    };
-  };
+  systemd.extraConfig = ''
+    DefaultTimeoutStopSec=5s
+  '';
 
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.

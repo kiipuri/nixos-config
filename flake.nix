@@ -20,12 +20,17 @@
 
     agenix.url = "github:ryantm/agenix";
     agenix.inputs.nixpkgs.follows = "nixpkgs";
+
+    hyprland.url = "github:hyprwm/Hyprland";
+    waybar-git.url = "github:Alexays/Waybar";
   };
 
   outputs = {
     nixpkgs,
     home-manager,
     agenix,
+    hyprland,
+    waybar-git,
     ...
   } @ inputs: {
     # NixOS configuration entrypoint
@@ -35,7 +40,10 @@
       nixos = nixpkgs.lib.nixosSystem {
         specialArgs = {inherit inputs;}; # Pass flake inputs to our config
         # > Our main nixos configuration file <
-        modules = [./nixos/configuration.nix agenix.nixosModules.default];
+        modules = [
+          ./nixos/configuration.nix
+          agenix.nixosModules.default
+        ];
       };
     };
 
@@ -47,7 +55,11 @@
         pkgs = nixpkgs.legacyPackages.x86_64-linux; # Home-manager requires 'pkgs' instance
         extraSpecialArgs = {inherit inputs;}; # Pass flake inputs to our config
         # > Our main home-manager configuration file <
-        modules = [./home-manager/home.nix];
+        modules = [
+          ./home-manager/home.nix
+          hyprland.homeManagerModules.default
+          {wayland.windowManager.hyprland.enable = true;}
+        ];
       };
     };
   };

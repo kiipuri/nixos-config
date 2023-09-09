@@ -1,7 +1,8 @@
 #!/bin/sh
 
 image() {
-    if [ -n "$DISPLAY" ] && [ -z "$WAYLAND_DISPLAY" ]; then
+    # if [ -n "$DISPLAY" ] && [ -z "$WAYLAND_DISPLAY" ]; then
+    if [ -n "$DISPLAY" ]; then
         kitty +kitten icat --silent --stdin no --transfer-mode file --place "$2x$3@$4x$5" "$1" </dev/null >/dev/tty
         exit 1
     else
