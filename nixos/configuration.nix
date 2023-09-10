@@ -1,5 +1,3 @@
-# This is your system's configuration file.
-# Use this to configure your system environment (it replaces /etc/nixos/configuration.nix)
 {
   inputs,
   lib,
@@ -7,23 +5,12 @@
   pkgs,
   ...
 }: {
-  # You can import other NixOS modules here
   imports = [
-    # If you want to use modules from other flakes (such as nixos-hardware):
-    # inputs.hardware.nixosModules.common-cpu-amd
-    # inputs.hardware.nixosModules.common-ssd
-
-    # You can also split up your configuration and import pieces of it here:
-    # ./users.nix
-
-    # Import your generated (nixos-generate-config) hardware configuration
     ./hardware-configuration.nix
   ];
 
   nixpkgs = {
-    # Configure your nixpkgs instance
     config = {
-      # Disable if you don't want unfree packages
       allowUnfree = true;
     };
   };
@@ -49,38 +36,27 @@
     (builtins.getFlake "github:fortuneteller2k/nixpkgs-f2k/9773e93c3b81d645aabb95b8635a8c512e17aa3b").overlays.default
   ];
 
-  # Use the GRUB 2 boot loader.
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
   boot.resumeDevice = "/dev/disk/by-partlabel/SWAP";
-  #boot.loader.grub.enable = true;
+  # boot.loader.grub.enable = true;
+  # Define on which hard drive you want to install Grub.
+  # boot.loader.grub.device = "/dev/vda"; # or "nodev" for efi only
   # boot.loader.grub.efiSupport = true;
   # boot.loader.grub.efiInstallAsRemovable = true;
   # boot.loader.efi.efiSysMountPoint = "/boot/efi";
-  # Define on which hard drive you want to install Grub.
-  #boot.loader.grub.device = "/dev/vda"; # or "nodev" for efi only
 
-  networking.hostName = "nixos"; # Define your hostname.
-  # Pick only one of the below networking options.
-  # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
-  networking.networkmanager.enable = true; # Easiest to use and most distros use this by default.
+  networking.hostName = "nixos";
+  networking.networkmanager.enable = true;
   networking.firewall.enable = false;
-  #config.networking.nftables.enable = false;
 
-  # Set your time zone.
   time.timeZone = "Europe/Helsinki";
 
-  # Configure network proxy if necessary
-  # networking.proxy.default = "http://user:password@proxy:port/";
-  # networking.proxy.noProxy = "127.0.0.1,localhost,internal.domain";
-
-  # Select internationalisation properties.
   i18n.defaultLocale = "en_US.UTF-8";
   console = {
     # font = "Lat2-Terminus16";
     font = "${pkgs.terminus_font}/share/consolefonts/ter-732b.psf.gz";
-    # keyMap = "us";
-    useXkbConfig = true; # use xkbOptions in tty.
+    useXkbConfig = true;
   };
 
   services.openssh.enable = true;
@@ -93,16 +69,18 @@
     videoDrivers = ["nvidia"];
   };
 
-  #services.xserver.displayManager = {
-  #lightdm.enable = true;
-  #startx.enable = true;
-  #setupCommands = "${pkgs.xorg.xrandr}/bin/xrandr --output Virtual-1 --primary --mode 1920x1080";
-  #};
+  # services.xserver.displayManager = {
+  #   lightdm.enable = true;
+  #   startx.enable = true;
+  #   setupCommands = "${pkgs.xorg.xrandr}/bin/xrandr --output Virtual-1 --primary --mode 1920x1080";
+  # };
 
   services.xserver.displayManager.sddm = {
-    enable = true;
+    enable = false;
     theme = "tokyo-night-sddm";
   };
+
+  services.xserver.displayManager.gdm.enable = true;
 
   hardware = {
     opengl.enable = true;
@@ -156,6 +134,7 @@
     XDG_SESSION_DESKTOP = "Hyprland";
     WLR_NO_HARDWARE_CURSORS = "1";
   };
+
   nixpkgs.config.packageOverrides = pkgs: {
     steam = pkgs.steam.override {
       extraPkgs = pkgs:
@@ -174,58 +153,42 @@
     };
   };
 
-  # Enable touchpad support (enabled default in most desktopManager).
-  # services.xserver.libinput.enable = true;
-
-  # Define a user account. Don't forget to set a password with ‘passwd’.
-  # users.users.alice = {
-  #   isNormalUser = true;
-  #   extraGroups = [ "wheel" ]; # Enable ‘sudo’ for the user.
-  #   packages = with pkgs; [
-  #     firefox
-  #     tree
-  #   ];
-  # };
-
-  # List packages installed in system profile. To search, run:
-  # $ nix search wget
   environment.systemPackages = with pkgs; [
     (builtins.getFlake "github:fortuneteller2k/nixpkgs-f2k/9773e93c3b81d645aabb95b8635a8c512e17aa3b").packages.${system}.awesome-git
-    home-manager
+    (libsForQt5.callPackage ../derivatives/tokyo-night-sddm.nix {})
+    alsa-utils
     dunst
     fd
     ffmpeg
     file
     git
-    inputs.agenix.packages.${system}.default
+    home-manager
     htop
+    inputs.agenix.packages.${system}.default
     killall
     lf
     libnotify
+    libsForQt5.qt5.qtbase
+    libsForQt5.qt5.qtgraphicaleffects
+    libsForQt5.qt5.qtquickcontrols2
+    libsForQt5.qt5.qtsvg
     lua5_4_compat
+    lxsession
+    neovim
+    pavucontrol
     ripgrep
     rofi
+    swaybg
     sxhkd
     trash-cli
     unzip
     vim
-    wget
-    xclip
-    neovim
     virt-manager
-    lxsession
-    pavucontrol
-    wofi
-    (libsForQt5.callPackage ../derivatives/tokyo-night-sddm.nix {})
-    libsForQt5.qt5.qtgraphicaleffects
-    libsForQt5.qt5.qtbase
-    libsForQt5.qt5.qtquickcontrols2
-    libsForQt5.qt5.qtsvg
+    wget
     wl-clipboard
-    swaybg
-    alsa-utils
     wlogout
-    xdg-desktop-portal-hyprland
+    wofi
+    xclip
   ];
 
   fonts.fonts = with pkgs; [
@@ -341,30 +304,6 @@
   systemd.extraConfig = ''
     DefaultTimeoutStopSec=5s
   '';
-
-  # Some programs need SUID wrappers, can be configured further or are
-  # started in user sessions.
-  # programs.mtr.enable = true;
-  # programs.gnupg.agent = {
-  #   enable = true;
-  #   enableSSHSupport = true;
-  # };
-
-  # List services that you want to enable:
-
-  # Enable the OpenSSH daemon.
-  # services.openssh.enable = true;
-
-  # Open ports in the firewall.
-  # networking.firewall.allowedTCPPorts = [ ... ];
-  # networking.firewall.allowedUDPPorts = [ ... ];
-  # Or disable the firewall altogether.
-  # networking.firewall.enable = false;
-
-  # Copy the NixOS configuration file and link it from the resulting system
-  # (/run/current-system/configuration.nix). This is useful in case you
-  # accidentally delete configuration.nix.
-  # system.copySystemConfiguration = true;
 
   # This value determines the NixOS release from which the default
   # settings for stateful data, like file locations and database versions

@@ -34,6 +34,8 @@
     mpv
     keepassxc
     anki
+    qalculate-gtk
+    yt-dlp
     (builtins.getFlake "github:Duckonaut/split-monitor-workspaces/b719a7b73199d2b0e24694183daa3714c4cced44").packages.${system}.split-monitor-workspaces
     (builtins.getFlake "github:sopa0/hyprsome/9636be05ef20fbe473709cc3913b5bbf735eb4f3").packages.${system}.default
   ];
@@ -92,7 +94,6 @@
 
       # Execute your favorite apps at launch
       # exec-once = waybar & hyprpaper & firefox
-      exec-once = waybar
 
       # Source a file (multi-file configs)
       # source = ~/.config/hypr/myColors.conf
@@ -186,6 +187,7 @@
       # Example windowrule v2
       # windowrulev2 = float,class:^(kitty)$,title:^(kitty)$
       # See https://wiki.hyprland.org/Configuring/Window-Rules/ for more
+      windowrule = float, qalculate-gtk
 
 
       # See https://wiki.hyprland.org/Configuring/Keywords/ for more
@@ -200,6 +202,8 @@
       bind = $mainMod, P, exec, wofi --show drun
       #bind = $mainMod, P, pseudo, # dwindle
       #bind = $mainMod, J, togglesplit, # dwindle
+
+      bind = $mainMod, F, fullscreen
 
       # Move focus with mainMod + arrow keys
       bind = $mainMod, left, movefocus, l
@@ -271,6 +275,13 @@
       package = pkgs.tokyo-night-gtk;
       name = "Tokyonight-Storm-B";
     };
+  };
+
+  qt = {
+    enable = true;
+    platformTheme = "gtk";
+    style.name = "adwaita-dark";
+    style.package = pkgs.adwaita-qt;
   };
 
   home.pointerCursor = {
@@ -380,13 +391,15 @@
         # ${pkgs.feh}/bin/feh --randomize --bg-scale /home/kiipuri/wallpapers --no-fehbg &
         # ${pkgs.iproute2}/bin/ifstat -t 1 -d 1 &
         ${pkgs.swaybg}/bin/swaybg -i $(cd ~/wallpapers && ${pkgs.coreutils}/bin/ls | ${pkgs.coreutils}/bin/shuf | ${pkgs.coreutils}/bin/head -n1 | ${pkgs.findutils}/bin/xargs ${pkgs.coreutils}/bin/realpath) -m stretch &
-
       ''}";
+
       ExecStop = "${pkgs.writeShellScript "autorun-stop" ''
         # ${pkgs.copyq}/bin/copyq exit
-        ${pkgs.procps}/bin/pkill ${pkgs.iproute2}/bin/ifstat
-        ${pkgs.procps}/bin/pkill ${pkgs.swaybg}/bin/swaybg
+        ${pkgs.procps}/bin/pkill -f ${pkgs.iproute2}/bin/ifstat
+        ${pkgs.procps}/bin/pkill -f ${pkgs.swaybg}/bin/swaybg
       ''}";
+
+      Type = "forking";
     };
   };
 
