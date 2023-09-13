@@ -18,9 +18,6 @@
     # everything match nicely? Try nix-colors!
     nix-colors.url = "github:misterio77/nix-colors";
 
-    agenix.url = "github:ryantm/agenix";
-    agenix.inputs.nixpkgs.follows = "nixpkgs";
-
     hyprland.url = "github:hyprwm/Hyprland";
     waybar-git.url = "github:Alexays/Waybar";
   };
@@ -28,7 +25,6 @@
   outputs = {
     nixpkgs,
     home-manager,
-    agenix,
     hyprland,
     waybar-git,
     ...
@@ -42,7 +38,6 @@
         # > Our main nixos configuration file <
         modules = [
           ./nixos/configuration.nix
-          agenix.nixosModules.default
         ];
       };
     };

@@ -52,10 +52,33 @@
 
   time.timeZone = "Europe/Helsinki";
 
+  fileSystems = {
+    "/mnt/artix" = {
+      device = "/dev/disk/by-label/ROOT";
+      fsType = "btrfs";
+    };
+    "/mnt/hdd" = {
+      device = "/dev/disk/by-label/HDD";
+      fsType = "ext4";
+    };
+    "/mnt/hdd2" = {
+      device = "/dev/disk/by-label/HDD2";
+      fsType = "ext4";
+    };
+  };
+
   i18n.defaultLocale = "en_US.UTF-8";
+  i18n.inputMethod = {
+    enabled = "fcitx5";
+    fcitx5.addons = with pkgs; [
+      fcitx5-mozc
+      fcitx5-gtk
+    ];
+  };
+
   console = {
-    # font = "Lat2-Terminus16";
-    font = "${pkgs.terminus_font}/share/consolefonts/ter-732b.psf.gz";
+    packages = with pkgs; [terminus_font];
+    font = "ter-128b";
     useXkbConfig = true;
   };
 
@@ -75,16 +98,20 @@
   #   setupCommands = "${pkgs.xorg.xrandr}/bin/xrandr --output Virtual-1 --primary --mode 1920x1080";
   # };
 
-  services.xserver.displayManager.sddm = {
-    enable = false;
-    theme = "tokyo-night-sddm";
-  };
+  # services.xserver.displayManager.sddm = {
+  #   enable = false;
+  #   theme = "tokyo-night-sddm";
+  # };
 
   services.xserver.displayManager.gdm.enable = true;
 
   hardware = {
     opengl.enable = true;
     nvidia.modesetting.enable = true;
+    opentabletdriver = {
+      enable = true;
+      daemon.enable = true;
+    };
   };
 
   services.xserver.windowManager = {
@@ -164,7 +191,6 @@
     git
     home-manager
     htop
-    inputs.agenix.packages.${system}.default
     killall
     lf
     libnotify
@@ -222,6 +248,7 @@
       bindkey -M menuselect 'l' vi-forward-char
 
       source "$HOME/.config/lf/lfcd"
+      eval "$(zoxide init zsh)"
     '';
 
     promptInit = ''
@@ -264,20 +291,12 @@
   };
 
   users.mutableUsers = false;
-  users.users.root.password = "pass";
-  age.secrets.password.file = ../secrets/password.age;
-  age.secrets.id_ed25519 = {
-    file = ../secrets/id_ed25519.age;
-    path = "/home/kiipuri/.ssh";
-    owner = "kiipuri";
-    group = "users";
-  };
+  users.users.root.hashedPassword = "$y$j9T$orXQD6ZLWsh8O8p0fyrsL1$eSwLvuV/xbCJC3Uq7pHw6SWS9pLC7vLOuqjeJzo1Nd3";
 
   users.users.kiipuri = {
     isNormalUser = true;
     shell = pkgs.zsh;
-    password = "pass";
-    # passwordFile = config.age.secrets.password.path;
+    hashedPassword = "$y$j9T$99Ie.QqXuV29Pgasvfpfa0$x4yJlYAvWERYxw3Vbbo8.xqHfvSUkzueJqOMUtpT9V1";
     extraGroups = ["wheel"];
   };
 
