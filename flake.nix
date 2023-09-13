@@ -4,10 +4,10 @@
   inputs = {
     # Nixpkgs
     nixpkgs.url = "github:nixos/nixpkgs/nixos-23.05";
+    nixpkgs-unstable.url = "github:nixos/nixpkgs/nixpkgs-unstable";
 
     # Home manager
-    home-manager.url = "github:nix-community/home-manager/release-23.05";
-    home-manager.inputs.nixpkgs.follows = "nixpkgs";
+    home-manager.url = "github:nix-community/home-manager";
 
     # TODO: Add any other flake you might need
     # hardware.url = "github:nixos/nixos-hardware";
@@ -24,11 +24,15 @@
 
   outputs = {
     nixpkgs,
+    nixpkgs-unstable,
     home-manager,
     hyprland,
     waybar-git,
     ...
-  } @ inputs: {
+  } @ inputs: let
+    system = "x86_64-linux";
+    unstable = import nixpkgs-unstable {inherit system;};
+  in {
     # NixOS configuration entrypoint
     # Available through 'nixos-rebuild --flake .#your-hostname'
     nixosConfigurations = {
@@ -48,7 +52,7 @@
       # FIXME replace with your username@hostname
       "kiipuri@nixos" = home-manager.lib.homeManagerConfiguration {
         pkgs = nixpkgs.legacyPackages.x86_64-linux; # Home-manager requires 'pkgs' instance
-        extraSpecialArgs = {inherit inputs;}; # Pass flake inputs to our config
+        extraSpecialArgs = {inherit inputs unstable;}; # Pass flake inputs to our config
         # > Our main home-manager configuration file <
         modules = [
           ./home-manager/home.nix

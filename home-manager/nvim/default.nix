@@ -342,6 +342,7 @@ in {
           eslint.enable = true;
           tsserver.enable = true;
           lua-ls.enable = true;
+          omnisharp.enable = true;
         };
       };
 

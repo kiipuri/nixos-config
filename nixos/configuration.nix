@@ -119,6 +119,8 @@
     awesome.package = pkgs.awesome-git;
   };
 
+  services.jellyfin.enable = true;
+
   programs.hyprland = {
     enable = true;
     nvidiaPatches = true;
@@ -198,9 +200,11 @@
     libsForQt5.qt5.qtgraphicaleffects
     libsForQt5.qt5.qtquickcontrols2
     libsForQt5.qt5.qtsvg
+    libsForQt5.fcitx5-qt
     lua5_4_compat
     lxsession
     neovim
+    jellyfin-mpv-shim
     pavucontrol
     ripgrep
     rofi
