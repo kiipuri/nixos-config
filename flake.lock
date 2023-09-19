@@ -258,12 +258,12 @@
       },
       "locked": {
         "lastModified": 1,
-        "narHash": "sha256-0Sd7+bbbF808dAeql65MC8LO6nOx6vzOlMTGwPCndL8=",
-        "path": "/nix/store/mg0zim7bz86aj0ivnijqzxc8y8vlx3ns-source/home-manager/nvim",
+        "narHash": "sha256-DHaaRnqYUhm25Wd9ITEYoCIzCRVAzxfWSVp78RQ99j4=",
+        "path": "/nix/store/andgwhb47byq3x2pri880v1bk66aib9h-source/home-manager/nvim",
         "type": "path"
       },
       "original": {
-        "path": "/nix/store/mg0zim7bz86aj0ivnijqzxc8y8vlx3ns-source/home-manager/nvim",
+        "path": "/nix/store/andgwhb47byq3x2pri880v1bk66aib9h-source/home-manager/nvim",
         "type": "path"
       }
     },

@@ -4,10 +4,33 @@
   lib,
   ...
 }: let
-  inherit (lib) mkEnableOption mkOption types;
-  cfg = config.programs.nixvim.colorschemes.nix-colors;
+  inherit (lib) mkEnableOption;
+  inherit (pkgs.vimUtils) buildVimPluginFrom2Nix;
+  inherit (pkgs) fetchFromGitHub;
   theme = config.colorScheme;
   inherit (theme) colors;
+  configString = import ./config/config.nix;
+
+  fileTypes = [
+    "nix"
+    "javascript"
+    "typescript"
+    "typescriptreact"
+  ];
+
+  fileOpts = builtins.listToAttrs (
+    builtins.map (f: {
+      name = "ftplugin/${f}.lua";
+      value = {
+        options = {
+          tabstop = 2;
+          shiftwidth = 2;
+          expandtab = true;
+        };
+      };
+    })
+    fileTypes
+  );
 in {
   options = {
     programs.nixvim.colorschemes.nix-colors = {
@@ -29,7 +52,6 @@ in {
         cursorline = true;
         signcolumn = "yes";
         cmdheight = 2;
-        # cot = ["menu" "menuone" "noselect"];
         updatetime = 100;
         listchars = "tab:>-,lead:·,nbsp:␣,trail:•";
         timeout = true;
@@ -37,21 +59,218 @@ in {
         clipboard = "unnamedplus";
       };
 
-      extraConfigLua =
-        ''
-          local base16 = require("base16-colorscheme")
-          base16.setup({
-            base00 = "#${colors.base00}", base01 = "#${colors.base01}", base02 = "#${colors.base02}",
-            base03 = "#${colors.base03}", base04 = "#${colors.base04}", base05 = "#${colors.base05}",
-            base06 = "#${colors.base06}", base07 = "#${colors.base07}", base08 = "#${colors.base08}",
-            base09 = "#${colors.base09}", base0A = "#${colors.base0A}", base0B = "#${colors.base0B}",
-            base0C = "#${colors.base0C}", base0D = "#${colors.base0D}", base0E = "#${colors.base0E}",
-            base0F = "#${colors.base0F}"
-          })
+      colorschemes.base16 = {
+        enable = true;
+      };
 
-          local colors = base16.colors
-        ''
-        + builtins.readFile ./config.lua;
+      plugins = {
+        floaterm.enable = true;
+
+        markdown-preview.enable = true;
+
+        null-ls = {
+          enable = true;
+          sources = {
+            diagnostics = {
+              shellcheck.enable = true;
+              statix.enable = true;
+            };
+            code_actions = {
+              shellcheck.enable = true;
+              gitsigns.enable = false;
+            };
+            formatting = {
+              alejandra.enable = true;
+              black.enable = true;
+              stylua.enable = true;
+              prettier.enable = true;
+            };
+          };
+          onAttach = ''
+            function(client, bufnr)
+              if client.supports_method("textDocument/formatting") then
+                vim.api.nvim_create_autocmd("BufWritePre", {
+                  buffer = bufnr,
+                  callback = function()
+                    vim.lsp.buf.format()
+                  end,
+                })
+              end
+            end
+          '';
+        };
+
+        gitsigns.enable = true;
+
+        luasnip.enable = true;
+        telescope = {
+          enable = true;
+          enabledExtensions = ["ui-select"];
+          extensionConfig = {
+            ui-select = {
+              __raw = ''
+                  require("telescope.themes").get_dropdown {
+                  -- even more opts
+                }
+              '';
+            };
+          };
+          extraOptions = {
+            defaults.layout_strategy = "vertical";
+          };
+        };
+
+        treesitter = {
+          enable = true;
+          indent = true;
+          nixvimInjections = true;
+        };
+
+        treesitter-refactor = {
+          enable = true;
+          smartRename.enable = true;
+          navigation.enable = true;
+        };
+
+        treesitter-context = {
+          enable = false;
+          maxLines = 2;
+          trimScope = "outer";
+        };
+
+        noice = {
+          enable = true;
+
+          lsp.signature.enabled = false;
+          lsp.override = {
+            "vim.lsp.util.convert_input_to_markdown_lines" = true;
+            "vim.lsp.util.stylize_markdown" = true;
+            "cmp.entry.get_documentation" = true;
+          };
+          presets = {
+            bottom_search = true;
+            command_palette = true;
+            long_message_to_split = true;
+            inc_rename = true;
+            lsp_doc_border = false;
+          };
+        };
+
+        harpoon.enable = true;
+        comment-nvim.enable = true;
+
+        indent-blankline = {
+          enable = true;
+          useTreesitter = true;
+          showCurrentContext = true;
+          showCurrentContextStart = false;
+        };
+
+        lsp = {
+          enable = true;
+          servers = {
+            nil_ls = {
+              enable = true;
+              settings = {
+                formatting.command = ["alejandra" "--quiet"];
+              };
+            };
+            bashls.enable = true;
+            eslint.enable = true;
+            tsserver.enable = true;
+            lua-ls.enable = true;
+            omnisharp.enable = true;
+          };
+        };
+
+        lspkind = {
+          enable = true;
+          cmp = {
+            enable = true;
+          };
+        };
+
+        nvim-lightbulb = {
+          enable = true;
+          autocmd.enabled = true;
+        };
+
+        nvim-autopairs = {
+          enable = true;
+        };
+
+        inc-rename.enable = true;
+        trouble.enable = true;
+        which-key.enable = true;
+        nvim-colorizer.enable = true;
+        surround.enable = true;
+        lualine.enable = true;
+        neo-tree.enable = true;
+        nvim-cmp = {
+          enable = true;
+
+          snippet.expand = "luasnip";
+
+          mapping = {
+            "<CR>" = "cmp.mapping.confirm({select = true })";
+            "<C-d>" = "cmp.mapping.scroll_docs(-4)";
+            "<C-f>" = "cmp.mapping.scroll_docs(4)";
+            "<C-Space>" = "cmp.mapping.complete()";
+            # "<Tab>" = ''
+            #   cmp.mapping(function(fallback)
+            #     if cmp.visible() then
+            #       cmp.select_next_item()
+            #     -- You could replace the expand_or_jumpable() calls with expand_or_locally_jumpable()
+            #     -- they way you will only jump inside the snippet region
+            #     elseif luasnip.expand_or_locally_jumpable() then
+            #       luasnip.expand_or_jump()
+            #     elseif has_words_before() then
+            #       cmp.complete()
+            #     else
+            #       fallback()
+            #     end
+            #   end, { "i", "s" })
+            # '';
+            "<S-Tab>" = ''
+              cmp.mapping(function(fallback)
+                if cmp.visible() then
+                  cmp.select_prev_item()
+                elseif luasnip.jumpable(-1) then
+                  luasnip.jump(-1)
+                else
+                  fallback()
+                end
+              end, { "i", "s" })
+            '';
+            "<C-j>" = "cmp.mapping(cmp.mapping.select_next_item({ behavior = cmp.SelectBehavior.Select }), {'i'})";
+            "<C-k>" = "cmp.mapping(cmp.mapping.select_prev_item({ behavior = cmp.SelectBehavior.Select }), {'i'})";
+          };
+
+          sources = [
+            {name = "luasnip";}
+            {name = "nvim_lsp";}
+            {name = "path";}
+            {name = "buffer";}
+            {name = "calc";}
+            {name = "zsh";}
+          ];
+        };
+      };
+
+      extraConfigLua = ''
+        local base16 = require("base16-colorscheme")
+        base16.setup({
+          base00 = "#${colors.base00}", base01 = "#${colors.base01}", base02 = "#${colors.base02}",
+          base03 = "#${colors.base03}", base04 = "#${colors.base04}", base05 = "#${colors.base05}",
+          base06 = "#${colors.base06}", base07 = "#${colors.base07}", base08 = "#${colors.base08}",
+          base09 = "#${colors.base09}", base0A = "#${colors.base0A}", base0B = "#${colors.base0B}",
+          base0C = "#${colors.base0C}", base0D = "#${colors.base0D}", base0E = "#${colors.base0E}",
+          base0F = "#${colors.base0F}"
+        })
+
+        local colors = base16.colors
+        ${configString}
+      '';
 
       globals = {
         mapleader = " ";
@@ -60,14 +279,21 @@ in {
       extraPlugins = with pkgs.vimPlugins; [
         telescope-ui-select-nvim
         vim-snippets
-        markdown-preview-nvim
-        nvim-base16
         vim-illuminate
-        lualine-nvim
         nvim-web-devicons
         neoscroll-nvim
-        vim-surround
-        null-ls-nvim
+        lsp_signature-nvim
+        nvim-notify
+        (buildVimPluginFrom2Nix {
+          pname = "tabout.nvim";
+          version = "2023-09-18";
+          src = fetchFromGitHub {
+            owner = "abecodes";
+            repo = "tabout.nvim";
+            rev = "0d275c8d25f32457e67b5c66d6ae43f26a61bce5";
+            sha256 = "sha256-Ltys1BVWWBHuv1GOCFQ0wMYf36feRRePAiH85tbx9Ic=";
+          };
+        })
       ];
 
       maps.normal = {
@@ -75,9 +301,15 @@ in {
         "<leader>ls" = "<cmd>lua vim.diagnostic.open_float()<cr>";
         "<leader>lc" = "<cmd>lua vim.lsp.buf.code_action()<cr>";
         "<leader>lh" = "<cmd>lua vim.lsp.buf.hover()<cr>";
+        "<leader>lr" = "<cmd>lua vim.lsp.buf.rename()<cr>";
+
         "<leader>e" = "<cmd>Telescope diagnostics<cr>";
-        "<leader>ff" = "<cmd>Telescope find_files<cr>";
-        "<leader>fg" = "<cmd>Telescope git_files<cr>";
+        "<leader>tf" = "<cmd>Telescope find_files<cr>";
+        "<leader>tg" = "<cmd>Telescope git_files<cr>";
+        "<leader>ts" = "<cmd>Telescope lsp_document_symbols<cr>";
+        "<leader>tb" = "<cmd>Telescope buffers<cr>";
+        "<leader>tr" = "<cmd>Telescope lsp_references<cr>";
+        "<leader>tl" = "<cmd>Telescope live_grep<cr>";
 
         "<leader>jf" = "<cmd>lua require'harpoon.ui'.nav_file(1)<cr>";
         "<leader>jd" = "<cmd>lua require'harpoon.ui'.nav_file(2)<cr>";
@@ -86,77 +318,20 @@ in {
         "<leader>jm" = "<cmd>lua require'harpoon.mark'.add_file()<cr>";
         "<leader>jt" = "<cmd>lua require'harpoon.ui'.toggle_quick_menu()<cr>";
 
+        "<leader>f" = "<cmd>FloatermToggle<cr>";
+
+        "<leader>n" = "<cmd>Neotree toggle float<cr>";
+
         "<leader>h" = "<cmd>noh<cr>";
-      };
-      #maps.normal = helpers.mkModeMaps {silent = true;} {
-      #"ft" = "<cmd>Neotree<CR>";
-      #"fG" = "<cmd>Neotree git_status<CR>";
-      #"fR" = "<cmd>Neotree remote<CR>";
-      #"fc" = "<cmd>Neotree close<CR>";
-      #"bp" = "<cmd>Telescope buffers<CR>";
-      #
-      #"<C-s>" = "<cmd>Telescope spell_suggest<CR>";
-      #"mk" = "<cmd>Telescope keymaps<CR>";
-      #"fg" = "<cmd>Telescope git_files<CR>";
-      #
-      #"gr" = "<cmd>Telescope lsp_references<CR>";
-      #"gI" = "<cmd>Telescope lsp_implementations<CR>";
-      #"gW" = "<cmd>Telescope lsp_workspace_symbols<CR>";
-      #"gF" = "<cmd>Telescope lsp_document_symbols<CR>";
-      #"ge" = "<cmd>Telescope diagnostics bufnr=0<CR>";
-      #"gE" = "<cmd>Telescope diagnostics<CR>";
-      #
-      #"<leader>rn" = {
-      #action = ''
-      #function()
-      #return ":IncRename " .. vim.fn.expand("<cword>")
-      #end
-      #'';
-      #lua = true;
-      #expr = true;
-      #};
-      #"<leader>ld" = "<cmd>lua vim.lsp.buf.definition()<cr>";
-      #"<leader>ls" = "<cmd>lua vim.diagnostic.open_float()<cr>";
-      #"<leader>lc" = "<cmd>lua vim.lsp.buf.code_action()<cr>";
-      #"<leader>lh" = "<cmd>lua vim.lsp.buf.hover()<cr>";
-      #};
 
-      plugins.null-ls = {
-        enable = false;
-        sources = {
-          diagnostics = {
-            shellcheck.enable = true;
-            statix.enable = true;
-          };
-          code_actions = {
-            shellcheck.enable = true;
-            gitsigns.enable = false;
-          };
-          formatting = {
-            alejandra.enable = true;
-            black.enable = true;
-            stylua.enable = true;
-            prettier.enable = true;
-          };
-        };
-        onAttach = ''
-          function(client, bufnr)
-            if client.supports_method("textDocument/formatting") then
-              vim.api.nvim_create_autocmd("BufWritePre", {
-                buffer = bufnr,
-                callback = function()
-                  vim.lsp.buf.format()
-                end,
-              })
-            end
-          end
-        '';
+        "<c-j>" = "<c-w>j";
+        "<c-k>" = "<c-w>k";
+        "<c-h>" = "<c-w>h";
+        "<c-l>" = "<c-w>l";
       };
-      plugins.gitsigns.enable = true;
-      # plugins.gitmessenger.enable = true;
 
-      plugins.luasnip = {
-        enable = true;
+      maps.insert = {
+        "<c-s>" = "<cmd>lua vim.lsp.buf.signature_help()<cr>";
       };
 
       extraConfigLuaPre = ''
@@ -168,260 +343,11 @@ in {
         local luasnip = require("luasnip")
       '';
 
-      plugins.nvim-cmp = {
-        enable = true;
-
-        snippet.expand = "luasnip";
-
-        mapping = {
-          "<CR>" = "cmp.mapping.confirm({select = true })";
-          "<C-d>" = "cmp.mapping.scroll_docs(-4)";
-          "<C-f>" = "cmp.mapping.scroll_docs(4)";
-          "<C-Space>" = "cmp.mapping.complete()";
-          "<Tab>" = ''
-            cmp.mapping(function(fallback)
-              if cmp.visible() then
-                cmp.select_next_item()
-              -- You could replace the expand_or_jumpable() calls with expand_or_locally_jumpable()
-              -- they way you will only jump inside the snippet region
-              elseif luasnip.expand_or_locally_jumpable() then
-                luasnip.expand_or_jump()
-              elseif has_words_before() then
-                cmp.complete()
-              else
-                fallback()
-              end
-            end, { "i", "s" })
-          '';
-          "<S-Tab>" = ''
-            cmp.mapping(function(fallback)
-              if cmp.visible() then
-                cmp.select_prev_item()
-              elseif luasnip.jumpable(-1) then
-                luasnip.jump(-1)
-              else
-                fallback()
-              end
-            end, { "i", "s" })
-          '';
-          "<C-j>" = "cmp.mapping(cmp.mapping.select_next_item({ behavior = cmp.SelectBehavior.Select }), {'i'})";
-          "<C-k>" = "cmp.mapping(cmp.mapping.select_prev_item({ behavior = cmp.SelectBehavior.Select }), {'i'})";
-        };
-
-        sources = [
-          {name = "luasnip";}
-          {name = "nvim_lsp";}
-          {name = "path";}
-          {name = "buffer";}
-          {name = "calc";}
-          {name = "zsh";}
-        ];
-      };
-
-      plugins.telescope = {
-        enable = true;
-        enabledExtensions = ["ui-select"];
-        extensionConfig = {
-          ui-select = {
-            __raw = ''
-                require("telescope.themes").get_dropdown {
-                -- even more opts
-              }
-            '';
-          };
-        };
-        extraOptions = {
-          defaults.layout_strategy = "vertical";
-        };
-      };
-
-      plugins.treesitter = {
-        enable = true;
-        indent = true;
-
-        nixvimInjections = true;
-
-        #grammarPackages = with config.plugins.treesitter.package.passthru.builtGrammars; [
-        #arduino
-        #bash
-        #c
-        #cpp
-        #cuda
-        #dart
-        #devicetree
-        #diff
-        #dockerfile
-        #gitattributes
-        #gitcommit
-        #gitignore
-        #git_rebase
-        #html
-        #ini
-        #json
-        #lalrpop
-        #latex
-        #lua
-        #make
-        #markdown
-        #markdown_inline
-        #meson
-        #ninja
-        #nix
-        #python
-        #regex
-        #rst
-        #rust
-        #slint
-        #sql
-        #tlaplus
-        #toml
-        #vim
-        #vimdoc
-        #yaml
-        #];
-      };
-
-      plugins.treesitter-refactor = {
-        enable = true;
-        smartRename = {
-          enable = true;
-        };
-        navigation = {
-          enable = true;
-        };
-      };
-
-      plugins.treesitter-context = {
-        enable = false;
-        maxLines = 2;
-        trimScope = "outer";
-      };
-
-      plugins.harpoon.enable = true;
-
-      plugins.comment-nvim = {
-        enable = true;
-      };
-
-      plugins.neo-tree = {
-        enable = true;
-      };
-
-      plugins.indent-blankline = {
-        enable = true;
-
-        useTreesitter = true;
-
-        showCurrentContext = true;
-        showCurrentContextStart = false;
-      };
-
-      plugins.lsp = {
-        enable = true;
-
-        # keymaps = {
-        #   silent = true;
-        #
-        #   lspBuf = {
-        #     "gd" = "definition";
-        #     "gD" = "declaration";
-        #     "ca" = "code_action";
-        #     "ff" = "format";
-        # "K" = "hover";
-        #   };
-        # };
-
-        servers = {
-          nil_ls = {
-            enable = true;
-            settings = {
-              formatting.command = ["alejandra" "--quiet"];
-            };
-          };
-          bashls.enable = true;
-          eslint.enable = true;
-          tsserver.enable = true;
-          lua-ls.enable = true;
-          omnisharp.enable = true;
-        };
-      };
-
-      plugins.lspkind = {
-        enable = true;
-        cmp = {
-          enable = true;
-        };
-      };
-
-      plugins.nvim-lightbulb = {
-        enable = true;
-        autocmd.enabled = true;
-      };
-
-      #plugins.lsp_signature = {
-      #enable = true;
-      #};
-
-      plugins.inc-rename = {
-        enable = true;
-      };
-
-      plugins.trouble = {
-        enable = true;
-      };
-
       extraConfigLuaPost = ''
         require("luasnip.loaders.from_snipmate").lazy_load()
-
-        -- local null_ls = require("null-ls")
-        -- null_ls.setup({
-        --   sources = {
-        --     -- null_ls.builtins.formatting.shfmt.with({
-        --     --   extra_args = { "-i", "4", "-s", "-ci", "-sr" },
-        --     -- }),
-        --     null_ls.builtins.formatting.alejandra,
-        --     null_ls.builtins.formatting.stylua,
-        --     null_ls.builtins.formatting.prettier,
-        --     null_ls.builtins.formatting.black,
-        --
-        --     null_ls.builtins.diagnostics.shellcheck,
-        --     null_ls.builtins.diagnostics.statix,
-        --     null_ls.builtins.diagnostics.selene,
-        --
-        --     null_ls.builtins.code_actions.shellcheck,
-        --     null_ls.builtins.code_actions.gitsigns,
-        --   }
-        -- })
-          -- diagnostics = {
-          --   shellcheck.enable = true;
-          --   statix.enable = true;
-          -- };
-          -- code_actions = {
-          --   shellcheck.enable = true;
-          --   gitsigns.enable = false;
-          -- };
-          -- formatting = {
-          --   alejandra.enable = true;
-          --   black.enable = true;
-          --   stylua.enable = true;
-          --   #shfmt.enable = true;
-          --   prettier.enable = true;
-          -- };
-        -- local null_ls = require("null-ls")
-        --
-        -- local helpers = require("null-ls.helpers")
       '';
 
-      plugins.which-key.enable = true;
-      plugins.nvim-colorizer.enable = true;
-
-      files."ftplugin/nix.lua" = {
-        options = {
-          tabstop = 2;
-          shiftwidth = 2;
-          expandtab = true;
-        };
-      };
+      files = fileOpts;
     };
   };
 }

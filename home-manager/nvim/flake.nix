@@ -6,14 +6,12 @@
 
   outputs = {
     self,
-    nixpkgs,
     nixvim,
     flake-utils,
   }: let
     module = {
       imports = [
         ./default.nix
-        ./autocmd.nix
         ./plugins/lsp-signature.nix
       ];
     };
