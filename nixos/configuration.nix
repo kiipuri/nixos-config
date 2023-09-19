@@ -3,6 +3,7 @@
   lib,
   config,
   pkgs,
+  stable,
   ...
 }: {
   imports = [
@@ -36,9 +37,11 @@
     (builtins.getFlake "github:fortuneteller2k/nixpkgs-f2k/9773e93c3b81d645aabb95b8635a8c512e17aa3b").overlays.default
   ];
 
-  boot.loader.systemd-boot.enable = true;
-  boot.loader.efi.canTouchEfiVariables = true;
-  boot.resumeDevice = "/dev/disk/by-partlabel/SWAP";
+  boot = {
+    loader.systemd-boot.enable = true;
+    loader.efi.canTouchEfiVariables = true;
+    resumeDevice = "/dev/disk/by-partlabel/SWAP";
+  };
   # boot.loader.grub.enable = true;
   # Define on which hard drive you want to install Grub.
   # boot.loader.grub.device = "/dev/vda"; # or "nodev" for efi only
@@ -46,9 +49,11 @@
   # boot.loader.grub.efiInstallAsRemovable = true;
   # boot.loader.efi.efiSysMountPoint = "/boot/efi";
 
-  networking.hostName = "nixos";
-  networking.networkmanager.enable = true;
-  networking.firewall.enable = false;
+  networking = {
+    hostName = "nixos";
+    networkmanager.enable = true;
+    firewall.enable = false;
+  };
 
   time.timeZone = "Europe/Helsinki";
 
@@ -82,28 +87,37 @@
     useXkbConfig = true;
   };
 
-  services.openssh.enable = true;
+  services = {
+    openssh.enable = true;
 
-  services.xserver = {
-    enable = true;
-    layout = "us";
-    xkbVariant = "de_se_fi";
-    xkbOptions = "caps:escape";
-    videoDrivers = ["nvidia"];
+    xserver = {
+      enable = true;
+      layout = "us";
+      xkbVariant = "de_se_fi";
+      xkbOptions = "caps:escape";
+      videoDrivers = ["nvidia"];
+    };
+
+    # xserver.displayManager = {
+    #   lightdm.enable = true;
+    #   startx.enable = true;
+    #   setupCommands = "${pkgs.xorg.xrandr}/bin/xrandr --output Virtual-1 --primary --mode 1920x1080";
+    # };
+
+    xserver.displayManager.sddm = {
+      enable = false;
+      theme = "tokyo-night-sddm";
+    };
+
+    xserver.displayManager.gdm.enable = true;
+
+    xserver.windowManager = {
+      awesome.enable = true;
+      awesome.package = pkgs.awesome-git;
+    };
+
+    jellyfin.enable = true;
   };
-
-  # services.xserver.displayManager = {
-  #   lightdm.enable = true;
-  #   startx.enable = true;
-  #   setupCommands = "${pkgs.xorg.xrandr}/bin/xrandr --output Virtual-1 --primary --mode 1920x1080";
-  # };
-
-  # services.xserver.displayManager.sddm = {
-  #   enable = false;
-  #   theme = "tokyo-night-sddm";
-  # };
-
-  services.xserver.displayManager.gdm.enable = true;
 
   hardware = {
     opengl.enable = true;
@@ -114,38 +128,42 @@
     };
   };
 
-  services.xserver.windowManager = {
-    awesome.enable = true;
-    awesome.package = pkgs.awesome-git;
+  programs = {
+    hyprland = {
+      enable = true;
+      enableNvidiaPatches = true;
+      xwayland.enable = false;
+    };
+
+    # waybar = {
+    #   enable = true;
+    #   package = inputs.waybar-git.packages.${pkgs.system}.default;
+    # };
+
+    noisetorch.enable = true;
   };
 
-  services.jellyfin.enable = true;
+  security = {
+    rtkit.enable = true;
+    polkit.enable = true;
+    protectKernelImage = false;
+    pam.services.swaylock.text = ''
+      auth include login
+    '';
+  };
 
-  programs.hyprland = {
+  hardware.pulseaudio = {
     enable = true;
-    nvidiaPatches = true;
-    xwayland.enable = false;
+    support32Bit = true;
   };
 
-  programs.waybar = {
-    enable = true;
-    package = inputs.waybar-git.packages.${pkgs.system}.default;
-  };
-
-  programs.noisetorch.enable = true;
-
-  security.rtkit.enable = true;
-  security.polkit.enable = true;
-  security.protectKernelImage = false;
-  security.pam.services.swaylock.text = ''
-    auth include login
-  '';
-  services.pipewire = {
-    enable = true;
-    alsa.enable = true;
-    alsa.support32Bit = true;
-    pulse.enable = true;
-  };
+  # services.pipewire = {
+  #   enable = true;
+  #   package = stable.pipewire;
+  #   alsa.enable = true;
+  #   alsa.support32Bit = true;
+  #   pulse.enable = true;
+  # };
 
   programs.steam = {
     enable = true;
@@ -153,15 +171,56 @@
   };
   programs.gamescope.enable = true;
 
-  environment.sessionVariables = {
-    GDK_BACKEND = "wayland,x11";
-    QT_QPA_PLATFORM = "wayland;xcb";
-    #SDL_VIDEODRIVER = "x11";
-    CLUTTER_BACKEND = "wayland";
-    XDG_CURRENT_DESKTOP = "Hyprland";
-    XDG_SESSION_TYPE = "wayland";
-    XDG_SESSION_DESKTOP = "Hyprland";
-    WLR_NO_HARDWARE_CURSORS = "1";
+  environment = {
+    sessionVariables = {
+      GDK_BACKEND = "wayland,x11";
+      QT_QPA_PLATFORM = "wayland;xcb";
+      #SDL_VIDEODRIVER = "x11";
+      CLUTTER_BACKEND = "wayland";
+      XDG_CURRENT_DESKTOP = "Hyprland";
+      XDG_SESSION_TYPE = "wayland";
+      XDG_SESSION_DESKTOP = "Hyprland";
+      WLR_NO_HARDWARE_CURSORS = "1";
+    };
+
+    systemPackages = with pkgs; [
+      (builtins.getFlake "github:fortuneteller2k/nixpkgs-f2k/9773e93c3b81d645aabb95b8635a8c512e17aa3b").packages.${system}.awesome-git
+      (libsForQt5.callPackage ../derivatives/tokyo-night-sddm.nix {})
+      alsa-utils
+      dunst
+      fd
+      ffmpeg
+      file
+      docker-compose
+      git
+      home-manager
+      htop
+      killall
+      lf
+      libnotify
+      libsForQt5.qt5.qtbase
+      libsForQt5.qt5.qtgraphicaleffects
+      libsForQt5.qt5.qtquickcontrols2
+      libsForQt5.qt5.qtsvg
+      libsForQt5.fcitx5-qt
+      lua5_4_compat
+      neovim
+      jellyfin-mpv-shim
+      pavucontrol
+      ripgrep
+      rofi
+      swaybg
+      sxhkd
+      trash-cli
+      unzip
+      vim
+      virt-manager
+      wget
+      wl-clipboard
+      wlogout
+      wofi
+      xclip
+    ];
   };
 
   nixpkgs.config.packageOverrides = pkgs: {
@@ -182,46 +241,7 @@
     };
   };
 
-  environment.systemPackages = with pkgs; [
-    (builtins.getFlake "github:fortuneteller2k/nixpkgs-f2k/9773e93c3b81d645aabb95b8635a8c512e17aa3b").packages.${system}.awesome-git
-    (libsForQt5.callPackage ../derivatives/tokyo-night-sddm.nix {})
-    alsa-utils
-    dunst
-    fd
-    ffmpeg
-    file
-    git
-    home-manager
-    htop
-    killall
-    lf
-    libnotify
-    libsForQt5.qt5.qtbase
-    libsForQt5.qt5.qtgraphicaleffects
-    libsForQt5.qt5.qtquickcontrols2
-    libsForQt5.qt5.qtsvg
-    libsForQt5.fcitx5-qt
-    lua5_4_compat
-    lxsession
-    neovim
-    jellyfin-mpv-shim
-    pavucontrol
-    ripgrep
-    rofi
-    swaybg
-    sxhkd
-    trash-cli
-    unzip
-    vim
-    virt-manager
-    wget
-    wl-clipboard
-    wlogout
-    wofi
-    xclip
-  ];
-
-  fonts.fonts = with pkgs; [
+  fonts.packages = with pkgs; [
     nerdfonts
     noto-fonts
     noto-fonts-cjk
@@ -240,9 +260,11 @@
     autosuggestions.enable = true;
     enableGlobalCompInit = true;
     enableCompletion = true;
-    ohMyZsh.enable = true;
-    ohMyZsh.theme = "jonathan";
-    ohMyZsh.plugins = ["vi-mode"];
+    ohMyZsh = {
+      enable = true;
+      theme = "jonathan";
+      plugins = ["vi-mode" "history-substring-search"];
+    };
     interactiveShellInit = ''
       zstyle ":completion:*" menu select
       zmodload zsh/complist
@@ -250,6 +272,9 @@
       bindkey -M menuselect 'j' vi-down-line-or-history
       bindkey -M menuselect 'k' vi-up-line-or-history
       bindkey -M menuselect 'l' vi-forward-char
+
+      bindkey -M vicmd 'k' history-substring-search-up
+      bindkey -M vicmd 'j' history-substring-search-down
 
       source "$HOME/.config/lf/lfcd"
       eval "$(zoxide init zsh)"
@@ -291,17 +316,20 @@
       sudo = "doas";
       update = "sudo nixos-rebuild switch --flake .#nixos";
       hmupdate = "home-manager switch --flake .#kiipuri@nixos";
+      ns = "NIXPKGS_ALLOW_UNFREE=1 nix-shell";
+      nsp = "NIXPKGS_ALLOW_UNFREE=1 nix-shell -p";
     };
   };
 
-  users.mutableUsers = false;
-  users.users.root.hashedPassword = "$y$j9T$orXQD6ZLWsh8O8p0fyrsL1$eSwLvuV/xbCJC3Uq7pHw6SWS9pLC7vLOuqjeJzo1Nd3";
-
-  users.users.kiipuri = {
-    isNormalUser = true;
-    shell = pkgs.zsh;
-    hashedPassword = "$y$j9T$99Ie.QqXuV29Pgasvfpfa0$x4yJlYAvWERYxw3Vbbo8.xqHfvSUkzueJqOMUtpT9V1";
-    extraGroups = ["wheel"];
+  users = {
+    mutableUsers = false;
+    users.root.hashedPassword = "$y$j9T$orXQD6ZLWsh8O8p0fyrsL1$eSwLvuV/xbCJC3Uq7pHw6SWS9pLC7vLOuqjeJzo1Nd3";
+    users.kiipuri = {
+      isNormalUser = true;
+      shell = pkgs.zsh;
+      hashedPassword = "$y$j9T$99Ie.QqXuV29Pgasvfpfa0$x4yJlYAvWERYxw3Vbbo8.xqHfvSUkzueJqOMUtpT9V1";
+      extraGroups = ["wheel"];
+    };
   };
 
   security.sudo.enable = false;
