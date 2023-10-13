@@ -8,7 +8,7 @@ local cfg = {
 
     max_height = 12,
     max_width = 80,
-    noice = true,
+    noice = false,
     wrap = true,
 
     floating_window = true,
