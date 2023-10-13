@@ -23,7 +23,6 @@ in {
       #(callPackage ./derivatives/rofi-shutdown.nix {})
       #(callPackage ./derivatives/netuse.nix {})
 
-      (builtins.getFlake "github:sopa0/hyprsome/9636be05ef20fbe473709cc3913b5bbf735eb4f3").packages.${system}.default
       anki
       dconf
       discord
@@ -34,7 +33,6 @@ in {
       lxsession
       lazygit
       librewolf
-      mpv
       neofetch
       nvtop
       qalculate-gtk
@@ -53,6 +51,18 @@ in {
   };
 
   programs = {
+    home-manager.enable = true;
+    git = {
+      enable = true;
+      userName = "kiipuri";
+      userEmail = "kiipuri@proton.me";
+    };
+    imv.enable = true;
+    broot.enable = true;
+    mpv = {
+      enable = true;
+      package = with pkgs; mpv-unwrapped.override {ffmpeg_5 = ffmpeg_6-full;};
+    };
     bat.enable = true;
     nixvim.enable = true;
     zathura.enable = true;
@@ -60,8 +70,27 @@ in {
       enable = true;
       enableZshIntegration = true;
     };
+    kitty = {
+      enable = true;
+      extraConfig = ''
+        font_family JetBrainsMono Nerd Font
+        font_size 16
+        map f1 launch --cwd=current --type=background kitty
+      '';
+      settings = {
+        foreground = "#${config.colorScheme.colors.base05}";
+        background = "#${config.colorScheme.colors.base00}";
+        window_padding_width = 10;
+        font_family = "Cascadia Code";
+        font_size = 18;
+        confirm_os_window_close = 0;
+        enable_audio_bell = "no";
+      };
+    };
     zsh = {
       enable = true;
+      dotDir = ".config/zsh";
+      history.path = "${config.xdg.dataHome}/zsh/zsh_history";
       initExtra = ''
         myprompt() {
           if [[ -n $IN_NIX_SHELL ]]; then
@@ -146,24 +175,6 @@ in {
     gtk.enable = true;
   };
 
-  programs.kitty = {
-    enable = true;
-    extraConfig = ''
-      font_family JetBrainsMono Nerd Font
-      font_size 16
-      map f1 launch --cwd=current --type=background kitty
-    '';
-    settings = {
-      foreground = "#${config.colorScheme.colors.base05}";
-      background = "#${config.colorScheme.colors.base00}";
-      window_padding_width = 10;
-      font_family = "Cascadia Code";
-      font_size = 18;
-      confirm_os_window_close = 0;
-      enable_audio_bell = "no";
-    };
-  };
-
   nixpkgs = {
     ## You can add overlays here
     #overlays = [
@@ -188,11 +199,16 @@ in {
   xdg = {
     enable = true;
     mime.enable = true;
-    configFile = {
-      lf = {
-        source = ./config/lf;
-        recursive = true;
+    mimeApps = {
+      enable = true;
+      defaultApplications = {
+        "application/pdf" = "org.pwmt.zathura.desktop";
+        "image/jpeg" = "imv.desktop";
+        "image/png" = "imv.desktop";
+        "image/webp" = "imv.desktop";
       };
+    };
+    configFile = {
       awesome = {
         source = ./config/awesome;
         recursive = true;
@@ -236,13 +252,6 @@ in {
     };
   };
 
-  programs.home-manager.enable = true;
-  programs.git = {
-    enable = true;
-    userName = "kiipuri";
-    userEmail = "kiipuri@proton.me";
-  };
-
   services.mako = {
     enable = true;
     anchor = "top-right";
@@ -258,24 +267,33 @@ in {
     defaultTimeout = 5000;
   };
 
-  # Nicely reload system units when changing configs
-  systemd.user.startServices = "sd-switch";
+  systemd = {
+    user = {
+      # Nicely reload system units when changing configs
+      startServices = "sd-switch";
 
-  systemd.user.services.autorun = {
-    Install.WantedBy = ["graphical-session.target"];
-    Unit.PartOf = ["graphical-session.target"];
-    Service = {
-      ExecStart = "${pkgs.writeShellScript "autorun-start" ''
-        ${pkgs.swaybg}/bin/swaybg -i $(cd ~/wallpapers && ${pkgs.coreutils}/bin/ls | ${pkgs.coreutils}/bin/shuf | ${pkgs.coreutils}/bin/head -n1 | ${pkgs.findutils}/bin/xargs ${pkgs.coreutils}/bin/realpath) -m stretch &
-        ${pkgs.lxsession}/bin/lxpolkit &
-      ''}";
+      services.autorun = {
+        Install.WantedBy = ["graphical-session.target"];
+        Unit.PartOf = ["graphical-session.target"];
+        Service = {
+          ExecStart = "${pkgs.writeShellScript "autorun-start" ''
+            ${pkgs.swaybg}/bin/swaybg -i \
+              $(cd ~/wallpapers && ${pkgs.coreutils}/bin/ls | \
+              ${pkgs.coreutils}/bin/shuf | \
+              ${pkgs.coreutils}/bin/head -n1 | \
+              ${pkgs.findutils}/bin/xargs | \
+              ${pkgs.coreutils}/bin/realpath) -m stretch &
+            ${pkgs.lxsession}/bin/lxpolkit &
+          ''}";
 
-      ExecStop = "${pkgs.writeShellScript "autorun-stop" ''
-        ${pkgs.procps}/bin/pkill -f ${pkgs.swaybg}/bin/swaybg
-        ${pkgs.procps}/bin/pkill -f ${pkgs.lxsession}/bin/lxpolkit
-      ''}";
+          ExecStop = "${pkgs.writeShellScript "autorun-stop" ''
+            ${pkgs.procps}/bin/pkill -f ${pkgs.swaybg}/bin/swaybg
+            ${pkgs.procps}/bin/pkill -f ${pkgs.lxsession}/bin/lxpolkit
+          ''}";
 
-      Type = "forking";
+          Type = "forking";
+        };
+      };
     };
   };
 

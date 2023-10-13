@@ -99,12 +99,6 @@
       videoDrivers = ["nvidia"];
     };
 
-    # xserver.displayManager = {
-    #   lightdm.enable = true;
-    #   startx.enable = true;
-    #   setupCommands = "${pkgs.xorg.xrandr}/bin/xrandr --output Virtual-1 --primary --mode 1920x1080";
-    # };
-
     xserver.displayManager.sddm = {
       enable = true;
       theme = "tokyo-night-sddm";
@@ -170,11 +164,7 @@
   #   pulse.enable = true;
   # };
 
-  programs.steam = {
-    enable = true;
-    gamescopeSession.enable = true;
-  };
-  programs.gamescope.enable = true;
+  programs.steam.enable = true;
 
   environment = {
     sessionVariables = {
@@ -189,7 +179,6 @@
     };
 
     systemPackages = with pkgs; [
-      (builtins.getFlake "github:fortuneteller2k/nixpkgs-f2k/9773e93c3b81d645aabb95b8635a8c512e17aa3b").packages.${system}.awesome-git
       (libsForQt5.callPackage ../derivatives/tokyo-night-sddm.nix {})
       alsa-utils
       dunst

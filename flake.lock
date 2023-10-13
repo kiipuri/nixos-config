@@ -335,11 +335,11 @@
       "locked": {
         "lastModified": 1,
         "narHash": "sha256-HH3XKm1Lcs/bu7KLlvBxTPfjRH8O9CsLDs9KGVy0fq8=",
-        "path": "/nix/store/2f9jix662nfrgvs6phkk359q2b08qpc1-source/home-manager/nvim",
+        "path": "/nix/store/rf4kkp87crmmrxg2b3pyzyxczh7gmpdw-source/home-manager/nvim",
         "type": "path"
       },
       "original": {
-        "path": "/nix/store/2f9jix662nfrgvs6phkk359q2b08qpc1-source/home-manager/nvim",
+        "path": "/nix/store/rf4kkp87crmmrxg2b3pyzyxczh7gmpdw-source/home-manager/nvim",
         "type": "path"
       }
     },
