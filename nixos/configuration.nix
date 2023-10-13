@@ -34,7 +34,8 @@
   };
 
   nixpkgs.overlays = [
-    (builtins.getFlake "github:fortuneteller2k/nixpkgs-f2k/9773e93c3b81d645aabb95b8635a8c512e17aa3b").overlays.default
+    inputs.nixpkgs-f2k.overlays.window-managers
+    inputs.nixpkgs-f2k.overlays.compositors
   ];
 
   boot = {
@@ -105,15 +106,15 @@
     # };
 
     xserver.displayManager.sddm = {
-      enable = false;
+      enable = true;
       theme = "tokyo-night-sddm";
     };
 
-    xserver.displayManager.gdm.enable = true;
-
     xserver.windowManager = {
-      awesome.enable = true;
-      awesome.package = pkgs.awesome-git;
+      awesome = {
+        enable = true;
+        package = pkgs.awesome-git;
+      };
     };
 
     jellyfin.enable = true;

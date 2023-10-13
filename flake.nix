@@ -14,11 +14,17 @@
 
     mynvim.url = "./home-manager/nvim";
 
+    nixpkgs-f2k.url = "github:fortuneteller2k/nixpkgs-f2k";
+
     # Shameless plug: looking for a way to nixify your themes and make
     # everything match nicely? Try nix-colors!
     nix-colors.url = "github:misterio77/nix-colors";
 
     hyprland.url = "github:hyprwm/Hyprland";
+    split-monitor-workspaces = {
+      url = "github:Duckonaut/split-monitor-workspaces";
+      inputs.hyprland.follows = "hyprland";
+    };
     waybar-git.url = "github:Alexays/Waybar";
   };
 
@@ -27,6 +33,8 @@
     nixpkgs-stable,
     home-manager,
     hyprland,
+    nixpkgs-f2k,
+    split-monitor-workspaces,
     waybar-git,
     ...
   } @ inputs: let

@@ -108,8 +108,8 @@ in {
     enableNvidiaPatches = true;
     systemdIntegration = true;
     recommendedEnvironment = true;
-    plugins = with pkgs; [
-      # (builtins.getFlake "github:Duckonaut/split-monitor-workspaces/b719a7b73199d2b0e24694183daa3714c4cced44").packages.${system}.split-monitor-workspaces
+    plugins = [
+      inputs.split-monitor-workspaces.packages.${pkgs.system}.split-monitor-workspaces
     ];
     extraConfig = builtins.readFile ./config/hypr/hyprland.conf;
   };
