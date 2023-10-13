@@ -121,7 +121,11 @@
 
   hardware = {
     opengl.enable = true;
-    nvidia.modesetting.enable = true;
+    nvidia = {
+      modesetting.enable = true;
+      nvidiaPersistenced = true;
+      powerManagement.enable = true;
+    };
     opentabletdriver = {
       enable = true;
       daemon.enable = true;
