@@ -13,6 +13,7 @@ in {
 
     ./nvim
     ./config/waybar.nix
+    ./config/lf.nix
   ];
 
   home = {
