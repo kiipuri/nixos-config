@@ -281,7 +281,22 @@
       bindkey -M vicmd 'k' history-substring-search-up
       bindkey -M vicmd 'j' history-substring-search-down
 
-      source "$HOME/.config/lf/lfcd"
+      lf() {
+        set +m
+
+        tmp="$(${pkgs.toybox}/bin/mktemp)"
+        ${pkgs.lf}/bin/lf --last-dir-path="$tmp" "$@"
+        if [ -f "$tmp" ]; then
+          dir="$(${pkgs.toybox}/bin/cat "$tmp")"
+          rm -f "$tmp"
+          if [ -d "$dir" ]; then
+            if [ "$dir" != "$(pwd)" ]; then
+              cd "$dir" || exit
+            fi
+          fi
+        fi
+      }
+
       eval "$(zoxide init zsh)"
     '';
 
