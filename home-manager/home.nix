@@ -53,6 +53,10 @@ in {
 
   programs = {
     home-manager.enable = true;
+    starship = {
+      enable = true;
+      enableZshIntegration = true;
+    };
     git = {
       enable = true;
       userName = "kiipuri";
@@ -87,6 +91,23 @@ in {
         confirm_os_window_close = 0;
         enable_audio_bell = "no";
       };
+    };
+    tmux = {
+      enable = true;
+      keyMode = "vi";
+      mouse = true;
+      newSession = true;
+      prefix = "C-Space";
+      terminal = "tmux-256color";
+      plugins = with pkgs.tmuxPlugins; [
+        yank
+        catppuccin
+      ];
+      extraConfig = ''
+        bind-key -T copy-mode-vi v send-keys -X begin-selection
+        bind-key -T copy-mode-vi C-v send-keys -X rectangle-toggle
+        bind-key -T copy-mode-vi y send-keys -X copy-selection-and-cancel
+      '';
     };
     zsh = {
       enable = true;
@@ -125,13 +146,10 @@ in {
       ];
     };
   };
-  colorScheme = inputs.nix-colors.colorSchemes.tokyo-night-dark;
-  # colorScheme = inputs.nix-colors.colorSchemes.gruvbox-dark-hard;
-  # colorScheme = inputs.nix-colors.colorSchemes.gruvbox-light-hard;
-  # colorScheme = inputs.nix-colors.colorSchemes.dracula;
-  # colorScheme = inputs.nix-colors.colorSchemes.tokyo-night-storm;
-  # colorScheme = inputs.nix-colors.colorSchemes.harmonic16-dark;
+  # colorScheme = inputs.nix-colors.colorSchemes.tokyo-night-dark;
   # colorScheme = inputs.nix-colors.colorSchemes.catppuccin-mocha;
+  colorScheme = inputs.nix-colors.colorSchemes.catppuccin-macchiato;
+  # colorScheme = inputs.nix-colors.colorSchemes.gruvbox-light-hard;
 
   wayland.windowManager.hyprland = {
     enable = true;
@@ -214,10 +232,6 @@ in {
         source = ./config/awesome;
         recursive = true;
       };
-      rofi = {
-        source = ./config/rofi;
-        recursive = true;
-      };
       picom = {
         source = ./config/picom;
         recursive = true;
@@ -282,7 +296,7 @@ in {
               $(cd ~/wallpapers && ${pkgs.coreutils}/bin/ls | \
               ${pkgs.coreutils}/bin/shuf | \
               ${pkgs.coreutils}/bin/head -n1 | \
-              ${pkgs.findutils}/bin/xargs | \
+              ${pkgs.findutils}/bin/xargs \
               ${pkgs.coreutils}/bin/realpath) -m stretch &
             ${pkgs.lxsession}/bin/lxpolkit &
           ''}";
