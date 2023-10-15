@@ -140,6 +140,89 @@
     # };
 
     noisetorch.enable = true;
+    droidcam.enable = true;
+
+    zsh = {
+      enable = true;
+      syntaxHighlighting.enable = true;
+      autosuggestions.enable = true;
+      enableGlobalCompInit = true;
+      enableCompletion = true;
+      ohMyZsh = {
+        enable = true;
+        theme = "jonathan";
+        plugins = ["vi-mode" "history-substring-search"];
+      };
+      interactiveShellInit = ''
+        zstyle ":completion:*" menu select
+        zmodload zsh/complist
+        bindkey -M menuselect 'h' vi-backward-char
+        bindkey -M menuselect 'j' vi-down-line-or-history
+        bindkey -M menuselect 'k' vi-up-line-or-history
+        bindkey -M menuselect 'l' vi-forward-char
+
+        bindkey -M vicmd 'k' history-substring-search-up
+        bindkey -M vicmd 'j' history-substring-search-down
+
+        lf() {
+          set +m
+
+          tmp="$(${pkgs.toybox}/bin/mktemp)"
+          ${pkgs.lf}/bin/lf --last-dir-path="$tmp" "$@"
+          if [ -f "$tmp" ]; then
+            dir="$(${pkgs.toybox}/bin/cat "$tmp")"
+            rm -f "$tmp"
+            if [ -d "$dir" ]; then
+              if [ "$dir" != "$(pwd)" ]; then
+                cd "$dir" || exit
+              fi
+            fi
+          fi
+        }
+
+        eval "$(zoxide init zsh)"
+      '';
+
+      promptInit = ''
+        zle-line-init() {
+          emulate -L zsh
+
+          [[ $CONTEXT == start ]] || return 0
+
+          while true; do
+            zle .recursive-edit
+            local -i ret=$?
+            [[ $ret == 0 && $KEYS == $'\4' ]] || break
+            [[ -o ignore_eof ]] || exit 0
+          done
+
+          local saved_prompt=$PROMPT
+          local saved_rprompt=$RPROMPT
+          PROMPT='> '
+          RPROMPT='%'
+          zle .reset-prompt
+          PROMPT=$saved_prompt
+          RPROMPT=$saved_rprompt
+
+          if (( ret )); then
+            zle .send-break
+          else
+            zle .accept-line
+          fi
+          return ret
+        }
+
+        zle -N zle-line-init
+      '';
+
+      shellAliases = {
+        sudo = "doas";
+        update = "sudo nixos-rebuild switch --flake .#nixos";
+        hmupdate = "home-manager switch --flake .#kiipuri@nixos";
+        ns = "NIXPKGS_ALLOW_UNFREE=1 nix-shell";
+        nsp = "NIXPKGS_ALLOW_UNFREE=1 nix-shell -p";
+      };
+    };
   };
 
   security = {
@@ -181,28 +264,29 @@
     systemPackages = with pkgs; [
       (libsForQt5.callPackage ../derivatives/tokyo-night-sddm.nix {})
       alsa-utils
+      btop
+      docker-compose
       dunst
       fd
-      ffmpeg
+      ffmpeg_6-full
       file
-      docker-compose
       git
       home-manager
       htop
+      jellyfin-mpv-shim
       killall
       lf
       libnotify
+      libsForQt5.fcitx5-qt
       libsForQt5.qt5.qtbase
       libsForQt5.qt5.qtgraphicaleffects
       libsForQt5.qt5.qtquickcontrols2
       libsForQt5.qt5.qtsvg
-      libsForQt5.fcitx5-qt
       lua5_4_compat
       neovim
-      jellyfin-mpv-shim
       pavucontrol
+      picom
       ripgrep
-      rofi
       swaybg
       sxhkd
       trash-cli
@@ -235,99 +319,39 @@
     };
   };
 
-  fonts.packages = with pkgs; [
-    nerdfonts
-    noto-fonts
-    noto-fonts-cjk
-    cascadia-code
-    terminus_font
-  ];
+  fonts = {
+    enableDefaultPackages = true;
+    packages = with pkgs; [
+      nerdfonts
+      noto-fonts
+      noto-fonts-cjk
+      cascadia-code
+      terminus_font
+    ];
+    fontconfig = {
+      localConf = ''
+        <match target="pattern">
+          <test name="lang" compare="contains">
+              <string>hi</string>
+          </test>
+          <test qual="any" name="family">
+              <string>sans-serif</string>
+          </test>
+          <edit name="family" mode="prepend" binding="strong">
+              <string>Noto Sans Devanagari</string>
+          </edit>
+        </match>
+      '';
+      defaultFonts = {
+        serif = ["Noto Serif Devanagari" "Noto Serif"];
+        sansSerif = ["Noto Sans"];
+      };
+    };
+  };
 
   environment.variables = {
     EDITOR = "nvim";
     WLR_NO_HARDWARE_CURSORS = "1";
-  };
-
-  programs.zsh = {
-    enable = true;
-    syntaxHighlighting.enable = true;
-    autosuggestions.enable = true;
-    enableGlobalCompInit = true;
-    enableCompletion = true;
-    ohMyZsh = {
-      enable = true;
-      theme = "jonathan";
-      plugins = ["vi-mode" "history-substring-search"];
-    };
-    interactiveShellInit = ''
-      zstyle ":completion:*" menu select
-      zmodload zsh/complist
-      bindkey -M menuselect 'h' vi-backward-char
-      bindkey -M menuselect 'j' vi-down-line-or-history
-      bindkey -M menuselect 'k' vi-up-line-or-history
-      bindkey -M menuselect 'l' vi-forward-char
-
-      bindkey -M vicmd 'k' history-substring-search-up
-      bindkey -M vicmd 'j' history-substring-search-down
-
-      lf() {
-        set +m
-
-        tmp="$(${pkgs.toybox}/bin/mktemp)"
-        ${pkgs.lf}/bin/lf --last-dir-path="$tmp" "$@"
-        if [ -f "$tmp" ]; then
-          dir="$(${pkgs.toybox}/bin/cat "$tmp")"
-          rm -f "$tmp"
-          if [ -d "$dir" ]; then
-            if [ "$dir" != "$(pwd)" ]; then
-              cd "$dir" || exit
-            fi
-          fi
-        fi
-      }
-
-      eval "$(zoxide init zsh)"
-    '';
-
-    promptInit = ''
-      zle-line-init() {
-        emulate -L zsh
-
-        [[ $CONTEXT == start ]] || return 0
-
-        while true; do
-          zle .recursive-edit
-          local -i ret=$?
-          [[ $ret == 0 && $KEYS == $'\4' ]] || break
-          [[ -o ignore_eof ]] || exit 0
-        done
-
-        local saved_prompt=$PROMPT
-        local saved_rprompt=$RPROMPT
-        PROMPT='> '
-        RPROMPT='%'
-        zle .reset-prompt
-        PROMPT=$saved_prompt
-        RPROMPT=$saved_rprompt
-
-        if (( ret )); then
-          zle .send-break
-        else
-          zle .accept-line
-        fi
-        return ret
-      }
-
-      zle -N zle-line-init
-    '';
-
-    shellAliases = {
-      sudo = "doas";
-      update = "sudo nixos-rebuild switch --flake .#nixos";
-      hmupdate = "home-manager switch --flake .#kiipuri@nixos";
-      ns = "NIXPKGS_ALLOW_UNFREE=1 nix-shell";
-      nsp = "NIXPKGS_ALLOW_UNFREE=1 nix-shell -p";
-    };
   };
 
   users = {
