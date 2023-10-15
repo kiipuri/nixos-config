@@ -34,6 +34,10 @@ in {
         background-color: #a6e3a1;
       }
 
+      #custom-date {
+        background-color: #fdffb6;
+      }
+
       /** ********** CPU ********** **/
       #cpu {
         background-color: #89dceb;
@@ -79,6 +83,7 @@ in {
       }
 
       /** ********** Custom ********** **/
+      /*
       #custom-menu,
       #custom-power,
       #custom-weather,
@@ -115,6 +120,12 @@ in {
         padding: 2px 8px;
         font-size: 12px;
       }
+      */
+
+      #custom-weather {
+        background-color: #cba6f7;
+        font-size: 12px;
+      }
 
       /** Common style **/
       #backlight,
@@ -127,11 +138,21 @@ in {
       #mpd,
       #tray,
       #pulseaudio,
+      #custom-weather,
+      #custom-date,
+      #custom-power,
       #network {
         border-radius: 4px;
         margin: 6px 0px;
         padding: 2px 8px;
         color: #${colors.base00};
+      }
+
+      #custom-power {
+        background-color: #f38ba8;
+        margin-right: 4px;
+        padding: 0 10px 0 8px;
+        font-size: 16px;
       }
 
       button:hover {
@@ -147,6 +168,7 @@ in {
 
       #workspaces button:hover {
         background-color: salmon;
+        color: #${colors.base00};
         border: none;
       }
 
@@ -164,11 +186,12 @@ in {
       /* has focus */
       #workspaces button.active {
         background-color: #a6e3a1;
+        color: #${colors.base00};
       }
     '';
     settings = {
       mainBar = {
-        include = "~/.config/waybar/modules";
+        # include = "~/.config/waybar/modules";
         id = "main-bar";
         name = "main-bar";
         layer = "top";
@@ -186,33 +209,112 @@ in {
 
         modules-left = ["custom/menu" "hyprland/workspaces" "cpu" "memory" "disk"];
         modules-center = ["tray"];
-        modules-right = ["pulseaudio" "network" "battery" "clock" "custom/power"];
+        modules-right = ["custom/weather" "pulseaudio" "network" "battery" "custom/date" "clock" "custom/power"];
+
+        "hyprland/workspaces" = {
+          format = "{icon}";
+          format-icons = {
+            "1" = "1";
+            "2" = "2";
+            "3" = "3";
+            "4" = "4";
+            "5" = "5";
+            "6" = "6";
+            "7" = "7";
+            "8" = "8";
+            "9" = "9";
+            "11" = "1";
+            "12" = "2";
+            "13" = "3";
+            "14" = "4";
+            "15" = "5";
+            "16" = "6";
+            "17" = "7";
+            "18" = "8";
+            "19" = "9";
+          };
+        };
+
+        clock = {
+          interval = 60;
+          align = 0;
+          rotate = 0;
+          tooltip-format = "<big>{:%B %Y}</big>\n<tt><small>{calendar}</small></tt>";
+          format = " {:%H:%M}";
+          # format-alt = " {:%a %b %d, %G}";
+        };
+
+        "custom/date" = {
+          interval = 60;
+          format = " {}";
+          exec = "${pkgs.toybox}/bin/date +\"%a %d %b %G\"";
+        };
+
+        cpu = {
+          interval = 5;
+          format = "󰄧 LOAD: {usage}%";
+        };
+
+        "custom/power" = {
+          format = "󰐥";
+          tooltip = false;
+          on-click = "${pkgs.wlogout}/bin/wlogout";
+        };
+
+        disk = {
+          interval = 30;
+          format = "󰆼 FREE: {free}";
+        };
+
+        memory = {
+          interval = 10;
+          format = " USED: {used:0.1f}G";
+        };
+
+        network = {
+          interval = 1;
+          # //interface = "wlan*";
+          format-wifi = " {essid}";
+          format-ethernet = "󰈀 {ipaddr}/{cidr}";
+          format-linked = "󰈀 {ifname} (No IP)";
+          format-disconnected = "󰖪 Disconnected";
+          format-disabled = "󰖪 Disabled";
+          format-alt = " {bandwidthDownBits} |  {bandwidthUpBits}";
+          # //format-alt = " {bandwidthDownBits} |  {bandwidthUpBits}";
+          tooltip-format = " {ifname} via {gwaddr}";
+        };
+
+        "custom/weather" = {
+          format = "{}";
+          interval = 1800;
+          exec = pkgs.writeShellScript "waybar-weather" ''
+            ${pkgs.curl}/bin/curl -s 'wttr.in/Tornio?format=%c%t' | ${pkgs.toybox}/bin/sed 's/+//; s/  / /'
+          '';
+        };
+
+        pulseaudio = {
+          # format = "{volume}% {icon} {format_source}";
+          format = "{icon} {volume}%";
+          format-muted = " Mute";
+          format-bluetooth = " {volume}% {format_source}";
+          format-bluetooth-muted = " Mute";
+          format-source = " {volume}%";
+          format-source-muted = "";
+          format-icons = {
+            headphone = "";
+            hands-free = "";
+            headset = "";
+            phone = "";
+            portable = "";
+            car = "";
+            default = ["" "" ""];
+          };
+          scroll-step = 5.0;
+          on-click = "${pkgs.alsa-utils}/bin/amixer set Master toggle";
+          on-click-right = "${pkgs.pavucontrol}/bin/pavucontrol";
+          smooth-scrolling-threshold = 1;
+        };
       };
-      # mainBar = {
-      #   layer = "top";
-      #   position = "top";
-      #   height = 30;
-      #   output = [
-      #     "eDP-1"
-      #     "HDMI-A-1"
-      #   ];
-      #   modules-left = ["sway/workspaces" "sway/mode" "wlr/taskbar"];
-      #   modules-center = ["sway/window" "custom/hello-from-waybar"];
-      #   modules-right = ["mpd" "custom/mymodule#with-css-id" "temperature"];
-      #
-      #   "sway/workspaces" = {
-      #     disable-scroll = true;
-      #     all-outputs = true;
-      #   };
-      #   "custom/hello-from-waybar" = {
-      #     format = "hello {}";
-      #     max-length = 40;
-      #     interval = "once";
-      #     exec = pkgs.writeShellScript "hello-from-waybar" ''
-      #       echo "from within waybar"
-      #     '';
-      #   };
-      # };
     };
   };
 }

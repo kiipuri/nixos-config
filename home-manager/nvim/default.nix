@@ -5,7 +5,7 @@
   ...
 }: let
   inherit (lib) mkEnableOption;
-  inherit (pkgs.vimUtils) buildVimPluginFrom2Nix;
+  inherit (pkgs.vimUtils) buildVimPlugin;
   inherit (pkgs) fetchFromGitHub;
   theme = config.colorScheme;
   inherit (theme) colors;
@@ -157,6 +157,16 @@ in {
         };
 
         harpoon.enable = true;
+        harpoon.package = buildVimPlugin {
+          pname = "harpoon";
+          version = "2023-09-16";
+          src = fetchFromGitHub {
+            owner = "ThePrimeagen";
+            repo = "harpoon";
+            rev = "c1aebbad9e3d13f20bedb8f2ce8b3a94e39e424a";
+            sha256 = "sha256-pSnFx5fg1llNlpTCV4hoo3Pf1KWnAJDRVSe+88N4HXM=";
+          };
+        };
         comment-nvim.enable = true;
 
         indent-blankline = {
@@ -284,7 +294,7 @@ in {
         neoscroll-nvim
         lsp_signature-nvim
         nvim-notify
-        (buildVimPluginFrom2Nix {
+        (buildVimPlugin {
           pname = "tabout.nvim";
           version = "2023-09-18";
           src = fetchFromGitHub {
