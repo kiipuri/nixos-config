@@ -11,6 +11,7 @@
       ifs = "\\n";
     };
     commands = with pkgs; {
+      clip = "\$${wl-clipboard}/bin/wl-copy < $fx";
       trash = "%${trash-cli}/bin/trash-put $fx";
       sudotrash = "sudo ${trash-cli}/bin/trash-put $fx";
       sudopaste = ''
@@ -27,7 +28,7 @@
       open = ''
         ''${{
           test -L $f && f=$(${toybox}/bin/readlink -f $f)
-          case $(${file}/bin/file -Lb --mime-type $f) in
+          case $(${xdg-utils}/bin/xdg-mime query filetype $f) in
             text/*|application/json|application/x-subrip) $EDITOR $fx;;
             *) for f in $fx; do ${toybox}/bin/setsid $OPENER $f > /dev/null 2> /dev/null & done;;
           esac
@@ -88,6 +89,7 @@
       '';
     };
     keybindings = {
+      "<c-c>" = "clip";
       m = "";
       mm = "mark-save";
       ml = "mark-load";
