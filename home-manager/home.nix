@@ -14,6 +14,7 @@ in {
     ./nvim
     ./config/waybar.nix
     ./config/lf.nix
+    ./config/rofi.nix
   ];
 
   home = {
