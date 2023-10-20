@@ -12,7 +12,7 @@
     # TODO: Add any other flake you might need
     # hardware.url = "github:nixos/nixos-hardware";
 
-    mynvim.url = "./home-manager/nvim";
+    nvim.url = "./home-manager/nvim";
 
     nixpkgs-f2k.url = "github:fortuneteller2k/nixpkgs-f2k";
 
@@ -25,6 +25,7 @@
       url = "github:Duckonaut/split-monitor-workspaces";
       inputs.hyprland.follows = "hyprland";
     };
+    stylix.url = "github:danth/stylix";
     waybar-git.url = "github:Alexays/Waybar";
   };
 
@@ -40,13 +41,21 @@
   } @ inputs: let
     system = "x86_64-linux";
     stable = import nixpkgs-stable {inherit system;};
+
+    theme = "catppuccin-mocha";
   in {
     # NixOS configuration entrypoint
     # Available through 'nixos-rebuild --flake .#your-hostname'
     nixosConfigurations = {
       # FIXME replace with your hostname
       nixos = nixpkgs.lib.nixosSystem {
-        specialArgs = {inherit inputs stable;}; # Pass flake inputs to our config
+        specialArgs = {
+          inherit inputs;
+          inherit stable;
+          inherit theme;
+          inherit (inputs) stylix;
+          inherit (inputs) nixpkgs-f2k;
+        }; # Pass flake inputs to our config
         # > Our main nixos configuration file <
         modules = [
           ./nixos/configuration.nix
@@ -60,7 +69,13 @@
       # FIXME replace with your username@hostname
       "kiipuri@nixos" = home-manager.lib.homeManagerConfiguration {
         pkgs = nixpkgs.legacyPackages.x86_64-linux; # Home-manager requires 'pkgs' instance
-        extraSpecialArgs = {inherit inputs stable;}; # Pass flake inputs to our config
+        extraSpecialArgs = {
+          inherit inputs;
+          inherit stable;
+          inherit theme;
+          inherit (inputs) stylix;
+          inherit (inputs) nix-colors;
+        }; # Pass flake inputs to our config
         # > Our main home-manager configuration file <
         modules = [
           ./home-manager/home.nix

@@ -128,6 +128,7 @@
   };
 
   programs = {
+    dconf.enable = true;
     hyprland = {
       enable = true;
       enableNvidiaPatches = true;
@@ -151,7 +152,10 @@
       ohMyZsh = {
         enable = true;
         theme = "jonathan";
-        plugins = ["vi-mode" "history-substring-search"];
+        plugins = [
+          "vi-mode"
+          "history-substring-search"
+        ];
       };
       interactiveShellInit = ''
         zstyle ":completion:*" menu select
@@ -234,33 +238,16 @@
     '';
   };
 
-  hardware.pulseaudio = {
+  services.pipewire = {
     enable = true;
-    support32Bit = true;
+    alsa.enable = true;
+    alsa.support32Bit = true;
+    pulse.enable = true;
   };
-
-  # services.pipewire = {
-  #   enable = true;
-  #   package = stable.pipewire;
-  #   alsa.enable = true;
-  #   alsa.support32Bit = true;
-  #   pulse.enable = true;
-  # };
 
   programs.steam.enable = true;
 
   environment = {
-    sessionVariables = {
-      GDK_BACKEND = "wayland,x11";
-      QT_QPA_PLATFORM = "wayland;xcb";
-      #SDL_VIDEODRIVER = "x11";
-      CLUTTER_BACKEND = "wayland";
-      XDG_CURRENT_DESKTOP = "Hyprland";
-      XDG_SESSION_TYPE = "wayland";
-      XDG_SESSION_DESKTOP = "Hyprland";
-      WLR_NO_HARDWARE_CURSORS = "1";
-    };
-
     systemPackages = with pkgs; [
       (libsForQt5.callPackage ../derivatives/tokyo-night-sddm.nix {})
       alsa-utils

@@ -2,13 +2,13 @@
   config,
   pkgs,
   lib,
+  theme,
   ...
 }: let
   inherit (lib) mkEnableOption;
   inherit (pkgs.vimUtils) buildVimPlugin;
   inherit (pkgs) fetchFromGitHub;
-  theme = config.colorScheme;
-  inherit (theme) colors;
+  inherit (config.colorScheme) colors;
   configString = import ./config/config.nix;
 
   fileTypes = [
@@ -268,6 +268,7 @@ in {
       };
 
       extraConfigLua = ''
+        vim.cmd[[colorscheme base16-${theme}]]
         local base16 = require("base16-colorscheme")
         base16.setup({
           base00 = "#${colors.base00}", base01 = "#${colors.base01}", base02 = "#${colors.base02}",
@@ -294,6 +295,7 @@ in {
         neoscroll-nvim
         lsp_signature-nvim
         nvim-notify
+        vim-obsession
         (buildVimPlugin {
           pname = "tabout.nvim";
           version = "2023-09-18";

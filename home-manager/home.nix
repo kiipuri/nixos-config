@@ -2,14 +2,15 @@
   inputs,
   config,
   pkgs,
+  theme,
   ...
 }: let
-  theme = config.colorScheme;
-  inherit (theme) colors;
+  inherit (config.colorScheme) colors;
+  inherit (pkgs) fetchFromGitHub;
 in {
   imports = [
     inputs.nix-colors.homeManagerModule
-    inputs.mynvim.inputs.nixvim.homeManagerModules.nixvim
+    inputs.nvim.inputs.nixvim.homeManagerModules.nixvim
 
     ./nvim
     ./config/waybar.nix
@@ -17,15 +18,11 @@ in {
     ./config/rofi.nix
   ];
 
+  colorScheme = inputs.nix-colors.colorSchemes.${theme};
+
   home = {
     packages = with pkgs; [
-      #(callPackage ./derivatives/screenshot.nix {})
-      #(callPackage ./derivatives/audiorec.nix {})
-      #(callPackage ./derivatives/rofi-shutdown.nix {})
-      #(callPackage ./derivatives/netuse.nix {})
-
       anki
-      dconf
       discord
       gucharmap
       gimp
@@ -56,6 +53,17 @@ in {
     starship = {
       enable = true;
       enableZshIntegration = true;
+      settings = {
+        add_newline = false;
+
+        character = {
+          success_symbol = "[➜](bold green)";
+          error_symbol = "[➜](bold red)";
+        };
+
+        python.symbol = "󰌠 ";
+        lua.symbol = "󰢱 ";
+      };
     };
     git = {
       enable = true;
@@ -83,13 +91,17 @@ in {
         map f1 launch --cwd=current --type=background kitty
       '';
       settings = {
-        foreground = "#${config.colorScheme.colors.base05}";
-        background = "#${config.colorScheme.colors.base00}";
+        foreground = "#${colors.base05}";
+        background = "#${colors.base00}";
         window_padding_width = 10;
         font_family = "Cascadia Code";
         font_size = 18;
         confirm_os_window_close = 0;
         enable_audio_bell = "no";
+      };
+      shellIntegration = {
+        enableZshIntegration = true;
+        mode = "no-sudo";
       };
     };
     tmux = {
@@ -98,10 +110,28 @@ in {
       mouse = true;
       newSession = true;
       prefix = "C-Space";
-      terminal = "tmux-256color";
+      terminal = "\${TERM}";
+      escapeTime = 0;
       plugins = with pkgs.tmuxPlugins; [
         yank
-        catppuccin
+        {
+          plugin =
+            mkTmuxPlugin
+            {
+              pluginName = "base16-tmux";
+              version = "2023-10-19";
+              rtpFilePath = "tmuxcolors.tmux";
+              src = fetchFromGitHub {
+                owner = "tinted-theming";
+                repo = "base16-tmux";
+                rev = "c02050bebb60dbb20cb433cd4d8ce668ecc11ba7";
+                sha256 = "sha256-wDPg5elZPcQpu7Df0lI5O8Jv4A3T6jUQIVg63KDU+3Q=";
+              };
+            };
+          extraConfig = ''
+            set -g @colors-base16 "${theme}"
+          '';
+        }
       ];
       extraConfig = ''
         bind-key -T copy-mode-vi v send-keys -X begin-selection
@@ -122,6 +152,8 @@ in {
         }
 
         add-zsh-hook precmd myprompt
+        BASE16_THEME_DEFAULT="${theme}"
+        base16_${theme}
       '';
       plugins = [
         {
@@ -143,13 +175,19 @@ in {
             sha256 = "sha256-QE6ZwwM2X0aPqNnbVrj0y7w9hmuRf0H1j8nXYwyoLo4=";
           };
         }
+        {
+          name = "base16-shell";
+          file = "base16-shell.plugin.zsh";
+          src = pkgs.fetchFromGitHub {
+            owner = "tinted-theming";
+            repo = "base16-shell";
+            rev = "9706041539504a7dda5bf2411a0f513cce8460ad";
+            sha256 = "sha256-k7acnFJKAU4lrfOEpsWDOtnMqP5sZfULa3vYTOix7DU=";
+          };
+        }
       ];
     };
   };
-  # colorScheme = inputs.nix-colors.colorSchemes.tokyo-night-dark;
-  # colorScheme = inputs.nix-colors.colorSchemes.catppuccin-mocha;
-  colorScheme = inputs.nix-colors.colorSchemes.catppuccin-macchiato;
-  # colorScheme = inputs.nix-colors.colorSchemes.gruvbox-light-hard;
 
   wayland.windowManager.hyprland = {
     enable = true;
@@ -165,8 +203,6 @@ in {
   gtk = {
     enable = true;
     cursorTheme = {
-      # package = pkgs.bibata-cursors;
-      # name = "Bibata-Modern-Ice";
       package = pkgs.callPackage ./derivatives/touhou-cursors.nix {};
       name = "Reimu";
     };
@@ -186,9 +222,6 @@ in {
   home.pointerCursor = {
     x11.enable = true;
     x11.defaultCursor = "X_cursor";
-    # package = pkgs.bibata-cursors;
-    # name = "Bibata-Original-Amber";
-
     package = pkgs.callPackage ./derivatives/touhou-cursors.nix {};
     name = "Reimu";
     gtk.enable = true;
@@ -252,18 +285,6 @@ in {
       icon = "discord";
       mimeType = ["x-scheme-handler/discord"];
       type = "Application";
-    };
-
-    goldendict-ng = {
-      name = "GoldenDict-NG works";
-      genericName = "Multiformat Dictionary";
-      comment = "A feature-rich dictionary lookup program";
-      exec = "/run/current-system/sw/bin/env QT_PLUGIN_PATH=\"\\$QT_PLUGIN_PATH:${pkgs.fcitx5-with-addons}/lib/qt-6/plugins\" QT_IM_MODULE=fcitx goldendict %u";
-      categories = ["Office" "Dictionary" "Education" "Qt"];
-      icon = "goldendict";
-      mimeType = ["x-scheme-handler/goldendict" "x-scheme-handler/dict"];
-      type = "Application";
-      terminal = false;
     };
   };
 
