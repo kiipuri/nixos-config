@@ -8,12 +8,14 @@
   theme = config.colorScheme;
   inherit (theme) colors;
 in {
+  home.packages = [(pkgs.callPackage ../derivatives/vpn.nix {})];
+
   programs.rofi = {
     enable = true;
     package = pkgs.rofi-wayland;
     plugins = [pkgs.rofi-vpn];
     extraConfig = {
-      modi = "run,drun,window";
+      modi = "run,drun,vpn:vpn";
       icon-theme = "Oranchelo";
       show-icons = true;
       terminal = "kitty";
@@ -23,8 +25,9 @@ in {
       hide-scrollbar = true;
       display-drun = "   Apps ";
       display-run = "   Run ";
-      display-window = " 󰕰  Window";
-      display-Network = " 󰤨  Network";
+      display-window = " 󰕰  Window ";
+      display-network = " 󰤨  Network ";
+      display-vpn = " 󰒘  VPN ";
       sidebar-mode = true;
       kb-accept-entry = "Return,KP_Enter";
       kb-remove-to-eol = "";
@@ -59,6 +62,13 @@ in {
       };
 
       window = {
+        height = mkLiteral "360px";
+        border = mkLiteral "3px";
+        border-color = mkLiteral "@border-col";
+        background-color = mkLiteral "@bg-col";
+      };
+
+      network = {
         height = mkLiteral "360px";
         border = mkLiteral "3px";
         border-color = mkLiteral "@border-col";
