@@ -347,6 +347,7 @@ local branch = {
 
 require("lualine").setup({
     options = {
+        theme = "base16",
         -- sectionSeparators = { left = "", right = "" },
         -- componentSeparators = { left = "", right = "" },
         section_separators = "",

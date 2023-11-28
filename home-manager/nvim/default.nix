@@ -103,20 +103,40 @@ in {
         gitsigns.enable = true;
 
         luasnip.enable = true;
+        ts-autotag = {
+          enable = true;
+          extraOptions.enable_close_on_slash = false;
+        };
+
         telescope = {
           enable = true;
           enabledExtensions = ["ui-select"];
-          extensionConfig = {
-            ui-select = {
-              __raw = ''
-                  require("telescope.themes").get_dropdown {
-                  -- even more opts
-                }
-              '';
+          extensions = {
+            undo = {
+              enable = true;
+              sideBySide = true;
+              mappings = {
+                i = {
+                  "<cr>" = "yank_additions";
+                  "<S-cr>" = "yank_deletions";
+                  "<C-cr>" = "restore";
+                };
+                n = {
+                  "<cr>" = "yank_additions";
+                  "<S-cr>" = "yank_deletions";
+                  "<C-cr>" = "restore";
+                };
+              };
             };
           };
           extraOptions = {
             defaults.layout_strategy = "vertical";
+            undo = {
+              layout_strategy = "horizontal";
+              layout_config = {
+                preview_width = 0.7;
+              };
+            };
           };
         };
 
@@ -190,6 +210,7 @@ in {
             tsserver.enable = true;
             lua-ls.enable = true;
             omnisharp.enable = true;
+            csharp-ls.enable = true;
           };
         };
 
@@ -215,7 +236,10 @@ in {
         nvim-colorizer.enable = true;
         surround.enable = true;
         lualine.enable = true;
-        neo-tree.enable = true;
+        neo-tree = {
+          enable = true;
+          popupBorderStyle = "rounded";
+        };
         nvim-cmp = {
           enable = true;
 
@@ -281,6 +305,15 @@ in {
 
         local colors = base16.colors
         ${configString}
+
+        -- require("telescope").load_extension("undo")
+        vim.filetype.add({
+          extension = {http = "http"}
+        })
+
+        local rest = require("rest-nvim")
+        rest.setup()
+        vim.keymap.set('n', '<leader>xr', rest.run)
       '';
 
       globals = {
@@ -295,7 +328,7 @@ in {
         neoscroll-nvim
         lsp_signature-nvim
         nvim-notify
-        vim-obsession
+        rest-nvim
         (buildVimPlugin {
           pname = "tabout.nvim";
           version = "2023-09-18";
@@ -304,6 +337,16 @@ in {
             repo = "tabout.nvim";
             rev = "0d275c8d25f32457e67b5c66d6ae43f26a61bce5";
             sha256 = "sha256-Ltys1BVWWBHuv1GOCFQ0wMYf36feRRePAiH85tbx9Ic=";
+          };
+        })
+        (buildVimPlugin {
+          pname = "neovim-session-manager";
+          version = "2023-11-14";
+          src = fetchFromGitHub {
+            owner = "Shatur";
+            repo = "neovim-session-manager";
+            rev = "68dde355a4304d83b40cf073f53915604bdd8e70";
+            sha256 = "sha256-WOJQ6RIibOby+Pmzr6kQxcT2NCGrq1roWkh4QKJECks=";
           };
         })
       ];
@@ -322,6 +365,7 @@ in {
         "<leader>tb" = "<cmd>Telescope buffers<cr>";
         "<leader>tr" = "<cmd>Telescope lsp_references<cr>";
         "<leader>tl" = "<cmd>Telescope live_grep<cr>";
+        "<leader>u" = "<cmd>Telescope undo<cr>";
 
         "<leader>jf" = "<cmd>lua require'harpoon.ui'.nav_file(1)<cr>";
         "<leader>jd" = "<cmd>lua require'harpoon.ui'.nav_file(2)<cr>";
