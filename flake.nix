@@ -46,6 +46,8 @@
 
     theme = "catppuccin-mocha";
     username = "kiipuri";
+    # font = "JetBrainsMono Nerd Font";
+    # fontPkg = pkgs.jetbrains-mono;
     font = "Maple Mono";
     fontPkg = pkgs.maple-mono;
 

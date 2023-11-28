@@ -29,7 +29,11 @@
         ''${{
           test -L $f && f=$(${toybox}/bin/readlink -f $f)
           case $(${xdg-utils}/bin/xdg-mime query filetype $f) in
-            text/*|application/json|application/x-subrip) $EDITOR $fx;;
+            text/*| \
+            application/json| \
+            application/x-subrip| \
+            application/x-yaml| \
+            application/x-shellscript) $EDITOR $fx;;
             *) for f in $fx; do ${toybox}/bin/setsid $OPENER $f > /dev/null 2> /dev/null & done;;
           esac
         }}
@@ -122,12 +126,21 @@
 
         case "$(${pkgs.xdg-utils}/bin/xdg-mime query filetype "$file")" in
           image/*) image ;;
+
+          video/*)
+            [ ! -f "''${CACHE}.jpg" ] && \
+              ${pkgs.ffmpegthumbnailer}/bin/ffmpegthumbnailer -i "$file" -o "''${CACHE}.jpg" -s 0 -q 5
+            file="''${CACHE}.jpg"
+            image
+          ;;
+
           text/markdown) ${pkgs.glow}/bin/glow -s dark $file ;;
+
           application/pdf)
             [ ! -f "''${CACHE}.jpg" ] &&
               ${pkgs.toybox}/bin/mkdir "$HOME/.cache/lf"
               ${pkgs.poppler_utils}/bin/pdftoppm -jpeg -f 1 -singlefile "$file" "$CACHE"
-            file=''${CACHE}.jpg
+            file="''${CACHE}.jpg"
             image
           ;;
         esac

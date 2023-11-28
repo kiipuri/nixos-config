@@ -1,7 +1,6 @@
 {
   lib,
   inputs,
-  config,
   pkgs,
   username,
   theme,
@@ -9,15 +8,11 @@
   hyprland,
   split-monitor-workspaces,
   ...
-}: let
-  inherit (pkgs) fetchFromGitHub;
-in {
+}: {
   imports = [
     inputs.nix-colors.homeManagerModule
     inputs.nvim.inputs.nixvim.homeManagerModules.nixvim
 
-    # ./nvim
-    # ./config/waybar.nix
     ./config/lf.nix
     ./config/rofi.nix
     ./style/stylix.nix
@@ -30,6 +25,8 @@ in {
     packages = with pkgs; [
       anki
       discord
+      ungoogled-chromium
+      teams-for-linux
       gucharmap
       gimp
       firefox
@@ -50,6 +47,7 @@ in {
       picard
       goldendict-ng
       tldr
+      jq
     ];
     inherit username;
     homeDirectory = "/home/${username}";
@@ -77,17 +75,16 @@ in {
       enableZshIntegration = true;
       settings = {
         add_newline = false;
-
-        character = {
-          success_symbol = "[➜](bold green)";
-          error_symbol = "[➜](bold red)";
-        };
-
         python.symbol = "󰌠 ";
         lua.symbol = "󰢱 ";
       };
     };
     zellij.enable = true;
+    direnv = {
+      enable = true;
+      enableZshIntegration = true;
+      nix-direnv.enable = true;
+    };
     git = {
       enable = true;
       userName = "kiipuri";
@@ -123,47 +120,7 @@ in {
         mode = "no-sudo";
       };
     };
-    tmux = {
-      enable = true;
-      keyMode = "vi";
-      mouse = true;
-      newSession = true;
-      prefix = "C-Space";
-      terminal = "\${TERM}";
-      escapeTime = 0;
-      plugins = with pkgs.tmuxPlugins; [
-        yank
-        {
-          plugin =
-            mkTmuxPlugin
-            {
-              pluginName = "base16-tmux";
-              version = "2023-10-19";
-              rtpFilePath = "tmuxcolors.tmux";
-              src = fetchFromGitHub {
-                owner = "tinted-theming";
-                repo = "base16-tmux";
-                rev = "c02050bebb60dbb20cb433cd4d8ce668ecc11ba7";
-                sha256 = "sha256-wDPg5elZPcQpu7Df0lI5O8Jv4A3T6jUQIVg63KDU+3Q=";
-              };
-            };
-          extraConfig = ''
-            set -g @colors-base16 "${theme}"
-          '';
-        }
-      ];
-      extraConfig = ''
-        bind-key h select-pane -L
-        bind-key j select-pane -D
-        bind-key k select-pane -U
-        bind-key l select-pane -R
-
-        bind-key -T copy-mode-vi v send-keys -X begin-selection
-        bind-key -T copy-mode-vi C-v send-keys -X rectangle-toggle
-        bind-key -T copy-mode-vi y send-keys -X copy-selection-and-cancel
-
-      '';
-    };
+    qutebrowser.enable = true;
   };
 
   wayland.windowManager.hyprland = {
@@ -258,6 +215,8 @@ in {
       type = "Application";
     };
   };
+
+  services.easyeffects.enable = true;
 
   services.mako = {
     enable = true;

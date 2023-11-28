@@ -161,20 +161,14 @@
       enableNvidiaPatches = true;
       xwayland.enable = true;
     };
-
-    # waybar = {
-    #   enable = true;
-    #   package = inputs.waybar-git.packages.${pkgs.system}.default;
-    # };
-
     noisetorch.enable = true;
     droidcam.enable = true;
-
     zsh.enable = true;
+    command-not-found.enable = false;
+    nix-index = {
       enable = true;
+      enableZshIntegration = true;
     };
-  };
-
     steam.enable = true;
   };
 
