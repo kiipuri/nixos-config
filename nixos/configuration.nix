@@ -3,7 +3,10 @@
   lib,
   config,
   pkgs,
-  stable,
+  hostname,
+  timezone,
+  locale,
+  username,
   ...
 }: {
   imports = [
@@ -51,12 +54,11 @@
   # boot.loader.efi.efiSysMountPoint = "/boot/efi";
 
   networking = {
-    hostName = "nixos";
-    networkmanager.enable = true;
+    hostName = hostname;
     firewall.enable = false;
   };
 
-  time.timeZone = "Europe/Helsinki";
+  time.timeZone = timezone;
 
   fileSystems = {
     "/mnt/artix" = {
@@ -73,45 +75,21 @@
     };
   };
 
-  i18n.defaultLocale = "en_US.UTF-8";
-  i18n.inputMethod = {
-    enabled = "fcitx5";
-    fcitx5.addons = with pkgs; [
-      fcitx5-mozc
-      fcitx5-gtk
-    ];
+  i18n = {
+    defaultLocale = locale;
+    inputMethod = {
+      enabled = "fcitx5";
+      fcitx5.addons = with pkgs; [
+        fcitx5-mozc
+        fcitx5-gtk
+      ];
+    };
   };
 
   console = {
     packages = with pkgs; [terminus_font];
     font = "ter-128b";
     useXkbConfig = true;
-  };
-
-  services = {
-    openssh.enable = true;
-
-    xserver = {
-      enable = true;
-      layout = "us";
-      xkbVariant = "de_se_fi";
-      xkbOptions = "caps:escape";
-      videoDrivers = ["nvidia"];
-    };
-
-    xserver.displayManager.sddm = {
-      enable = true;
-      theme = "tokyo-night-sddm";
-    };
-
-    xserver.windowManager = {
-      awesome = {
-        enable = true;
-        package = pkgs.awesome-git;
-      };
-    };
-
-    jellyfin.enable = true;
   };
 
   hardware = {
@@ -127,12 +105,61 @@
     };
   };
 
+  security = {
+    rtkit.enable = true;
+    polkit.enable = true;
+    protectKernelImage = false;
+    pam.services.swaylock.text = ''
+      auth include login
+    '';
+
+    sudo.enable = false;
+    doas.enable = true;
+    doas.extraRules = [
+      {
+        users = ["kiipuri"];
+        keepEnv = true;
+        persist = true;
+      }
+    ];
+  };
+
+  services = {
+    flatpak.enable = true;
+    openssh.enable = true;
+    xserver = {
+      enable = true;
+      layout = "us";
+      xkbVariant = "de_se_fi";
+      xkbOptions = "caps:escape";
+      videoDrivers = ["nvidia"];
+    };
+    xserver.displayManager.sddm = {
+      enable = true;
+      theme = "tokyo-night-sddm";
+    };
+
+    xserver.windowManager = {
+      awesome = {
+        enable = true;
+        package = pkgs.awesome-git;
+      };
+    };
+    jellyfin.enable = true;
+    pipewire = {
+      enable = true;
+      alsa.enable = true;
+      alsa.support32Bit = true;
+      pulse.enable = true;
+    };
+  };
+
   programs = {
     dconf.enable = true;
     hyprland = {
       enable = true;
       enableNvidiaPatches = true;
-      xwayland.enable = false;
+      xwayland.enable = true;
     };
 
     # waybar = {
@@ -229,63 +256,7 @@
     };
   };
 
-  security = {
-    rtkit.enable = true;
-    polkit.enable = true;
-    protectKernelImage = false;
-    pam.services.swaylock.text = ''
-      auth include login
-    '';
-  };
-
-  services.pipewire = {
-    enable = true;
-    alsa.enable = true;
-    alsa.support32Bit = true;
-    pulse.enable = true;
-  };
-
-  programs.steam.enable = true;
-
-  environment = {
-    systemPackages = with pkgs; [
-      (libsForQt5.callPackage ../derivatives/tokyo-night-sddm.nix {})
-      alsa-utils
-      btop
-      docker-compose
-      dunst
-      fd
-      ffmpeg_6-full
-      file
-      git
-      home-manager
-      htop
-      jellyfin-mpv-shim
-      killall
-      lf
-      libnotify
-      libsForQt5.fcitx5-qt
-      libsForQt5.qt5.qtbase
-      libsForQt5.qt5.qtgraphicaleffects
-      libsForQt5.qt5.qtquickcontrols2
-      libsForQt5.qt5.qtsvg
-      lua5_4_compat
-      neovim
-      pavucontrol
-      picom
-      ripgrep
-      swaybg
-      sxhkd
-      trash-cli
-      unzip
-      vim
-      virt-manager
-      wget
-      wl-clipboard
-      wlogout
-      wofi
-      xclip
-    ];
+    steam.enable = true;
   };
 
   nixpkgs.config.packageOverrides = pkgs: {
@@ -336,31 +307,64 @@
     };
   };
 
-  environment.variables = {
-    EDITOR = "nvim";
-    WLR_NO_HARDWARE_CURSORS = "1";
+  environment = {
+    systemPackages = with pkgs; [
+      (libsForQt5.callPackage ../derivatives/tokyo-night-sddm.nix {})
+      alsa-utils
+      btop
+      comma
+      docker-compose
+      dunst
+      eza
+      fd
+      ffmpeg_6-full
+      file
+      git
+      home-manager
+      htop
+      jellyfin-mpv-shim
+      killall
+      lf
+      libnotify
+      libsForQt5.fcitx5-qt
+      libsForQt5.qt5.qtbase
+      libsForQt5.qt5.qtgraphicaleffects
+      libsForQt5.qt5.qtquickcontrols2
+      libsForQt5.qt5.qtsvg
+      lua5_4_compat
+      neovim
+      pavucontrol
+      picom
+      ripgrep
+      swaybg
+      sxhkd
+      trash-cli
+      unzip
+      vim
+      virt-manager
+      wget
+      wl-clipboard
+      wlogout
+      wofi
+      xclip
+    ];
+
+    variables = {
+      EDITOR = "nvim";
+      WLR_NO_HARDWARE_CURSORS = "1";
+    };
   };
 
   users = {
     mutableUsers = false;
     users.root.hashedPassword = "$y$j9T$orXQD6ZLWsh8O8p0fyrsL1$eSwLvuV/xbCJC3Uq7pHw6SWS9pLC7vLOuqjeJzo1Nd3";
-    users.kiipuri = {
+    users.${username} = {
       isNormalUser = true;
       shell = pkgs.zsh;
       hashedPassword = "$y$j9T$99Ie.QqXuV29Pgasvfpfa0$x4yJlYAvWERYxw3Vbbo8.xqHfvSUkzueJqOMUtpT9V1";
       extraGroups = ["wheel"];
     };
   };
-
-  security.sudo.enable = false;
-  security.doas.enable = true;
-  security.doas.extraRules = [
-    {
-      users = ["kiipuri"];
-      keepEnv = true;
-      persist = true;
-    }
-  ];
 
   virtualisation.docker = {
     enable = true;

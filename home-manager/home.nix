@@ -1,8 +1,13 @@
 {
+  lib,
   inputs,
   config,
   pkgs,
+  username,
   theme,
+  font,
+  hyprland,
+  split-monitor-workspaces,
   ...
 }: let
   inherit (config.colorScheme) colors;
@@ -44,8 +49,8 @@ in {
       goldendict-ng
       tldr
     ];
-    username = "kiipuri";
-    homeDirectory = "/home/kiipuri";
+    inherit username;
+    homeDirectory = "/home/${username}";
   };
 
   programs = {
@@ -86,16 +91,12 @@ in {
     kitty = {
       enable = true;
       extraConfig = ''
-        font_family JetBrainsMono Nerd Font
-        font_size 16
         map f1 launch --cwd=current --type=background kitty
+        # term xterm-256color
       '';
       settings = {
-        foreground = "#${colors.base05}";
-        background = "#${colors.base00}";
         window_padding_width = 10;
-        font_family = "Cascadia Code";
-        font_size = 18;
+        font_size = 16;
         confirm_os_window_close = 0;
         enable_audio_bell = "no";
       };
@@ -134,6 +135,11 @@ in {
         }
       ];
       extraConfig = ''
+        bind-key h select-pane -L
+        bind-key j select-pane -D
+        bind-key k select-pane -U
+        bind-key l select-pane -R
+
         bind-key -T copy-mode-vi v send-keys -X begin-selection
         bind-key -T copy-mode-vi C-v send-keys -X rectangle-toggle
         bind-key -T copy-mode-vi y send-keys -X copy-selection-and-cancel
@@ -191,11 +197,11 @@ in {
 
   wayland.windowManager.hyprland = {
     enable = true;
+    package = hyprland.packages.${pkgs.system}.default;
     enableNvidiaPatches = true;
-    systemdIntegration = true;
-    recommendedEnvironment = true;
+    systemd.enable = true;
     plugins = [
-      inputs.split-monitor-workspaces.packages.${pkgs.system}.split-monitor-workspaces
+      split-monitor-workspaces.packages.${pkgs.system}.split-monitor-workspaces
     ];
     extraConfig = builtins.readFile ./config/hypr/hyprland.conf;
   };

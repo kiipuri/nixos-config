@@ -4,7 +4,6 @@
   inputs = {
     # Nixpkgs
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
-    nixpkgs-stable.url = "github:nixos/nixpkgs/nixos-23.05";
 
     # Home manager
     home-manager.url = "github:nix-community/home-manager";
@@ -31,28 +30,47 @@
 
   outputs = {
     nixpkgs,
-    nixpkgs-stable,
     home-manager,
     hyprland,
     nixpkgs-f2k,
     split-monitor-workspaces,
     waybar-git,
+    stylix,
     ...
   } @ inputs: let
     system = "x86_64-linux";
-    stable = import nixpkgs-stable {inherit system;};
+    hostname = "nixos";
+    timezone = "Europe/Helsinki";
+    locale = "en_US.UTF-8";
 
     theme = "catppuccin-mocha";
+    username = "kiipuri";
+    font = "Maple Mono";
+    fontPkg = pkgs.maple-mono;
+
+    # cursor = "Reimu";
+    # cursorPkg = pkgs.callPackage ./home-manager/derivatives/touhou-cursors.nix {};
+
+    cursor = "Bibata-Modern-Ice";
+    cursorPkg = pkgs.bibata-cursors;
+
+    pkgs = import nixpkgs {inherit system;};
   in {
     # NixOS configuration entrypoint
     # Available through 'nixos-rebuild --flake .#your-hostname'
     nixosConfigurations = {
       # FIXME replace with your hostname
-      nixos = nixpkgs.lib.nixosSystem {
+      ${hostname} = nixpkgs.lib.nixosSystem {
         specialArgs = {
           inherit inputs;
-          inherit stable;
+          inherit hostname;
+          inherit timezone;
+          inherit locale;
+
+          inherit username;
           inherit theme;
+          inherit font;
+          inherit fontPkg;
           inherit (inputs) stylix;
           inherit (inputs) nixpkgs-f2k;
         }; # Pass flake inputs to our config
@@ -66,21 +84,26 @@
     # Standalone home-manager configuration entrypoint
     # Available through 'home-manager --flake .#your-username@your-hostname'
     homeConfigurations = {
-      # FIXME replace with your username@hostname
-      "kiipuri@nixos" = home-manager.lib.homeManagerConfiguration {
+      "${username}@${hostname}" = home-manager.lib.homeManagerConfiguration {
         pkgs = nixpkgs.legacyPackages.x86_64-linux; # Home-manager requires 'pkgs' instance
         extraSpecialArgs = {
           inherit inputs;
-          inherit stable;
           inherit theme;
+          inherit font;
+          inherit fontPkg;
+          inherit cursor;
+          inherit cursorPkg;
+          inherit username;
+          inherit hostname;
           inherit (inputs) stylix;
           inherit (inputs) nix-colors;
+          inherit (inputs) hyprland;
+          inherit (inputs) split-monitor-workspaces;
         }; # Pass flake inputs to our config
         # > Our main home-manager configuration file <
         modules = [
           ./home-manager/home.nix
-          hyprland.homeManagerModules.default
-          {wayland.windowManager.hyprland.enable = true;}
+          stylix.homeManagerModules.stylix
         ];
       };
     };
