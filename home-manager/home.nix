@@ -53,6 +53,17 @@ in {
     ];
     inherit username;
     homeDirectory = "/home/${username}";
+    activation = {
+      reloadConfigs = lib.hm.dag.entryAfter ["writeBoundary"] ''
+        for socket in $(${pkgs.fd}/bin/fd --type=socket nvim /run/user/1000); do
+          for file in $(${pkgs.fd}/bin/fd ".*\.lua" ~/.config/nvim); do
+            ${pkgs.neovim-remote}/bin/nvr --servername $socket -c "so $file"
+          done
+        done
+        ${pkgs.coreutils}/bin/kill -SIGUSR1 $(${pkgs.toybox}/bin/pgrep kitty)
+        ${pkgs.mako}/bin/makoctl reload
+      '';
+    };
   };
 
   programs = {
