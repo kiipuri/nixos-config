@@ -8,7 +8,7 @@
   inherit (lib) mkEnableOption;
   inherit (pkgs.vimUtils) buildVimPlugin;
   inherit (pkgs) fetchFromGitHub;
-  inherit (config.colorScheme) colors;
+  inherit (theme) colors;
   configString = import ./config/config.nix;
 
   fileTypes = [
@@ -268,7 +268,7 @@ in {
       };
 
       extraConfigLua = ''
-        vim.cmd[[colorscheme base16-${theme}]]
+        vim.cmd[[set bg=light]]
         local base16 = require("base16-colorscheme")
         base16.setup({
           base00 = "#${colors.base00}", base01 = "#${colors.base01}", base02 = "#${colors.base02}",

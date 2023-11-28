@@ -218,6 +218,12 @@
               <string>Noto Sans Devanagari</string>
           </edit>
         </match>
+        <alias>
+          <family>icon</family>
+          <prefer>
+              <family>Noto Color Emoji</family>
+          </prefer>
+        </alias>
       '';
       defaultFonts = {
         serif = ["Noto Serif Devanagari" "Noto Serif"];

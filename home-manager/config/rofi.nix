@@ -1,4 +1,5 @@
 {
+  lib,
   config,
   pkgs,
   ...
@@ -37,7 +38,7 @@ in {
       kb-row-right = "Control+l";
     };
 
-    theme = {
+    theme = lib.mkForce {
       "*" = {
         bg-col = mkLiteral "#${colors.base00}";
         bg-col-light = mkLiteral "#${colors.base00}";
@@ -50,7 +51,6 @@ in {
         grey = mkLiteral "#6e738d";
 
         width = 600;
-        font = "JetBrainsMono Nerd Font 14";
       };
 
       "element-text, element-icon , mode-switcher" = {

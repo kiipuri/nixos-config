@@ -10,17 +10,17 @@
   split-monitor-workspaces,
   ...
 }: let
-  inherit (config.colorScheme) colors;
   inherit (pkgs) fetchFromGitHub;
 in {
   imports = [
     inputs.nix-colors.homeManagerModule
     inputs.nvim.inputs.nixvim.homeManagerModules.nixvim
 
-    ./nvim
-    ./config/waybar.nix
+    # ./nvim
+    # ./config/waybar.nix
     ./config/lf.nix
     ./config/rofi.nix
+    ./style/stylix.nix
     ./shell/shell.nix
   ];
 
@@ -56,6 +56,10 @@ in {
 
   programs = {
     home-manager.enable = true;
+    fzf = {
+      enable = true;
+      enableZshIntegration = true;
+    };
     starship = {
       enable = true;
       enableZshIntegration = true;
@@ -71,6 +75,7 @@ in {
         lua.symbol = "󰢱 ";
       };
     };
+    zellij.enable = true;
     git = {
       enable = true;
       userName = "kiipuri";
@@ -162,14 +167,6 @@ in {
 
   gtk = {
     enable = true;
-    cursorTheme = {
-      package = pkgs.callPackage ./derivatives/touhou-cursors.nix {};
-      name = "Reimu";
-    };
-    theme = {
-      package = pkgs.tokyo-night-gtk;
-      name = "Tokyonight-Storm-B";
-    };
   };
 
   qt = {
@@ -182,8 +179,6 @@ in {
   home.pointerCursor = {
     x11.enable = true;
     x11.defaultCursor = "X_cursor";
-    package = pkgs.callPackage ./derivatives/touhou-cursors.nix {};
-    name = "Reimu";
     gtk.enable = true;
   };
 
@@ -251,13 +246,10 @@ in {
   services.mako = {
     enable = true;
     anchor = "top-right";
-    backgroundColor = "#${colors.base00}";
-    textColor = "#${colors.base05}";
-    borderColor = "#${colors.base05}";
     borderRadius = 10;
     borderSize = 5;
     padding = "10";
-    font = "JetBrainsMono Nerd Font Regular 18";
+    font = lib.mkForce "${font} Regular 18";
     height = 200;
     width = 500;
     defaultTimeout = 5000;

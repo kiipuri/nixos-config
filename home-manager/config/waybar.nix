@@ -1,78 +1,127 @@
 {
   config,
   pkgs,
+  font,
+  theme,
+  city,
   ...
 }: let
-  theme = config.colorScheme;
   inherit (theme) colors;
 in {
   programs.waybar = {
     enable = true;
     systemd.enable = true;
     style = ''
-      /** ********** Fonts ********** **/
       * {
-        font-family: "JetBrains Mono", "Iosevka Nerd Font", archcraft, sans-serif;
-        font-size: 16px;
-      }
-
-      tooltip {
-        color: #${colors.base05};
-        background-color: #${colors.base00};
-      }
-
-      tooltip * {
-        color: #${colors.base05};
-        background-color: #${colors.base00};
+          border: none;
+          border-radius: 0px;
+          font-family: ${font};
+          font-size: 18px;
       }
 
       window#waybar {
-        background-color: #${colors.base00};
-      }
-      /** ********** Clock ********** **/
-      #clock {
-        background-color: #a6e3a1;
+          background: transparent;
       }
 
-      #custom-date {
-        background-color: #fdffb6;
+      window#waybar.hidden {
+          opacity: 0.2;
       }
 
-      /** ********** CPU ********** **/
+      tooltip * {
+          color: #${colors.base05};
+          background-color: #${colors.base00};
+      }
+
+      #window {
+          border-radius: 20px;
+          transition: none;
+          background: #${colors.base00};
+          padding-left: 16px;
+          padding-right: 16px;
+          margin-left: 20px;
+          margin-right: 20px;
+      }
+
+      .modules-left #workspaces {
+          margin-right: 8px;
+          border-radius: 20px;
+          transition: none;
+          background: #${colors.base00};
+          border: none;
+      }
+
+      .modules-left #workspaces button {
+          transition: none;
+          color: #${colors.base05};
+          background: transparent;
+          padding: 5px 15px;
+          border: none;
+      }
+
+      .modules-left #workspaces button.persistent {
+          color: #${colors.base05};
+          border: none;
+      }
+
+      .modules-left #workspaces button.active {
+          border-radius: inherit;
+          background: #${colors.base02};
+          color: #${colors.base06};
+          border: none;
+      }
+
+      /* https://github.com/Alexays/Waybar/wiki/FAQ#the-workspace-buttons-have-a-strange-hover-effect */
+      #workspaces button:hover {
+          transition: none;
+          box-shadow: inherit;
+          text-shadow: inherit;
+          border-radius: inherit;
+          color: #${colors.base05};
+          background: #${colors.base01};
+          border-bottom: 0px;
+      }
+
+      #workspaces button.focused {
+          color: white;
+          border: 0px;
+          border-bottom: 0px;
+      }
+
       #cpu {
-        background-color: #89dceb;
+          margin-left: 16px;
+          padding-left: 16px;
+          border-radius: 20px 0px 0px 20px;
+          transition: none;
+          color: #${colors.base0C};
+          background: #${colors.base00};
       }
 
-      /** ********** Memory ********** **/
       #memory {
-        background-color: #eba0ac;
+          padding-left: 16px;
+          border-radius: 0px;
+          transition: none;
+          color: #${colors.base0C};
+          background: #${colors.base00};
       }
 
-      /** ********** Disk ********** **/
       #disk {
-        background-color: #b4befe;
-      }
-      /** ********** Pulseaudio ********** **/
-      #pulseaudio {
-        background-color: #fab387;
-      }
-
-      #pulseaudio.bluetooth {
-        background-color: #f5c2e7;
-      }
-      #pulseaudio.muted {
-        background-color: #313244;
-        color: #cdd6f4;
+          padding-left: 16px;
+          padding-right: 16px;
+          border-radius: 0px 20px 20px 0px;
+          transition: none;
+          color: #${colors.base0C};
+          background: #${colors.base00};
       }
 
-      /** ********** Network ********** **/
       #network {
-        background-color: #89b4fa;
+          padding-left: 16px;
+          color: #${colors.base0A};
+          background-color: #${colors.base00};
       }
 
       #network.disconnected,
       #network.disabled {
-        background-color: #313244;
+        background-color: #${colors.base00};
         color: #cdd6f4;
       }
       #network.linked {
@@ -82,134 +131,132 @@ in {
       #network.wifi {
       }
 
-      /** ********** Custom ********** **/
-      /*
-      #custom-menu,
-      #custom-power,
-      #custom-weather,
-      #custom-updater {
-        border-radius: 4px;
-        margin: 6px 0px;
-        padding: 2px 8px;
+      #custom-date {
+          padding-left: 16px;
+          transition: none;
+          color: #${colors.base0B};
+          background: #${colors.base00};
       }
 
-      #custom-menu {
-        background-color: #f5c2e7;
-        margin-left: 6px;
-        padding: 2px 6px;
-        font-size: 16px;
+      #clock {
+          padding-left: 16px;
+          border-radius: 0px;
+          transition: none;
+          color: #${colors.base0C};
+          background: #${colors.base00};
       }
 
       #custom-power {
-        background-color: #f38ba8;
-        margin-right: 6px;
-        padding: 2px 8px;
-        font-size: 16px;
+          color: #${colors.base0D};
+          background-color: #${colors.base00};
+          padding-left: 16px;
+          padding-right: 20px;
+          border-radius: 0px 20px 20px 0px;
       }
 
-      #custom-updater {
-        background-color: #e6ed7b;
-        margin-right: 6px;
-        padding: 2px 8px;
-        font-size: 12px;
+      #custom-weather-icon {
+          font-family: "Noto Color Emoji";
+          padding-left: 16px;
+          border-radius: 0px;
+          transition: none;
+          color: #${colors.base08};
+          background: #${colors.base00};
       }
 
       #custom-weather {
-        background-color: #cba6f7;
-        margin-right: 6px;
-        padding: 2px 8px;
-        font-size: 12px;
-      }
-      */
-
-      #custom-weather {
-        background-color: #cba6f7;
-        font-size: 12px;
+          transition: none;
+          color: #${colors.base08};
+          background: #${colors.base00};
       }
 
-      /** Common style **/
-      #backlight,
-      #battery,
-      #clock,
-      #cpu,
-      #disk,
-      #mode,
-      #memory,
-      #mpd,
-      #tray,
-      #pulseaudio,
-      #custom-weather,
-      #custom-date,
-      #custom-power,
-      #network {
-        border-radius: 4px;
-        margin: 6px 0px;
-        padding: 2px 8px;
-        color: #${colors.base00};
+      #pulseaudio {
+          padding-left: 16px;
+          transition: none;
+          color: #${colors.base09};
+          background: #${colors.base00};
       }
 
-      #custom-power {
-        background-color: #f38ba8;
-        margin-right: 4px;
-        padding: 0 10px 0 8px;
-        font-size: 16px;
+      #pulseaudio.muted {
+          background-color: #${colors.base00};
+          color: #${colors.base05};
       }
 
-      button:hover {
-        box-shadow: none; /* Remove predefined box-shadow */
-        text-shadow: none; /* Remove predefined text-shadow */
-        background: none; /* Remove predefined background color (white) */
-        transition: none; /* Disable predefined animations */
+      #backlight {
+          margin-right: 8px;
+          padding-left: 16px;
+          padding-right: 16px;
+          border-radius: 10px;
+          transition: none;
+          color: #ffffff;
+          background: #383c4a;
       }
 
-      #workspaces button {
-        color: #${colors.base05};
+      #battery {
+          margin-right: 8px;
+          padding-left: 16px;
+          padding-right: 16px;
+          border-radius: 10px;
+          transition: none;
+          color: #ffffff;
+          background: #383c4a;
       }
 
-      #workspaces button:hover {
-        background-color: salmon;
-        color: #${colors.base00};
-        border: none;
+      #battery.charging {
+          color: #ffffff;
+          background-color: #26A65B;
       }
 
-      /*
-      #workspaces button.persistent {
-        background-color: yellow;
-      }
-      */
-
-      /* is visible on any monitor */
-      #workspaces button.visible {
-        background-color: #89dceb;
+      #battery.warning:not(.charging) {
+          background-color: #ffbe61;
+          color: black;
       }
 
-      /* has focus */
-      #workspaces button.active {
-        background-color: #a6e3a1;
-        color: #${colors.base00};
+      #battery.critical:not(.charging) {
+          background-color: #f53c3c;
+          color: #ffffff;
+          animation-name: blink;
+          animation-duration: 0.5s;
+          animation-timing-function: linear;
+          animation-iteration-count: infinite;
+          animation-direction: alternate;
+      }
+
+      #tray {
+          padding-left: 16px;
+          border-radius: 20px 0px 0px 20px;
+          transition: none;
+          color: #${colors.base05};
+          background: #${colors.base00};
+      }
+
+      @keyframes blink {
+          to {
+              background-color: #ffffff;
+              color: #000000;
+          }
       }
     '';
+
     settings = {
       mainBar = {
-        # include = "~/.config/waybar/modules";
         id = "main-bar";
         name = "main-bar";
         layer = "top";
         position = "top";
-        height = 32;
         passthrough = "false";
         width = 0;
-        spacing = 6;
+        height = 40;
+        spacing = 0;
         margin = "0";
-        margin-top = 0;
+        margin-top = 20;
         margin-bottom = 0;
-        margin-left = 0;
-        margin-right = 0;
+        margin-left = 20;
+        margin-right = 20;
         ipc = true;
 
         modules-left = ["custom/menu" "hyprland/workspaces" "cpu" "memory" "disk"];
-        modules-center = ["tray"];
-        modules-right = ["custom/weather" "pulseaudio" "network" "battery" "custom/date" "clock" "custom/power"];
+        modules-center = ["hyprland/window"];
+        modules-right = ["tray" "custom/weather-icon" "custom/weather" "pulseaudio" "network" "battery" "custom/date" "clock" "custom/power"];
 
         "hyprland/workspaces" = {
           format = "{icon}";
@@ -233,6 +280,11 @@ in {
             "18" = "8";
             "19" = "9";
           };
+        };
+
+        tray = {
+          icon-size = 24;
+          spacing = 4;
         };
 
         clock = {
@@ -284,11 +336,19 @@ in {
           tooltip-format = " {ifname} via {gwaddr}";
         };
 
-        "custom/weather" = {
+        "custom/weather-icon" = {
           format = "{}";
           interval = 1800;
+          exec = pkgs.writeShellScript "waybar-weather-icon" ''
+            ${pkgs.curl}/bin/curl -s 'wttr.in/${city}?format=%c' | ${pkgs.toybox}/bin/sed 's/\s*//g'
+          '';
+        };
+
+        "custom/weather" = {
+          format = " {}";
+          interval = 1800;
           exec = pkgs.writeShellScript "waybar-weather" ''
-            ${pkgs.curl}/bin/curl -s 'wttr.in/Tornio?format=%c%t' | ${pkgs.toybox}/bin/sed 's/+//; s/  / /'
+            ${pkgs.curl}/bin/curl -s 'wttr.in/${city}?format=%t' | ${pkgs.toybox}/bin/sed 's/\s*//g'
           '';
         };
 
