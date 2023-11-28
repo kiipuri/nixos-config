@@ -21,6 +21,7 @@ in {
     ./config/waybar.nix
     ./config/lf.nix
     ./config/rofi.nix
+    ./shell/shell.nix
   ];
 
   colorScheme = inputs.nix-colors.colorSchemes.${theme};
@@ -143,55 +144,8 @@ in {
         bind-key -T copy-mode-vi v send-keys -X begin-selection
         bind-key -T copy-mode-vi C-v send-keys -X rectangle-toggle
         bind-key -T copy-mode-vi y send-keys -X copy-selection-and-cancel
-      '';
-    };
-    zsh = {
-      enable = true;
-      dotDir = ".config/zsh";
-      history.path = "${config.xdg.dataHome}/zsh/zsh_history";
-      initExtra = ''
-        myprompt() {
-          if [[ -n $IN_NIX_SHELL ]]; then
-            PS1="%{$fg[cyan]%}%~ %{$fg[red]%}(%{$fg[green]%}nix-shell%{$fg[red]%}) %{$fg[blue]%}--> "
-            RPROMPT=
-          fi
-        }
 
-        add-zsh-hook precmd myprompt
-        BASE16_THEME_DEFAULT="${theme}"
-        base16_${theme}
       '';
-      plugins = [
-        {
-          name = "zsh-nix-shell";
-          file = "nix-shell.plugin.zsh";
-          src = pkgs.fetchFromGitHub {
-            owner = "chisui";
-            repo = "zsh-nix-shell";
-            rev = "v0.7.0";
-            sha256 = "sha256-oQpYKBt0gmOSBgay2HgbXiDoZo5FoUKwyHSlUrOAP5E=";
-          };
-        }
-        {
-          name = "zsh-vi-mode";
-          src = pkgs.fetchFromGitHub {
-            owner = "jeffreytse";
-            repo = "zsh-vi-mode";
-            rev = "v0.10.0";
-            sha256 = "sha256-QE6ZwwM2X0aPqNnbVrj0y7w9hmuRf0H1j8nXYwyoLo4=";
-          };
-        }
-        {
-          name = "base16-shell";
-          file = "base16-shell.plugin.zsh";
-          src = pkgs.fetchFromGitHub {
-            owner = "tinted-theming";
-            repo = "base16-shell";
-            rev = "9706041539504a7dda5bf2411a0f513cce8460ad";
-            sha256 = "sha256-k7acnFJKAU4lrfOEpsWDOtnMqP5sZfULa3vYTOix7DU=";
-          };
-        }
-      ];
     };
   };
 
