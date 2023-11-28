@@ -39,6 +39,7 @@ in {
       librewolf
       neofetch
       nvtop
+      pyprland
       qalculate-gtk
       slurp
       sonixd
@@ -227,6 +228,10 @@ in {
       dunst = {
         source = ./config/dunst;
         recursive = true;
+      };
+      pypr = {
+        source = ./config/hypr/pyprland.toml;
+        target = "hypr/pyprland.toml";
       };
     };
   };
