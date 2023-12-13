@@ -32,6 +32,8 @@
       fi
     }
 
+    zstyle ':completion:*' matcher-list ''' 'm:{a-zA-Z}={A-Za-z}' 'r:|=*' 'l:|=* r:|=*'
+
     export __HM_SESS_VARS_SOURCED=
     export __HM_ZSH_SESS_VARS_SOURCED=
     . "$HOME/.nix-profile/etc/profile.d/hm-session-vars.sh"
