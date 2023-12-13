@@ -17,6 +17,7 @@
     ./config/rofi.nix
     ./style/stylix.nix
     ./shell/shell.nix
+    ./browser/qutebrowser.nix
   ];
 
   colorScheme = inputs.nix-colors.colorSchemes.${theme};
@@ -120,7 +121,6 @@
         mode = "no-sudo";
       };
     };
-    qutebrowser.enable = true;
   };
 
   wayland.windowManager.hyprland = {
