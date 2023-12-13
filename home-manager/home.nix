@@ -55,12 +55,13 @@
     activation = {
       reloadConfigs = lib.hm.dag.entryAfter ["writeBoundary"] ''
         for socket in $(${pkgs.fd}/bin/fd --type=socket nvim /run/user/1000); do
-          for file in $(${pkgs.fd}/bin/fd ".*\.lua" ~/.config/nvim); do
+          for file in $(${pkgs.fd}/bin/fd --extension=lua . ~/.config/nvim | sort --reverse); do
             ${pkgs.neovim-remote}/bin/nvr --servername $socket -c "so $file"
           done
         done
         ${pkgs.coreutils}/bin/kill -SIGUSR1 $(${pkgs.toybox}/bin/pgrep kitty)
         ${pkgs.mako}/bin/makoctl reload
+        ${pkgs.systemd}/bin/systemctl --user restart waybar.service
       '';
     };
   };
@@ -126,7 +127,6 @@
   wayland.windowManager.hyprland = {
     enable = true;
     package = hyprland.packages.${pkgs.system}.default;
-    enableNvidiaPatches = true;
     systemd.enable = true;
     plugins = [
       split-monitor-workspaces.packages.${pkgs.system}.split-monitor-workspaces
@@ -140,7 +140,7 @@
 
   qt = {
     enable = true;
-    platformTheme = "gtk";
+    platformTheme = "gtk3";
     style.name = "adwaita-dark";
     style.package = pkgs.adwaita-qt;
   };
