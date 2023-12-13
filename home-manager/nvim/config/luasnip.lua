@@ -1,11 +1,16 @@
 local ls = require("luasnip")
 local snippet = ls.snippet
-local text = ls.text_node
-local insert = ls.insert_node
+local t = ls.text_node
+local i = ls.insert_node
 
 ls.add_snippets("typescript", {
     snippet("exd", {
-        text("export default "),
+        t("export default "),
+    }),
+    snippet("<>", {
+        t("<>"),
+        i(1),
+        t("</>"),
     }),
 })
 

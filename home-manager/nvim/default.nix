@@ -250,6 +250,15 @@ in {
             "<C-d>" = "cmp.mapping.scroll_docs(-4)";
             "<C-f>" = "cmp.mapping.scroll_docs(4)";
             "<C-Space>" = "cmp.mapping.complete()";
+            "<Tab>" = ''
+              cmp.mapping(function(fallback)
+                if luasnip.expand_or_locally_jumpable() then
+                  luasnip.expand_or_jump()
+                else
+                  fallback()
+                end
+              end, { "i", "s" })
+            '';
             # "<Tab>" = ''
             #   cmp.mapping(function(fallback)
             #     if cmp.visible() then
@@ -267,15 +276,22 @@ in {
             # '';
             "<S-Tab>" = ''
               cmp.mapping(function(fallback)
-                if cmp.visible() then
-                  cmp.select_prev_item()
-                elseif luasnip.jumpable(-1) then
+                if luasnip.jumpable(-1) then
                   luasnip.jump(-1)
-                else
-                  fallback()
                 end
               end, { "i", "s" })
             '';
+            # "<S-Tab>" = ''
+            #   cmp.mapping(function(fallback)
+            #     if cmp.visible() then
+            #       cmp.select_prev_item()
+            #     elseif luasnip.jumpable(-1) then
+            #       luasnip.jump(-1)
+            #     else
+            #       fallback()
+            #     end
+            #   end, { "i", "s" })
+            # '';
             "<C-j>" = "cmp.mapping(cmp.mapping.select_next_item({ behavior = cmp.SelectBehavior.Select }), {'i'})";
             "<C-k>" = "cmp.mapping(cmp.mapping.select_prev_item({ behavior = cmp.SelectBehavior.Select }), {'i'})";
           };
@@ -314,6 +330,11 @@ in {
         local rest = require("rest-nvim")
         rest.setup()
         vim.keymap.set('n', '<leader>xr', rest.run)
+
+        local config = require("session_manager.config")
+        require("session_manager").setup({
+          autoload_mode = config.AutoloadMode.CurrentDir
+        })
       '';
 
       globals = {
