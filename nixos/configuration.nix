@@ -127,6 +127,15 @@
   services = {
     flatpak.enable = true;
     openssh.enable = true;
+    transmission = {
+      enable = true;
+      home = "/home/${username}";
+      user = username;
+      settings = {
+        download-dir = "/mnt/hdd/Torrents";
+        incomplete-dir = "/home/${username}/Downloads";
+      };
+    };
     xserver = {
       enable = true;
       layout = "us";

@@ -41,7 +41,7 @@
       slurp
       sonixd
       osu-lazer-bin
-      transmission-gtk
+      transmission-remote-gtk
       grim
       yt-dlp
       picard
