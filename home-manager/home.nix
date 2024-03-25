@@ -18,6 +18,7 @@
     ./browser/qutebrowser.nix
     ./mpv/mpv.nix
     ./window-managers/hyprland/hyprland.nix
+    ./easyeffects/default.nix
   ];
 
   colorScheme = inputs.nix-colors.colorSchemes.${theme};
@@ -57,7 +58,6 @@
       yt-dlp
       picard
       goldendict-ng
-      tldr
       jq
     ];
     inherit username;
@@ -69,10 +69,19 @@
             ${pkgs.neovim-remote}/bin/nvr --servername $socket -c "so $file"
           done
         done
-        ${pkgs.coreutils}/bin/kill -SIGUSR1 $(${pkgs.toybox}/bin/pgrep kitty)
-        ${pkgs.mako}/bin/makoctl reload
-        ${pkgs.systemd}/bin/systemctl --user restart waybar.service
+
+        ${pkgs.coreutils}/bin/kill -SIGUSR1 $(${pkgs.toybox}/bin/pgrep kitty) 2>/dev/null
+        ${pkgs.coreutils}/bin/kill -SIGUSR1 $(${pkgs.toybox}/bin/pgrep picom) 2>/dev/null
+        ${pkgs.coreutils}/bin/kill -SIGUSR2 $(${pkgs.toybox}/bin/pgrep waybar) 2>/dev/null
+        ${pkgs.mako}/bin/makoctl reload 2>/dev/null
+        ${pkgs.systemd}/bin/systemctl --user start sops-nix.service
       '';
+    };
+    sessionVariables = {
+      MEDNAFEN_HOME = "${config.xdg.configHome}/mednafen";
+      XCOMPOSECACHE = "${config.xdg.cacheHome}/X11/xcompose";
+      DOCKER_CONFIG = "${config.xdg.configHome}/docker";
+      CUDA_CACHE_PATH = "${config.xdg.cacheHome}/nv";
     };
   };
 
@@ -81,6 +90,47 @@
     fzf = {
       enable = true;
       enableZshIntegration = true;
+    };
+    wlogout = {
+      enable = true;
+      layout = [
+        {
+          label = "lock";
+          action = "swaylock";
+          text = "Lock";
+          keybind = "l";
+        }
+        {
+          label = "hibernate";
+          action = "${pkgs.systemd}/bin/systemctl hibernate";
+          text = "Hibernate";
+          keybind = "h";
+        }
+        {
+          label = "logout";
+          action = "${pkgs.systemd}/bin/loginctl kill-session $XDG_SESSION_ID";
+          text = "Logout";
+          keybind = "e";
+        }
+        {
+          label = "shutdown";
+          action = "${pkgs.systemd}/bin/systemctl poweroff";
+          text = "Shutdown";
+          keybind = "s";
+        }
+        {
+          label = "suspend";
+          action = "${pkgs.systemd}/bin/systemctl suspend";
+          text = "Suspend";
+          keybind = "u";
+        }
+        {
+          label = "reboot";
+          action = "${pkgs.systemd}/bin/systemctl reboot";
+          text = "Reboot";
+          keybind = "r";
+        }
+      ];
     };
     starship = {
       enable = true;
@@ -96,6 +146,12 @@
       enable = true;
       enableZshIntegration = true;
       nix-direnv.enable = true;
+    };
+    tealdeer = {
+      enable = true;
+      settings = {
+        updates.auto_update = true;
+      };
     };
     git = {
       enable = true;
@@ -130,9 +186,9 @@
     };
   };
 
-
   gtk = {
     enable = true;
+    gtk2.configLocation = "${config.xdg.configHome}/gtk-2.0/gtkrc";
   };
 
   qt = {
@@ -227,20 +283,33 @@
 
       services.autorun = {
         Install.WantedBy = ["graphical-session.target"];
-        Unit.PartOf = ["graphical-session.target"];
+        Unit = {
+          PartOf = ["graphical-session.target"];
+          After = ["graphical-session.target"];
+        };
         Service = {
           ExecStart = "${pkgs.writeShellScript "autorun-start" ''
-            ${pkgs.swaybg}/bin/swaybg -i \
-              $(cd ~/wallpapers && ${pkgs.coreutils}/bin/ls | \
+            wallpaper=$(cd ~/wallpapers && ${pkgs.coreutils}/bin/ls | \
               ${pkgs.coreutils}/bin/shuf | \
               ${pkgs.coreutils}/bin/head -n1 | \
               ${pkgs.findutils}/bin/xargs \
-              ${pkgs.coreutils}/bin/realpath) -m stretch &
+              ${pkgs.coreutils}/bin/realpath)
+
+            environ=$(${pkgs.busybox}/bin/strings /proc/$(echo $$)/environ)
+
+            if [[ $environ == *"WAYLAND_DISPLAY"* ]]; then
+              ${pkgs.swaybg}/bin/swaybg -i $wallpaper -m fill &
+            elif [[ $environ == *"DISPLAY"* ]]; then
+              ${pkgs.feh}/bin/feh --no-fehbg --bg-fill $wallpaper &
+            fi
+
             ${pkgs.lxsession}/bin/lxpolkit &
           ''}";
 
           ExecStop = "${pkgs.writeShellScript "autorun-stop" ''
             ${pkgs.procps}/bin/pkill -f ${pkgs.swaybg}/bin/swaybg
+            ${pkgs.procps}/bin/pkill -f ${pkgs.feh}/bin/feh
+            ${pkgs.procps}/bin/pkill -f ${pkgs.fcitx5}/bin/fcitx5
             ${pkgs.procps}/bin/pkill -f ${pkgs.lxsession}/bin/lxpolkit
           ''}";
 
