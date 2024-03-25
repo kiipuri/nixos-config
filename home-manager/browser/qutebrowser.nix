@@ -17,6 +17,8 @@
         "<Ctrl-k>" = "cmd-run-with-count 10 scroll up";
         "J" = "tab-prev";
         "K" = "tab-next";
+        "<Alt+j>" = "tab-move -";
+        "<Alt+k>" = "tab-move +";
       };
     };
     searchEngines = {
@@ -24,15 +26,21 @@
       w = "https://en.wikipedia.org/wiki/Special:Search?search={}&go=Go&ns0=1";
       y = "https://www.youtube.com/results?search_query={}";
     };
+    extraConfig = ''
+      config.unbind("<Ctrl+q>", mode="normal")
+    '';
     settings = {
       scrolling.smooth = true;
       auto_save.session = true;
       url = {
         start_pages = "https://searx.kiipuri.dev";
       };
-      content.blocking = {
-        enabled = true;
-        adblock.lists = ["https://easylist.to/easylist/easylist.txt" "https://easylist.to/easylist/easyprivacy.txt" "https://easylist-downloads.adblockplus.org/easylistdutch.txt" "https://easylist-downloads.adblockplus.org/abp-filters-anti-cv.txt" "https://www.i-dont-care-about-cookies.eu/abp/" "https://secure.fanboy.co.nz/fanboy-cookiemonster.txt"];
+      content = {
+        autoplay = false;
+        blocking = {
+          enabled = true;
+          adblock.lists = ["https://easylist.to/easylist/easylist.txt" "https://easylist.to/easylist/easyprivacy.txt" "https://easylist-downloads.adblockplus.org/easylistdutch.txt" "https://easylist-downloads.adblockplus.org/abp-filters-anti-cv.txt" "https://www.i-dont-care-about-cookies.eu/abp/" "https://secure.fanboy.co.nz/fanboy-cookiemonster.txt"];
+        };
       };
     };
     greasemonkey = [
