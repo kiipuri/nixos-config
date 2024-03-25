@@ -3,7 +3,6 @@
   pkgs,
   font,
   theme,
-  city,
   ...
 }: let
   inherit (theme) colors;
@@ -340,7 +339,7 @@ in {
           format = "{}";
           interval = 1800;
           exec = pkgs.writeShellScript "waybar-weather-icon" ''
-            ${pkgs.curl}/bin/curl -s 'wttr.in/${city}?format=%c' | ${pkgs.toybox}/bin/sed 's/\s*//g'
+            ${pkgs.curl}/bin/curl -s "wttr.in/$(${pkgs.coreutils}/bin/cat ${config.sops.secrets.city.path})?format=%c" | ${pkgs.toybox}/bin/sed 's/\s*//g'
           '';
         };
 
@@ -348,7 +347,7 @@ in {
           format = " {}";
           interval = 1800;
           exec = pkgs.writeShellScript "waybar-weather" ''
-            ${pkgs.curl}/bin/curl -s 'wttr.in/${city}?format=%t' | ${pkgs.toybox}/bin/sed 's/\s*//g'
+            ${pkgs.curl}/bin/curl -s "wttr.in/$(${pkgs.coreutils}/bin/cat ${config.sops.secrets.city.path})?format=%t" | ${pkgs.toybox}/bin/sed 's/\s*//g'
           '';
         };
 

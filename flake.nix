@@ -19,6 +19,8 @@
     # everything match nicely? Try nix-colors!
     nix-colors.url = "github:misterio77/nix-colors";
 
+    sops-nix.url = "github:Mic92/sops-nix";
+
     hyprland.url = "github:hyprwm/Hyprland";
     split-monitor-workspaces = {
       url = "github:Duckonaut/split-monitor-workspaces";
@@ -29,6 +31,7 @@
   };
 
   outputs = {
+    sops-nix,
     nixpkgs,
     home-manager,
     hyprland,
@@ -89,6 +92,7 @@
         # > Our main nixos configuration file <
         modules = [
           ./nixos/configuration.nix
+          sops-nix.nixosModules.sops
         ];
       };
     };
@@ -117,6 +121,7 @@
         modules = [
           ./home-manager/home.nix
           stylix.homeManagerModules.stylix
+          sops-nix.homeManagerModules.sops
         ];
       };
     };

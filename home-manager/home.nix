@@ -16,10 +16,21 @@
     ./style/stylix.nix
     ./shell/shell.nix
     ./browser/qutebrowser.nix
+    ./mpv/mpv.nix
     ./window-managers/hyprland/hyprland.nix
   ];
 
   colorScheme = inputs.nix-colors.colorSchemes.${theme};
+
+  sops = {
+    defaultSopsFile = ../secrets/secrets.yaml;
+    defaultSopsFormat = "yaml";
+    age.keyFile = "${config.xdg.configHome}/sops/age/keys.txt";
+    defaultSymlinkPath = "/run/user/1000/secrets";
+    secrets = {
+      city = {};
+    };
+  };
 
   home = {
     packages = with pkgs; [
