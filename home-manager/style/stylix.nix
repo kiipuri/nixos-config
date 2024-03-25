@@ -77,7 +77,6 @@ in {
         mako.enable = true;
         gtk.enable = true;
         zathura.enable = true;
-        tmux.enable = true;
         qutebrowser.enable = true;
         fzf.enable = true;
         bat.enable = true;

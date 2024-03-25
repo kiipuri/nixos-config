@@ -33,6 +33,7 @@
       experimental-features = "nix-command flakes";
       # Deduplicate and optimize nix store
       auto-optimise-store = true;
+      # use-xdg-base-directories = true;
     };
   };
 
@@ -104,6 +105,7 @@
   hardware = {
     opengl.enable = true;
     nvidia = {
+      package = config.boot.kernelPackages.nvidiaPackages.production;
       modesetting.enable = true;
       nvidiaPersistenced = true;
       powerManagement.enable = true;
@@ -135,7 +137,6 @@
 
   services = {
     flatpak.enable = true;
-    openssh.enable = true;
     transmission = {
       enable = true;
       home = "/home/${username}";
@@ -144,6 +145,10 @@
         download-dir = "/mnt/hdd/Torrents";
         incomplete-dir = "/home/${username}/Downloads";
       };
+    };
+    openssh = {
+      enable = true;
+      ports = [79];
     };
     xserver = {
       enable = true;
@@ -156,7 +161,6 @@
       enable = true;
       theme = "tokyo-night-sddm";
     };
-
     xserver.windowManager = {
       awesome = {
         enable = true;
@@ -176,8 +180,6 @@
     dconf.enable = true;
     hyprland = {
       enable = true;
-      enableNvidiaPatches = true;
-      xwayland.enable = true;
     };
     noisetorch.enable = true;
     droidcam.enable = true;
@@ -218,28 +220,10 @@
       terminus_font
     ];
     fontconfig = {
-      localConf = ''
-        <match target="pattern">
-          <test name="lang" compare="contains">
-              <string>hi</string>
-          </test>
-          <test qual="any" name="family">
-              <string>sans-serif</string>
-          </test>
-          <edit name="family" mode="prepend" binding="strong">
-              <string>Noto Sans Devanagari</string>
-          </edit>
-        </match>
-        <alias>
-          <family>icon</family>
-          <prefer>
-              <family>Noto Color Emoji</family>
-          </prefer>
-        </alias>
-      '';
       defaultFonts = {
-        serif = ["Noto Serif Devanagari" "Noto Serif"];
-        sansSerif = ["Noto Sans"];
+        serif = ["Noto Serif" "Noto Serif Devanagari" "Noto Naskh Arabic"];
+        sansSerif = ["Noto Sans" "Noto Sans Devanagari" "Noto Sans Arabic"];
+        emoji = ["Noto Color Emoji"];
       };
     };
   };
@@ -281,7 +265,6 @@
       virt-manager
       wget
       wl-clipboard
-      wlogout
       wofi
       xclip
     ];
@@ -303,15 +286,17 @@
     };
   };
 
-  virtualisation.docker = {
-    enable = true;
-    rootless = {
+  virtualisation = {
+    docker = {
       enable = true;
-      setSocketVariable = true;
+      rootless = {
+        enable = true;
+        setSocketVariable = true;
+      };
     };
-  };
 
-  virtualisation.libvirtd.enable = true;
+    libvirtd.enable = true;
+  };
 
   systemd.extraConfig = ''
     DefaultTimeoutStopSec=5s
