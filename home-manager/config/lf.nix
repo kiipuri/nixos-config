@@ -11,7 +11,14 @@
       ifs = "\\n";
     };
     commands = with pkgs; {
-      clip = "\$${wl-clipboard}/bin/wl-copy < $fx";
+      clip = ''
+        ''${{
+          case $(${xdg-utils}/bin/xdg-mime query filetype $f) in
+            image/*) ${wl-clipboard}/bin/wl-copy < $fx ;;
+            *) ${wl-clipboard}/bin/wl-copy file://$fx ;;
+          esac
+        }}
+      '';
       trash = "%${trash-cli}/bin/trash-put $fx";
       sudotrash = "sudo ${trash-cli}/bin/trash-put $fx";
       sudopaste = ''
