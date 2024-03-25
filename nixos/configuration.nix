@@ -56,6 +56,15 @@
   networking = {
     hostName = hostname;
     firewall.enable = false;
+  sops = {
+    defaultSopsFile = ../secrets/secrets.yaml;
+    defaultSopsFormat = "yaml";
+    age.keyFile = "/home/${username}/.config/sops/age/keys.txt";
+    secrets = {
+      vpn = {
+        path = "/etc/NetworkManager/system-connections/vpn.nmconnection";
+      };
+    };
   };
 
   time.timeZone = timezone;
