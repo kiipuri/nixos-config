@@ -93,10 +93,6 @@
     };
     imv.enable = true;
     broot.enable = true;
-    mpv = {
-      enable = true;
-      package = with pkgs; mpv-unwrapped.override {ffmpeg_5 = ffmpeg_6-full;};
-    };
     bat.enable = true;
     nixvim.enable = true;
     zathura.enable = true;
