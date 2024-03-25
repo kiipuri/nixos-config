@@ -5,8 +5,6 @@
   username,
   theme,
   font,
-  hyprland,
-  split-monitor-workspaces,
   ...
 }: {
   imports = [
@@ -18,6 +16,7 @@
     ./style/stylix.nix
     ./shell/shell.nix
     ./browser/qutebrowser.nix
+    ./window-managers/hyprland/hyprland.nix
   ];
 
   colorScheme = inputs.nix-colors.colorSchemes.${theme};
@@ -124,15 +123,6 @@
     };
   };
 
-  wayland.windowManager.hyprland = {
-    enable = true;
-    package = hyprland.packages.${pkgs.system}.default;
-    systemd.enable = true;
-    plugins = [
-      split-monitor-workspaces.packages.${pkgs.system}.split-monitor-workspaces
-    ];
-    extraConfig = builtins.readFile ./config/hypr/hyprland.conf;
-  };
 
   gtk = {
     enable = true;
@@ -197,10 +187,6 @@
         source = ./config/dunst;
         recursive = true;
       };
-      pypr = {
-        source = ./config/hypr/pyprland.toml;
-        target = "hypr/pyprland.toml";
-      };
     };
   };
 
@@ -215,9 +201,6 @@
       type = "Application";
     };
   };
-
-  services.easyeffects.enable = true;
-
   services.mako = {
     enable = true;
     anchor = "top-right";
