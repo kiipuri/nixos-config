@@ -45,8 +45,6 @@
     hostname = "nixos";
     timezone = "Europe/Helsinki";
     locale = "en_US.UTF-8";
-    city = "";
-
     username = "kiipuri";
     # theme = "catppuccin-mocha";
     # theme = "gruvbox-light-hard";
@@ -111,7 +109,6 @@
           inherit cursorPkg;
           inherit username;
           inherit hostname;
-          inherit city;
           inherit (inputs) stylix;
           inherit (inputs) nix-colors;
           inherit (inputs) hyprland;
