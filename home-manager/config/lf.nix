@@ -35,13 +35,18 @@
       open = ''
         ''${{
           test -L $f && f=$(${toybox}/bin/readlink -f $f)
-          case $(${xdg-utils}/bin/xdg-mime query filetype $f) in
+          mimetype=$(${xdg-utils}/bin/xdg-mime query filetype $f)
+          case $mimetype in
             text/*| \
             application/json| \
             application/x-subrip| \
             application/x-yaml| \
             application/x-shellscript) $EDITOR $fx;;
-            *) for f in $fx; do ${toybox}/bin/setsid $OPENER $f > /dev/null 2> /dev/null & done;;
+            *) for f in $fx; do
+                if ${ripgrep}/bin/rg -q $mimetype ~/.config/mimeapps.list; then
+                  ${toybox}/bin/setsid $OPENER $f > /dev/null 2> /dev/null &
+                fi
+              done;;
           esac
         }}
       '';
