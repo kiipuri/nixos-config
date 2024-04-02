@@ -21,5 +21,11 @@
       sponsorblock
       thumbfast
     ];
+    scriptOpts = {
+      uosc = {
+        volume = "left";
+        top_bar_controls = false;
+      };
+    };
   };
 }
