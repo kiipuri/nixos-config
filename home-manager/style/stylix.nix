@@ -43,10 +43,6 @@ in {
     specialisation = themeSpecialisations;
     stylix = {
       autoEnable = false;
-      image = pkgs.fetchurl {
-        url = "https://img3.gelbooru.com//samples/03/d1/sample_03d1a90180adbbade6111f7ec43b7d6b.jpg";
-        sha256 = "sha256-dP/+FGhjKOavj66/uWPidkWMvMhqh4UJLPj5zysEkJY=";
-      };
 
       base16Scheme = lib.mkDefault "${pkgs.base16-schemes}/share/themes/${theme}.yaml";
       fonts = {
@@ -83,12 +79,6 @@ in {
         rofi.enable = true;
         vim.enable = true;
         zellij.enable = true;
-        # waybar = {
-        #   enable = true;
-        #   enableLeftBackColors = true;
-        #   enableCenterBackColors = true;
-        #   enableRightBackColors = true;
-        # };
       };
     };
   };
