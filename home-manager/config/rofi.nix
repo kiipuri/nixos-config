@@ -6,7 +6,7 @@
 }: let
   inherit (config.lib.formats.rasi) mkLiteral;
   theme = config.colorScheme;
-  inherit (theme) colors;
+  inherit (theme) palette;
 in {
   home.packages = [(pkgs.callPackage ../derivatives/vpn.nix {})];
 
@@ -43,14 +43,14 @@ in {
 
     theme = lib.mkForce {
       "*" = {
-        bg-col = mkLiteral "#${colors.base00}";
-        bg-col-light = mkLiteral "#${colors.base00}";
-        border-col = mkLiteral "#${colors.base00}";
+        bg-col = mkLiteral "#${palette.base00}";
+        bg-col-light = mkLiteral "#${palette.base00}";
+        border-col = mkLiteral "#${palette.base00}";
         border-radius = 10;
-        selected-col = mkLiteral "#${colors.base00}";
-        blue = mkLiteral "#${colors.base0D}";
-        fg-col = mkLiteral "#${colors.base05}";
-        fg-col2 = mkLiteral "#${colors.base08}";
+        selected-col = mkLiteral "#${palette.base00}";
+        blue = mkLiteral "#${palette.base0D}";
+        fg-col = mkLiteral "#${palette.base05}";
+        fg-col2 = mkLiteral "#${palette.base08}";
         grey = mkLiteral "#6e738d";
 
         width = 600;

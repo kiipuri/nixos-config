@@ -152,9 +152,11 @@
     };
     xserver = {
       enable = true;
-      layout = "us";
-      xkbVariant = "de_se_fi";
-      xkbOptions = "caps:escape";
+      xkb = {
+        variant = "de_se_fi";
+        layout = "us";
+        options = "caps:escape";
+      };
       videoDrivers = ["nvidia"];
     };
     xserver.displayManager.sddm = {

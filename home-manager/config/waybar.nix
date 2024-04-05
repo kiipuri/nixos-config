@@ -5,7 +5,7 @@
   theme,
   ...
 }: let
-  inherit (theme) colors;
+  inherit (theme) palette;
 in {
   programs.waybar = {
     enable = true;
@@ -27,14 +27,14 @@ in {
       }
 
       tooltip * {
-          color: #${colors.base05};
-          background-color: #${colors.base00};
+          color: #${palette.base05};
+          background-color: #${palette.base00};
       }
 
       #window {
           border-radius: 20px;
           transition: none;
-          background: #${colors.base00};
+          background: #${palette.base00};
           padding-left: 16px;
           padding-right: 16px;
           margin-left: 20px;
@@ -45,27 +45,27 @@ in {
           margin-right: 8px;
           border-radius: 20px;
           transition: none;
-          background: #${colors.base00};
+          background: #${palette.base00};
           border: none;
       }
 
       .modules-left #workspaces button {
           transition: none;
-          color: #${colors.base05};
+          color: #${palette.base05};
           background: transparent;
           padding: 5px 15px;
           border: none;
       }
 
       .modules-left #workspaces button.persistent {
-          color: #${colors.base05};
+          color: #${palette.base05};
           border: none;
       }
 
       .modules-left #workspaces button.active {
           border-radius: inherit;
-          background: #${colors.base02};
-          color: #${colors.base06};
+          background: #${palette.base02};
+          color: #${palette.base06};
           border: none;
       }
 
@@ -75,8 +75,8 @@ in {
           box-shadow: inherit;
           text-shadow: inherit;
           border-radius: inherit;
-          color: #${colors.base05};
-          background: #${colors.base01};
+          color: #${palette.base05};
+          background: #${palette.base01};
           border-bottom: 0px;
       }
 
@@ -91,16 +91,16 @@ in {
           padding-left: 16px;
           border-radius: 20px 0px 0px 20px;
           transition: none;
-          color: #${colors.base0C};
-          background: #${colors.base00};
+          color: #${palette.base0C};
+          background: #${palette.base00};
       }
 
       #memory {
           padding-left: 16px;
           border-radius: 0px;
           transition: none;
-          color: #${colors.base0C};
-          background: #${colors.base00};
+          color: #${palette.base0C};
+          background: #${palette.base00};
       }
 
       #disk {
@@ -108,19 +108,19 @@ in {
           padding-right: 16px;
           border-radius: 0px 20px 20px 0px;
           transition: none;
-          color: #${colors.base0C};
-          background: #${colors.base00};
+          color: #${palette.base0C};
+          background: #${palette.base00};
       }
 
       #network {
           padding-left: 16px;
-          color: #${colors.base0A};
-          background-color: #${colors.base00};
+          color: #${palette.base0A};
+          background-color: #${palette.base00};
       }
 
       #network.disconnected,
       #network.disabled {
-        background-color: #${colors.base00};
+        background-color: #${palette.base00};
         color: #cdd6f4;
       }
       #network.linked {
@@ -133,21 +133,21 @@ in {
       #custom-date {
           padding-left: 16px;
           transition: none;
-          color: #${colors.base0B};
-          background: #${colors.base00};
+          color: #${palette.base0B};
+          background: #${palette.base00};
       }
 
       #clock {
           padding-left: 16px;
           border-radius: 0px;
           transition: none;
-          color: #${colors.base0C};
-          background: #${colors.base00};
+          color: #${palette.base0C};
+          background: #${palette.base00};
       }
 
       #custom-power {
-          color: #${colors.base0D};
-          background-color: #${colors.base00};
+          color: #${palette.base0D};
+          background-color: #${palette.base00};
           padding-left: 16px;
           padding-right: 20px;
           border-radius: 0px 20px 20px 0px;
@@ -158,26 +158,26 @@ in {
           padding-left: 16px;
           border-radius: 0px;
           transition: none;
-          color: #${colors.base08};
-          background: #${colors.base00};
+          color: #${palette.base08};
+          background: #${palette.base00};
       }
 
       #custom-weather {
           transition: none;
-          color: #${colors.base08};
-          background: #${colors.base00};
+          color: #${palette.base08};
+          background: #${palette.base00};
       }
 
       #pulseaudio {
           padding-left: 16px;
           transition: none;
-          color: #${colors.base09};
-          background: #${colors.base00};
+          color: #${palette.base09};
+          background: #${palette.base00};
       }
 
       #pulseaudio.muted {
-          background-color: #${colors.base00};
-          color: #${colors.base05};
+          background-color: #${palette.base00};
+          color: #${palette.base05};
       }
 
       #backlight {
@@ -224,8 +224,8 @@ in {
           padding-left: 16px;
           border-radius: 20px 0px 0px 20px;
           transition: none;
-          color: #${colors.base05};
-          background: #${colors.base00};
+          color: #${palette.base05};
+          background: #${palette.base00};
       }
 
       @keyframes blink {

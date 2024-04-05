@@ -3,12 +3,13 @@
   pkgs,
   lib,
   theme,
+  themeName,
   ...
 }: let
   inherit (lib) mkEnableOption;
   inherit (pkgs.vimUtils) buildVimPlugin;
   inherit (pkgs) fetchFromGitHub;
-  inherit (theme) colors;
+  inherit (theme) palette;
   configString = import ./config/config.nix;
 
   fileTypes = [
@@ -61,44 +62,12 @@ in {
 
       colorschemes.base16 = {
         enable = true;
+        colorscheme = themeName;
       };
 
       plugins = {
         floaterm.enable = true;
-
         markdown-preview.enable = true;
-
-        null-ls = {
-          enable = true;
-          sources = {
-            diagnostics = {
-              shellcheck.enable = true;
-              statix.enable = true;
-            };
-            code_actions = {
-              shellcheck.enable = true;
-              gitsigns.enable = false;
-            };
-            formatting = {
-              alejandra.enable = true;
-              black.enable = true;
-              stylua.enable = true;
-              prettier.enable = true;
-            };
-          };
-          onAttach = ''
-            function(client, bufnr)
-              if client.supports_method("textDocument/formatting") then
-                vim.api.nvim_create_autocmd("BufWritePre", {
-                  buffer = bufnr,
-                  callback = function()
-                    vim.lsp.buf.format()
-                  end,
-                })
-              end
-            end
-          '';
-        };
 
         gitsigns.enable = true;
 
@@ -189,16 +158,28 @@ in {
         };
         comment-nvim.enable = true;
 
-        indent-blankline = {
+        indent-blankline.enable = true;
+
+        efmls-configs = {
           enable = true;
-          useTreesitter = true;
-          showCurrentContext = true;
-          showCurrentContextStart = false;
+          setup = {
+            nix = {
+              formatter = "alejandra";
+              linter = "statix";
+            };
+            sh = {
+              formatter = "shfmt";
+              linter = "shellcheck";
+            };
+            typescript.formatter = "prettier_d";
+            python.formatter = "black";
+          };
         };
 
         lsp = {
           enable = true;
           servers = {
+            efm.extraOptions.init_options.documentFormatting = true;
             nil_ls = {
               enable = true;
               settings = {
@@ -211,24 +192,35 @@ in {
             lua-ls.enable = true;
             omnisharp.enable = true;
             csharp-ls.enable = true;
+            pylsp.enable = true;
+            pyright.enable = true;
           };
+          onAttach = ''
+            if client.supports_method("textDocument/formatting") then
+              vim.api.nvim_create_autocmd("BufWritePre", {
+                buffer = bufnr,
+                callback = function()
+                  vim.lsp.buf.format()
+                end,
+              })
+            end
+          '';
+          capabilities = ''
+            require("cmp_nvim_lsp").default_capabilities()
+          '';
         };
 
         lspkind = {
           enable = true;
-          cmp = {
-            enable = true;
-          };
+          cmp.enable = true;
         };
 
         nvim-lightbulb = {
           enable = true;
-          autocmd.enabled = true;
+          settings.autocmd.enabled = true;
         };
 
-        nvim-autopairs = {
-          enable = true;
-        };
+        nvim-autopairs.enable = true;
 
         inc-rename.enable = true;
         trouble.enable = true;
@@ -240,70 +232,73 @@ in {
           enable = true;
           popupBorderStyle = "rounded";
         };
-        nvim-cmp = {
+        cmp = {
           enable = true;
 
-          snippet.expand = "luasnip";
+          settings = {
+            snippet.expand = "function(args) require('luasnip').lsp_expand(args.body) end";
 
-          mapping = {
-            "<CR>" = "cmp.mapping.confirm({select = true })";
-            "<C-d>" = "cmp.mapping.scroll_docs(-4)";
-            "<C-f>" = "cmp.mapping.scroll_docs(4)";
-            "<C-Space>" = "cmp.mapping.complete()";
-            "<Tab>" = ''
-              cmp.mapping(function(fallback)
-                if luasnip.expand_or_locally_jumpable() then
-                  luasnip.expand_or_jump()
-                else
-                  fallback()
-                end
-              end, { "i", "s" })
-            '';
-            # "<Tab>" = ''
-            #   cmp.mapping(function(fallback)
-            #     if cmp.visible() then
-            #       cmp.select_next_item()
-            #     -- You could replace the expand_or_jumpable() calls with expand_or_locally_jumpable()
-            #     -- they way you will only jump inside the snippet region
-            #     elseif luasnip.expand_or_locally_jumpable() then
-            #       luasnip.expand_or_jump()
-            #     elseif has_words_before() then
-            #       cmp.complete()
-            #     else
-            #       fallback()
-            #     end
-            #   end, { "i", "s" })
-            # '';
-            "<S-Tab>" = ''
-              cmp.mapping(function(fallback)
-                if luasnip.jumpable(-1) then
-                  luasnip.jump(-1)
-                end
-              end, { "i", "s" })
-            '';
-            # "<S-Tab>" = ''
-            #   cmp.mapping(function(fallback)
-            #     if cmp.visible() then
-            #       cmp.select_prev_item()
-            #     elseif luasnip.jumpable(-1) then
-            #       luasnip.jump(-1)
-            #     else
-            #       fallback()
-            #     end
-            #   end, { "i", "s" })
-            # '';
-            "<C-j>" = "cmp.mapping(cmp.mapping.select_next_item({ behavior = cmp.SelectBehavior.Select }), {'i'})";
-            "<C-k>" = "cmp.mapping(cmp.mapping.select_prev_item({ behavior = cmp.SelectBehavior.Select }), {'i'})";
+            mapping = {
+              "<CR>" = "cmp.mapping.confirm({select = true })";
+              "<C-d>" = "cmp.mapping.scroll_docs(-4)";
+              "<C-f>" = "cmp.mapping.scroll_docs(4)";
+              "<C-Space>" = "cmp.mapping.complete()";
+              "<Tab>" = ''
+                cmp.mapping(function(fallback)
+                  if luasnip.expand_or_locally_jumpable() then
+                    luasnip.expand_or_jump()
+                  else
+                    fallback()
+                  end
+                end, { "i", "s" })
+              '';
+              # "<Tab>" = ''
+              #   cmp.mapping(function(fallback)
+              #     if cmp.visible() then
+              #       cmp.select_next_item()
+              #     -- You could replace the expand_or_jumpable() calls with expand_or_locally_jumpable()
+              #     -- they way you will only jump inside the snippet region
+              #     elseif luasnip.expand_or_locally_jumpable() then
+              #       luasnip.expand_or_jump()
+              #     elseif has_words_before() then
+              #       cmp.complete()
+              #     else
+              #       fallback()
+              #     end
+              #   end, { "i", "s" })
+              # '';
+              "<S-Tab>" = ''
+                cmp.mapping(function(fallback)
+                  if luasnip.jumpable(-1) then
+                    luasnip.jump(-1)
+                  end
+                end, { "i", "s" })
+              '';
+              # "<S-Tab>" = ''
+              #   cmp.mapping(function(fallback)
+              #     if cmp.visible() then
+              #       cmp.select_prev_item()
+              #     elseif luasnip.jumpable(-1) then
+              #       luasnip.jump(-1)
+              #     else
+              #       fallback()
+              #     end
+              #   end, { "i", "s" })
+              # '';
+              "<C-j>" = "cmp.mapping(cmp.mapping.select_next_item({ behavior = cmp.SelectBehavior.Select }), {'i'})";
+              "<C-k>" = "cmp.mapping(cmp.mapping.select_prev_item({ behavior = cmp.SelectBehavior.Select }), {'i'})";
+            };
+
+            sources = [
+              {name = "luasnip";}
+              {name = "nvim_lsp";}
+              {name = "vim-dadbod-completion";}
+              {name = "path";}
+              {name = "buffer";}
+              {name = "calc";}
+              {name = "zsh";}
+            ];
           };
-
-          sources = [
-            {name = "luasnip";}
-            {name = "nvim_lsp";}
-            {name = "path";}
-            {name = "buffer";}
-            {name = "calc";}
-            {name = "zsh";}
-          ];
         };
       };
 
@@ -311,12 +306,12 @@ in {
         vim.cmd[[set bg=light]]
         local base16 = require("base16-colorscheme")
         base16.setup({
-          base00 = "#${colors.base00}", base01 = "#${colors.base01}", base02 = "#${colors.base02}",
-          base03 = "#${colors.base03}", base04 = "#${colors.base04}", base05 = "#${colors.base05}",
-          base06 = "#${colors.base06}", base07 = "#${colors.base07}", base08 = "#${colors.base08}",
-          base09 = "#${colors.base09}", base0A = "#${colors.base0A}", base0B = "#${colors.base0B}",
-          base0C = "#${colors.base0C}", base0D = "#${colors.base0D}", base0E = "#${colors.base0E}",
-          base0F = "#${colors.base0F}"
+          base00 = "#${palette.base00}", base01 = "#${palette.base01}", base02 = "#${palette.base02}",
+          base03 = "#${palette.base03}", base04 = "#${palette.base04}", base05 = "#${palette.base05}",
+          base06 = "#${palette.base06}", base07 = "#${palette.base07}", base08 = "#${palette.base08}",
+          base09 = "#${palette.base09}", base0A = "#${palette.base0A}", base0B = "#${palette.base0B}",
+          base0C = "#${palette.base0C}", base0D = "#${palette.base0D}", base0E = "#${palette.base0E}",
+          base0F = "#${palette.base0F}"
         })
 
         local colors = base16.colors
@@ -337,9 +332,7 @@ in {
         })
       '';
 
-      globals = {
-        mapleader = " ";
-      };
+      globals.mapleader = " ";
 
       extraPlugins = with pkgs.vimPlugins; [
         telescope-ui-select-nvim
@@ -372,44 +365,160 @@ in {
         })
       ];
 
-      maps.normal = {
-        "<leader>ld" = "<cmd>lua vim.lsp.buf.definition()<cr>";
-        "<leader>ls" = "<cmd>lua vim.diagnostic.open_float()<cr>";
-        "<leader>lc" = "<cmd>lua vim.lsp.buf.code_action()<cr>";
-        "<leader>lh" = "<cmd>lua vim.lsp.buf.hover()<cr>";
-        "<leader>lr" = "<cmd>lua vim.lsp.buf.rename()<cr>";
+      keymaps = [
+        {
+          key = "<leader>ld";
+          action = "<cmd>lua vim.lsp.buf.definition()<cr>";
+          mode = "n";
+        }
+        {
+          key = "<leader>ls";
+          action = "<cmd>lua vim.diagnostic.open_float()<cr>";
+          mode = "n";
+        }
+        {
+          key = "<leader>lc";
+          action = "<cmd>lua vim.lsp.buf.code_action()<cr>";
+          mode = "n";
+        }
+        {
+          key = "<leader>lh";
+          action = "<cmd>lua vim.lsp.buf.hover()<cr>";
+          mode = "n";
+        }
+        {
+          key = "<leader>lr";
+          action = "<cmd>lua vim.lsp.buf.rename()<cr>";
+          mode = "n";
+        }
 
-        "<leader>e" = "<cmd>Telescope diagnostics<cr>";
-        "<leader>tf" = "<cmd>Telescope find_files<cr>";
-        "<leader>tg" = "<cmd>Telescope git_files<cr>";
-        "<leader>ts" = "<cmd>Telescope lsp_document_symbols<cr>";
-        "<leader>tb" = "<cmd>Telescope buffers<cr>";
-        "<leader>tr" = "<cmd>Telescope lsp_references<cr>";
-        "<leader>tl" = "<cmd>Telescope live_grep<cr>";
-        "<leader>u" = "<cmd>Telescope undo<cr>";
+        {
+          key = "<leader>e";
+          action = "<cmd>Telescope diagnostics<cr>";
+          mode = "n";
+        }
+        {
+          key = "<leader>tf";
+          action = "<cmd>Telescope find_files<cr>";
+          mode = "n";
+        }
+        {
+          key = "<leader>tg";
+          action = "<cmd>Telescope git_files<cr>";
+          mode = "n";
+        }
+        {
+          key = "<leader>ts";
+          action = "<cmd>Telescope lsp_document_symbols<cr>";
+          mode = "n";
+        }
+        {
+          key = "<leader>tb";
+          action = "<cmd>Telescope buffers<cr>";
+          mode = "n";
+        }
+        {
+          key = "<leader>tr";
+          action = "<cmd>Telescope lsp_references<cr>";
+          mode = "n";
+        }
+        {
+          key = "<leader>tl";
+          action = "<cmd>Telescope live_grep<cr>";
+          mode = "n";
+        }
+        {
+          key = "<leader>u";
+          action = "<cmd>Telescope undo<cr>";
+          mode = "n";
+        }
 
-        "<leader>jf" = "<cmd>lua require'harpoon.ui'.nav_file(1)<cr>";
-        "<leader>jd" = "<cmd>lua require'harpoon.ui'.nav_file(2)<cr>";
-        "<leader>js" = "<cmd>lua require'harpoon.ui'.nav_file(3)<cr>";
-        "<leader>ja" = "<cmd>lua require'harpoon.ui'.nav_file(4)<cr>";
-        "<leader>jm" = "<cmd>lua require'harpoon.mark'.add_file()<cr>";
-        "<leader>jt" = "<cmd>lua require'harpoon.ui'.toggle_quick_menu()<cr>";
+        {
+          key = "<leader>oo";
+          action = "<cmd>Gen<cr>";
+          mode = "";
+        }
+        {
+          key = "<leader>or";
+          action = ":Gen Review_Code<cr>";
+          mode = "";
+        }
 
-        "<leader>f" = "<cmd>FloatermToggle<cr>";
+        {
+          key = "<leader>jf";
+          action = "<cmd>lua require'harpoon.ui'.nav_file(1)<cr>";
+          mode = "n";
+        }
+        {
+          key = "<leader>jd";
+          action = "<cmd>lua require'harpoon.ui'.nav_file(2)<cr>";
+          mode = "n";
+        }
+        {
+          key = "<leader>js";
+          action = "<cmd>lua require'harpoon.ui'.nav_file(3)<cr>";
+          mode = "n";
+        }
+        {
+          key = "<leader>ja";
+          action = "<cmd>lua require'harpoon.ui'.nav_file(4)<cr>";
+          mode = "n";
+        }
+        {
+          key = "<leader>jm";
+          action = "<cmd>lua require'harpoon.mark'.add_file()<cr>";
+          mode = "n";
+        }
+        {
+          key = "<leader>jt";
+          action = "<cmd>lua require'harpoon.ui'.toggle_quick_menu()<cr>";
+          mode = "n";
+        }
 
-        "<leader>n" = "<cmd>Neotree toggle float<cr>";
+        {
+          key = "<leader>f";
+          action = "<cmd>FloatermToggle<cr>";
+          mode = "n";
+        }
 
-        "<leader>h" = "<cmd>noh<cr>";
+        {
+          key = "<leader>n";
+          action = "<cmd>Neotree toggle float<cr>";
+          mode = "n";
+        }
 
-        "<c-j>" = "<c-w>j";
-        "<c-k>" = "<c-w>k";
-        "<c-h>" = "<c-w>h";
-        "<c-l>" = "<c-w>l";
-      };
+        {
+          key = "<leader>h";
+          action = "<cmd>noh<cr>";
+          mode = "n";
+        }
 
-      maps.insert = {
-        "<c-s>" = "<cmd>lua vim.lsp.buf.signature_help()<cr>";
-      };
+        {
+          key = "<c-j>";
+          action = "<c-w>j";
+          mode = "n";
+        }
+        {
+          key = "<c-k>";
+          action = "<c-w>k";
+          mode = "n";
+        }
+        {
+          key = "<c-h>";
+          action = "<c-w>h";
+          mode = "n";
+        }
+        {
+          key = "<c-l>";
+          action = "<c-w>l";
+          mode = "n";
+        }
+        {
+          key = "<c-s>";
+          action = "<cmd>lua vim.lsp.buf.signature_help()<cr>";
+          mode = "i";
+        }
+      ];
 
       extraConfigLuaPre = ''
         local has_words_before = function()

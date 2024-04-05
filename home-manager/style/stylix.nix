@@ -32,6 +32,7 @@
               {
                 inherit font fontPkg pkgs config lib;
                 theme = inputs.nix-colors.colorSchemes.${mytheme};
+                themeName = theme;
               })
           ];
         };

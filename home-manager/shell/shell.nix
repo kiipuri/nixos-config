@@ -63,7 +63,7 @@ in {
     enable = true;
     dotDir = ".config/zsh";
     syntaxHighlighting.enable = true;
-    enableAutosuggestions = true;
+    autosuggestion.enable = true;
     enableCompletion = true;
     history.path = "${config.xdg.dataHome}/zsh/zsh_history";
     inherit initExtra;
