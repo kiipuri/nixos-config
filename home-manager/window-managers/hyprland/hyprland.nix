@@ -117,7 +117,7 @@
         "$mainMod, Y, exec, pypr toggle volume && hyprctl dispatch bringactivetotop"
         "$mainMod, O, exec, pypr toggle music && hyprctl dispatch bringactivetotop"
 
-        ", Print, exec, grim -g \"$(slurp -o)\" - | wl-copy"
+        ", Print, exec, grim -g \"$(slurp -ow 0)\" - | wl-copy"
 
         # Switch workspaces with mainMod + [0-9]
         "$mainMod, 1, split-workspace, 1"
