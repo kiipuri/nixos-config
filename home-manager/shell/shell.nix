@@ -73,8 +73,9 @@ in {
       hmupdate = "home-manager switch --flake .#${username}@${hostname}";
       ns = "NIXPKGS_ALLOW_UNFREE=1 nix-shell";
       nsp = "NIXPKGS_ALLOW_UNFREE=1 nix-shell -p";
-      l = "eza -lah";
+      l = "eza -lah --icons";
       cat = "bat";
+      lg = "lazygit";
     };
   };
 }
