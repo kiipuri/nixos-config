@@ -1,4 +1,5 @@
 {
+  config,
   lib,
   inputs,
   pkgs,
@@ -36,9 +37,10 @@
   home = {
     packages = with pkgs; [
       anki
-      discord
+      vesktop
       ungoogled-chromium
       teams-for-linux
+      rofi-rbw-wayland
       gucharmap
       gimp
       firefox
@@ -47,12 +49,13 @@
       lazygit
       librewolf
       neofetch
-      nvtop
+      nvtopPackages.nvidia
       pyprland
       qalculate-gtk
       slurp
       sonixd
       osu-lazer-bin
+      onlyoffice-bin
       transmission-remote-gtk
       grim
       yt-dlp
@@ -82,6 +85,7 @@
       XCOMPOSECACHE = "${config.xdg.cacheHome}/X11/xcompose";
       DOCKER_CONFIG = "${config.xdg.configHome}/docker";
       CUDA_CACHE_PATH = "${config.xdg.cacheHome}/nv";
+      NIXOS_OZONE_WL = 1;
     };
   };
 
@@ -162,7 +166,12 @@
     broot.enable = true;
     bat.enable = true;
     nixvim.enable = true;
-    zathura.enable = true;
+    zathura = {
+      enable = true;
+      options = {
+        selection_clipboard = "clipboard";
+      };
+    };
     zoxide = {
       enable = true;
       enableZshIntegration = true;
@@ -205,20 +214,9 @@
   };
 
   nixpkgs = {
-    ## You can add overlays here
-    #overlays = [
-    ## If you want to use overlays exported from other flakes:
-    ## neovim-nightly-overlay.overlays.default
-    #
-    ## Or define it inline, for example:
-    ## (final: prev: {
-    ##   hi = final.hello.overrideAttrs (oldAttrs: {
-    ##     patches = [ ./change-hello-to-hi.patch ];
-    ##   });
-    ## })
-    #];
-    ## Configure your nixpkgs instance
-
+    overlays = [
+      (import ./overlays/btop.nix)
+    ];
     config = {
       allowUnfree = true;
       allowUnfreePredicate = _: true;
@@ -231,10 +229,21 @@
     mimeApps = {
       enable = true;
       defaultApplications = {
+        "application/ogg" = "mpv.desktop";
         "application/pdf" = "org.pwmt.zathura.desktop";
+        "audio/mpeg" = "mpv.desktop";
+        "audio/ogg" = "mpv.desktop";
+        "audio/mp4" = "mpv.desktop";
+        "audio/vnd.wave" = "mpv.desktop";
+        "audio/webm" = "mpv.desktop";
+        "audio/x-aac" = "mpv.desktop";
+        "audio/x-wav" = "mpv.desktop";
         "image/jpeg" = "imv.desktop";
         "image/png" = "imv.desktop";
         "image/webp" = "imv.desktop";
+        "video/ogg" = "mpv.desktop";
+        "video/webm" = "mpv.desktop";
+        "video/mp4" = "mpv.desktop";
       };
     };
     configFile = {
@@ -253,17 +262,6 @@
     };
   };
 
-  xdg.desktopEntries = {
-    discord = {
-      name = "Discord";
-      genericName = "All-in-one cross-platform voice and text chat for gamers";
-      exec = "discord --disable-gpu-sandbox";
-      categories = ["Network" "InstantMessaging"];
-      icon = "discord";
-      mimeType = ["x-scheme-handler/discord"];
-      type = "Application";
-    };
-  };
   services.mako = {
     enable = true;
     anchor = "top-right";
