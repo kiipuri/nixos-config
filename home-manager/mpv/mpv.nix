@@ -14,6 +14,7 @@
       ytdl-raw-options = "write-sub=,write-auto-sub=";
       cache = true;
       demuxer-max-bytes = "1G";
+      profile = "pseudo-gui";
     };
     scripts = with pkgs.mpvScripts; [
       mpvacious
