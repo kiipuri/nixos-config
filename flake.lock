@@ -946,12 +946,12 @@
       },
       "locked": {
         "lastModified": 1,
-        "narHash": "sha256-iqrXslywfR8Yxs/mm7R++28RTzTkdSY2mqVgMkPYCfE=",
-        "path": "/nix/store/2wkbx4m4408k305w31bvm8j5gxyrjn4j-source/home-manager/nvim",
+        "narHash": "sha256-I6ezo+ERMPEsvuraZANxJ5GW6DnLQ5A6AfhsjkZBl1I=",
+        "path": "/nix/store/y8rypfhp5rmpjy25z43szbxhj6h5gki1-source/home-manager/nvim",
         "type": "path"
       },
       "original": {
-        "path": "/nix/store/2wkbx4m4408k305w31bvm8j5gxyrjn4j-source/home-manager/nvim",
+        "path": "/nix/store/y8rypfhp5rmpjy25z43szbxhj6h5gki1-source/home-manager/nvim",
         "type": "path"
       }
     },

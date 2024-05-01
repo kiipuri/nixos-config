@@ -34,6 +34,12 @@
       # Deduplicate and optimize nix store
       auto-optimise-store = true;
       # use-xdg-base-directories = true;
+      substituters = [
+        "https://cuda-maintainers.cachix.org"
+      ];
+      trusted-public-keys = [
+        "cuda-maintainers.cachix.org-1:0dq3bujKpuEPMCX6U4WylrUDZ9JyUG0VpVZa7CNfq5E="
+      ];
     };
   };
 
@@ -56,7 +62,9 @@
 
   networking = {
     hostName = hostname;
-    firewall.enable = false;
+    networkmanager.enable = true;
+  };
+
   sops = {
     defaultSopsFile = ../secrets/secrets.yaml;
     defaultSopsFormat = "yaml";
@@ -136,6 +144,10 @@
   };
 
   services = {
+    ollama = {
+      enable = true;
+      acceleration = "cuda";
+    };
     flatpak.enable = true;
     transmission = {
       enable = true;
@@ -158,16 +170,16 @@
         options = "caps:escape";
       };
       videoDrivers = ["nvidia"];
+      windowManager = {
+        awesome = {
+          enable = true;
+          package = pkgs.awesome-git;
+        };
+      };
     };
-    xserver.displayManager.sddm = {
+    displayManager.sddm = {
       enable = true;
       theme = "tokyo-night-sddm";
-    };
-    xserver.windowManager = {
-      awesome = {
-        enable = true;
-        package = pkgs.awesome-git;
-      };
     };
     jellyfin.enable = true;
     pipewire = {
@@ -183,6 +195,7 @@
     hyprland = {
       enable = true;
     };
+    gamemode.enable = true;
     noisetorch.enable = true;
     droidcam.enable = true;
     zsh.enable = true;
@@ -234,7 +247,6 @@
     systemPackages = with pkgs; [
       (libsForQt5.callPackage ../derivatives/tokyo-night-sddm.nix {})
       alsa-utils
-      btop
       comma
       docker-compose
       dunst
@@ -289,14 +301,7 @@
   };
 
   virtualisation = {
-    docker = {
-      enable = true;
-      rootless = {
-        enable = true;
-        setSocketVariable = true;
-      };
-    };
-
+    docker.enable = true;
     libvirtd.enable = true;
   };
 
