@@ -4,7 +4,7 @@
   inputs,
   pkgs,
   username,
-  theme,
+  themeName,
   font,
   ...
 }: {
@@ -22,7 +22,7 @@
     ./easyeffects/default.nix
   ];
 
-  colorScheme = inputs.nix-colors.colorSchemes.${theme};
+  colorScheme = inputs.nix-colors.colorSchemes.${themeName};
 
   sops = {
     defaultSopsFile = ../secrets/secrets.yaml;

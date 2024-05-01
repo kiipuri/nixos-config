@@ -2,7 +2,7 @@
   config,
   lib,
   pkgs,
-  theme,
+  themeName,
   font,
   fontPkg,
   cursor,
@@ -30,10 +30,13 @@
               })
             (import ../nvim
               {
-                inherit font fontPkg pkgs config lib;
+                inherit font fontPkg pkgs config lib inputs;
                 theme = inputs.nix-colors.colorSchemes.${mytheme};
-                themeName = theme;
               })
+            (import ../window-managers/awesome/awesome.nix {
+              inherit font config;
+              theme = inputs.nix-colors.colorSchemes.${mytheme};
+            })
           ];
         };
       };
@@ -45,7 +48,7 @@ in {
     stylix = {
       autoEnable = false;
 
-      base16Scheme = lib.mkDefault "${pkgs.base16-schemes}/share/themes/${theme}.yaml";
+      base16Scheme = lib.mkDefault "${pkgs.base16-schemes}/share/themes/${themeName}.yaml";
       fonts = {
         monospace = {
           package = fontPkg;
