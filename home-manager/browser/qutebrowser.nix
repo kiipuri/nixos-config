@@ -47,20 +47,20 @@
     greasemonkey = [
       (
         pkgs.fetchurl {
-          url = "https://raw.githubusercontent.com/hoothin/UserScripts/master/Pagetual/pagetualRules.json";
+          url = "https://raw.githubusercontent.com/hoothin/UserScripts/cb96fec2e7ef4106dee0400219767a1484856323/Pagetual/pagetualRules.json";
           sha256 = "sha256-HdVNKpKiPs4lQwlqBlDnvonPkQJof/g0Pz03JfNcaj0=";
         }
       )
       (
         pkgs.fetchurl {
-          url = "https://update.greasyfork.org/scripts/383093/Twitch%20-%20Disable%20automatic%20video%20downscale.user.js";
+          url = "https://update.greasyfork.org/scripts/383093/1331790/Twitch%20-%20Disable%20automatic%20video%20downscale.user.js";
           sha256 = "sha256-RJj236f5Kd0oDSUiO+D9O/k3eJOI2gMpyxzGjQupNd4=";
         }
       )
       (
         pkgs.fetchurl {
-          url = "https://cdn.frankerfacez.com/static/ffz_injector.user.js";
-          sha256 = "0vl038x7mm98ghrirr5zcdv24zmhfaj7mrygcm07qs6dri99yjsl";
+          url = "https://update.greasyfork.org/scripts/486931/1324997/FrankerFaceZ.user.js";
+          sha256 = "sha256-+FzGOmBOKeJs7Ce3NJbVpSwNmoucyVu95lyqGbUCuMM=";
         }
       )
       (
