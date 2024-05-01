@@ -36,10 +36,11 @@
 
   home = {
     packages = with pkgs; [
-      anki
+      anki-bin
+      btop
+      webcord-vencord
       vesktop
       ungoogled-chromium
-      teams-for-linux
       rofi-rbw-wayland
       gucharmap
       gimp
@@ -50,6 +51,7 @@
       librewolf
       neofetch
       nvtopPackages.nvidia
+      magic-wormhole
       pyprland
       qalculate-gtk
       slurp
@@ -69,15 +71,19 @@
       reloadConfigs = lib.hm.dag.entryAfter ["writeBoundary"] ''
         for socket in $(${pkgs.fd}/bin/fd --type=socket nvim /run/user/1000); do
           for file in $(${pkgs.fd}/bin/fd --extension=lua . ~/.config/nvim | sort --reverse); do
-            ${pkgs.neovim-remote}/bin/nvr --servername $socket -c "so $file"
+            run --silence ${pkgs.neovim-remote}/bin/nvr --servername $socket -c "so $file"
           done
         done
 
-        ${pkgs.coreutils}/bin/kill -SIGUSR1 $(${pkgs.toybox}/bin/pgrep kitty) 2>/dev/null
-        ${pkgs.coreutils}/bin/kill -SIGUSR1 $(${pkgs.toybox}/bin/pgrep picom) 2>/dev/null
-        ${pkgs.coreutils}/bin/kill -SIGUSR2 $(${pkgs.toybox}/bin/pgrep waybar) 2>/dev/null
-        ${pkgs.mako}/bin/makoctl reload 2>/dev/null
-        ${pkgs.systemd}/bin/systemctl --user start sops-nix.service
+        run --silence ${pkgs.coreutils}/bin/kill -SIGUSR1 $(${pkgs.toybox}/bin/pgrep kitty)
+        run --silence ${pkgs.coreutils}/bin/kill -SIGUSR1 $(${pkgs.toybox}/bin/pgrep picom)
+        run --silence ${pkgs.coreutils}/bin/kill -SIGUSR2 $(${pkgs.toybox}/bin/pgrep waybar)
+        run --silence ${pkgs.mako}/bin/makoctl reload
+        run --silence ${pkgs.systemd}/bin/systemctl --user start sops-nix.service
+
+        # hack to fix awesome.restart()
+        PATH+=":${pkgs.dbus}/bin"
+        run --silence ${pkgs.awesome}/bin/awesome-client "awesome.restart()"
       '';
     };
     sessionVariables = {
@@ -86,6 +92,7 @@
       DOCKER_CONFIG = "${config.xdg.configHome}/docker";
       CUDA_CACHE_PATH = "${config.xdg.cacheHome}/nv";
       NIXOS_OZONE_WL = 1;
+      GTK_IM_MODULE = "";
     };
   };
 
@@ -112,7 +119,7 @@
         }
         {
           label = "logout";
-          action = "${pkgs.systemd}/bin/loginctl kill-session $XDG_SESSION_ID";
+          action = "hyprctl dispatch exit";
           text = "Logout";
           keybind = "e";
         }
@@ -283,31 +290,32 @@
         };
         Service = {
           ExecStart = "${pkgs.writeShellScript "autorun-start" ''
+            setsid ${pkgs.lxqt.lxqt-policykit}/bin/lxqt-policykit-agent &
+
             wallpaper=$(cd ~/wallpapers && ${pkgs.coreutils}/bin/ls | \
               ${pkgs.coreutils}/bin/shuf | \
               ${pkgs.coreutils}/bin/head -n1 | \
               ${pkgs.findutils}/bin/xargs \
               ${pkgs.coreutils}/bin/realpath)
 
-            environ=$(${pkgs.busybox}/bin/strings /proc/$(echo $$)/environ)
-
-            if [[ $environ == *"WAYLAND_DISPLAY"* ]]; then
-              ${pkgs.swaybg}/bin/swaybg -i $wallpaper -m fill &
-            elif [[ $environ == *"DISPLAY"* ]]; then
+            environ=$(printenv)
+            if [[ $environ == *"DISPLAY=:0"* ]]; then
               ${pkgs.feh}/bin/feh --no-fehbg --bg-fill $wallpaper &
+            else
+              ${pkgs.swaybg}/bin/swaybg -i $wallpaper -m fill &
             fi
-
-            ${pkgs.lxsession}/bin/lxpolkit &
           ''}";
 
           ExecStop = "${pkgs.writeShellScript "autorun-stop" ''
             ${pkgs.procps}/bin/pkill -f ${pkgs.swaybg}/bin/swaybg
             ${pkgs.procps}/bin/pkill -f ${pkgs.feh}/bin/feh
             ${pkgs.procps}/bin/pkill -f ${pkgs.fcitx5}/bin/fcitx5
-            ${pkgs.procps}/bin/pkill -f ${pkgs.lxsession}/bin/lxpolkit
+            ${pkgs.procps}/bin/pkill -f ${pkgs.lxqt.lxqt-policykit}/bin/lxqt-policykit-agent
           ''}";
 
           Type = "forking";
+          Restart = "always";
+          StartLimitBurst = "60";
         };
       };
     };
