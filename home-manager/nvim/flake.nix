@@ -12,7 +12,6 @@
     module = {
       imports = [
         ./default.nix
-        ./plugins/lsp-signature.nix
       ];
     };
   in
