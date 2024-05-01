@@ -247,10 +247,6 @@
       };
     };
     configFile = {
-      awesome = {
-        source = ./config/awesome;
-        recursive = true;
-      };
       picom = {
         source = ./config/picom;
         recursive = true;
