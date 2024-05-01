@@ -42,6 +42,8 @@
             application/x-subrip| \
             application/x-yaml| \
             application/x-shellscript) $EDITOR $fx;;
+            audio/*| \
+            video/*) ${toybox}/bin/setsid mpv $f > /dev/null 2> /dev/null &;;
             *) for f in $fx; do
                 if ${ripgrep}/bin/rg -q $mimetype ~/.config/mimeapps.list; then
                   ${toybox}/bin/setsid $OPENER $f > /dev/null 2> /dev/null &
