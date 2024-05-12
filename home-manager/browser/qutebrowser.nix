@@ -1,6 +1,11 @@
-{pkgs, ...}: {
+{
+  pkgs,
+  pkgs-stable,
+  ...
+}: {
   programs.qutebrowser = {
     enable = true;
+    package = pkgs-stable.qutebrowser;
     quickmarks = {
       nixos = "https://search.nixos.org/options";
       nixpkgs = "https://github.com/NixOS/nixpkgs";

@@ -4,6 +4,7 @@
   inputs = {
     # Nixpkgs
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
+    nixpkgs-stable.url = "github:nixos/nixpkgs/nixos-23.11";
 
     # Home manager
     home-manager = {
@@ -45,6 +46,7 @@
     waybar-git,
     stylix,
     nixpkgs-kitty,
+    nixpkgs-stable,
     ...
   } @ inputs: let
     system = "x86_64-linux";
@@ -120,6 +122,7 @@
           inherit (inputs) hyprland;
           inherit (inputs) split-monitor-workspaces;
           pkgs-kitty = import nixpkgs-kitty {inherit system;};
+          pkgs-stable = import nixpkgs-stable {inherit system;};
         }; # Pass flake inputs to our config
         # > Our main home-manager configuration file <
         modules = [
