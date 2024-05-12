@@ -1,13 +1,8 @@
 [pyprland]
 plugins = [
   "scratchpads",
-  "lost_windows",
   "monitors",
-  "shift_monitors",
   "toggle_dpms",
-  "magnify",
-  "expose",
-  "shift_monitors",
 ]
 
 [workspaces_follow_focus]
@@ -31,16 +26,17 @@ lazy = true
 size = "80% 80%"
 margin = 150
 
-# [scratchpads.sonixd]
-# animation = "fromTop"
-# command = "sonixd"
-# class = "Sonixd"
-# size = "80% 80%"
-# margin = 150
+[scratchpads.calc]
+animation = "fromTop"
+command = "qalculate-gtk"
+class = "qalculate-gtk"
+size = "80% 80%"
+margin = 150
 
-# [monitors]
-# unknown = "wlrlui"
-
-[monitors.placement]
-"Acer".leftOf = "HDMI-0"
-"Sony".topOf = "eDP-1"
+[scratchpads.music]
+animation = "fromTop"
+command = "sonixd"
+class = "Sonixd"
+size = "80% 80%"
+margin = 150
+process_tracking = false

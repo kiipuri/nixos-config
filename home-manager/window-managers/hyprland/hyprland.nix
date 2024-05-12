@@ -14,8 +14,8 @@
     settings = {
       workspace = [1 2 3 4 5 6 7 8 9];
       monitor = [
-        "DP-3,2560x1440@143.912003,0x0,1"
-        "HDMI-A-2,preferred,2560x0,1"
+        "DP-3,preferred,0x0,1"
+        "HDMI-A-2,preferred,auto-right,1"
       ];
       exec-once = [
         "pypr"
@@ -111,11 +111,11 @@
         # "$mainMod, M, exec, pypr toggle_minimized"
         "$mainMod, M, exec, hyprctl dispatch togglespecialworkspace minimized"
         "$mainMod SHIFT, Z, exec, pypr zoom"
-        "$mainMod SHIFT, O, exec, pypr shift_monitors +1"
         "$mainMod SHIFT, L, exec, pypr toggle_dpms"
         "$mainMod, T, exec, pypr toggle term && hyprctl dispatch bringactivetotop"
         "$mainMod, Y, exec, pypr toggle volume && hyprctl dispatch bringactivetotop"
         "$mainMod, O, exec, pypr toggle music && hyprctl dispatch bringactivetotop"
+        "$mainMod, C, exec, pypr toggle calc && hyprctl dispatch bringactivetotop"
 
         ", Print, exec, grim -g \"$(slurp -ow 0)\" - | wl-copy"
 
