@@ -31,6 +31,8 @@
     };
     stylix.url = "github:danth/stylix";
     waybar-git.url = "github:Alexays/Waybar";
+
+    nixpkgs-kitty.url = "github:nixos/nixpkgs/0169fd142d9bb36449e432660f0fd9e8d98ecc2c";
   };
 
   outputs = {
@@ -42,6 +44,7 @@
     split-monitor-workspaces,
     waybar-git,
     stylix,
+    nixpkgs-kitty,
     ...
   } @ inputs: let
     system = "x86_64-linux";
@@ -116,6 +119,7 @@
           inherit (inputs) nix-colors;
           inherit (inputs) hyprland;
           inherit (inputs) split-monitor-workspaces;
+          pkgs-kitty = import nixpkgs-kitty {inherit system;};
         }; # Pass flake inputs to our config
         # > Our main home-manager configuration file <
         modules = [

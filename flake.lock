@@ -738,6 +738,22 @@
         "type": "github"
       }
     },
+    "nixpkgs-kitty": {
+      "locked": {
+        "lastModified": 1715119579,
+        "narHash": "sha256-1Fl5CRapXVBTAe2GQM09EhNK1fYPtLSC5qtoz2d5hkY=",
+        "owner": "nixos",
+        "repo": "nixpkgs",
+        "rev": "0169fd142d9bb36449e432660f0fd9e8d98ecc2c",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nixos",
+        "repo": "nixpkgs",
+        "rev": "0169fd142d9bb36449e432660f0fd9e8d98ecc2c",
+        "type": "github"
+      }
+    },
     "nixpkgs-lib": {
       "locked": {
         "lastModified": 1697935651,
@@ -788,6 +804,22 @@
       }
     },
     "nixpkgs-stable_2": {
+      "locked": {
+        "lastModified": 1714971268,
+        "narHash": "sha256-IKwMSwHj9+ec660l+I4tki/1NRoeGpyA2GdtdYpAgEw=",
+        "owner": "nixos",
+        "repo": "nixpkgs",
+        "rev": "27c13997bf450a01219899f5a83bd6ffbfc70d3c",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nixos",
+        "ref": "nixos-23.11",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
+    "nixpkgs-stable_3": {
       "locked": {
         "lastModified": 1712437997,
         "narHash": "sha256-g0whLLwRvgO2FsyhY8fNk+TWenS3jg5UdlWL4uqgFeo=",
@@ -946,12 +978,12 @@
       },
       "locked": {
         "lastModified": 1,
-        "narHash": "sha256-I6ezo+ERMPEsvuraZANxJ5GW6DnLQ5A6AfhsjkZBl1I=",
-        "path": "/nix/store/y8rypfhp5rmpjy25z43szbxhj6h5gki1-source/home-manager/nvim",
+        "narHash": "sha256-rgdeGWqRvly4dJbrl77/etns9Lllh8mKrG+68Vx+Vhc=",
+        "path": "/nix/store/qxbwbnirysknz6j8fl8l59k6qq2yajiv-source/home-manager/nvim",
         "type": "path"
       },
       "original": {
-        "path": "/nix/store/y8rypfhp5rmpjy25z43szbxhj6h5gki1-source/home-manager/nvim",
+        "path": "/nix/store/qxbwbnirysknz6j8fl8l59k6qq2yajiv-source/home-manager/nvim",
         "type": "path"
       }
     },
@@ -1010,6 +1042,8 @@
         "nix-colors": "nix-colors",
         "nixpkgs": "nixpkgs_2",
         "nixpkgs-f2k": "nixpkgs-f2k",
+        "nixpkgs-kitty": "nixpkgs-kitty",
+        "nixpkgs-stable": "nixpkgs-stable_2",
         "nvim": "nvim",
         "sops-nix": "sops-nix",
         "split-monitor-workspaces": "split-monitor-workspaces",
@@ -1037,7 +1071,7 @@
     "sops-nix": {
       "inputs": {
         "nixpkgs": "nixpkgs_6",
-        "nixpkgs-stable": "nixpkgs-stable_2"
+        "nixpkgs-stable": "nixpkgs-stable_3"
       },
       "locked": {
         "lastModified": 1712617241,

@@ -6,6 +6,7 @@
   username,
   themeName,
   font,
+  pkgs-kitty,
   ...
 }: {
   imports = [
@@ -185,9 +186,9 @@
     };
     kitty = {
       enable = true;
+      package = pkgs-kitty.kitty;
       extraConfig = ''
         map f1 launch --cwd=current --type=background kitty
-        # term xterm-256color
       '';
       settings = {
         window_padding_width = 10;
