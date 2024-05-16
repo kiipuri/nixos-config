@@ -54,6 +54,7 @@
     loader.efi.canTouchEfiVariables = true;
     resumeDevice = "/dev/disk/by-partlabel/SWAP";
   };
+
   # boot.loader.grub.enable = true;
   # Define on which hard drive you want to install Grub.
   # boot.loader.grub.device = "/dev/vda"; # or "nodev" for efi only
@@ -81,21 +82,6 @@
   };
 
   time.timeZone = timezone;
-
-  fileSystems = {
-    "/mnt/artix" = {
-      device = "/dev/disk/by-label/ROOT";
-      fsType = "btrfs";
-    };
-    "/mnt/hdd" = {
-      device = "/dev/disk/by-label/HDD";
-      fsType = "ext4";
-    };
-    "/mnt/hdd2" = {
-      device = "/dev/disk/by-label/HDD2";
-      fsType = "ext4";
-    };
-  };
 
   i18n = {
     defaultLocale = locale;
@@ -271,6 +257,7 @@
       libsForQt5.qt5.qtsvg
       lua5_4_compat
       neovim
+      nh
       pavucontrol
       picom
       ripgrep
@@ -290,6 +277,14 @@
       EDITOR = "nvim";
       WLR_NO_HARDWARE_CURSORS = "1";
     };
+  };
+
+  sound = {
+    enable = true;
+    extraConfig = ''
+      defaults.pcm.!card "Wireless"
+      defaults.ctl.!card "Wireless"
+    '';
   };
 
   users = {

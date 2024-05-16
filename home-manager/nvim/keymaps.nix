@@ -117,7 +117,7 @@
     }
     {
       key = "<leader>h";
-      action = "<cmd>noh<cr>";
+      action = "<cmd>noh<cr><cmd>NoiceDismiss<cr>";
       mode = "n";
     }
     {

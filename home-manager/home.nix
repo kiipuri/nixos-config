@@ -202,6 +202,7 @@
         mode = "no-sudo";
       };
     };
+    mangohud.enable = true;
   };
 
   gtk = {

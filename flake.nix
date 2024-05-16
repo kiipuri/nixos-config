@@ -57,17 +57,7 @@
     locale = "en_US.UTF-8";
     username = "kiipuri";
     themeName = "catppuccin-mocha";
-    # theme = "gruvbox-light-hard";
-    # theme = "uwunicorn";
-    # theme = "rose-pine";
-    # theme = "rose-pine-moon";
-    # theme = "rose-pine-dawn";
-    # theme = "sakura";
-    # theme = "blueforest";
-    # theme = "3024";
 
-    # font = "JetBrainsMono Nerd Font";
-    # fontPkg = pkgs.jetbrains-mono;
     font = "Maple Mono";
     fontPkg = pkgs.maple-mono;
 

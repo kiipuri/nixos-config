@@ -200,6 +200,7 @@ in {
       };
     };
     extraPlugins = with pkgs.vimPlugins; [
+      yuck-vim
       telescope-ui-select-nvim
       vim-snippets
       nvim-web-devicons

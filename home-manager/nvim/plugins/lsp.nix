@@ -38,6 +38,7 @@
         csharp-ls.enable = true;
         pylsp.enable = true;
         pyright.enable = true;
+        cssls.enable = true;
       };
       onAttach = ''
         if client.supports_method("textDocument/formatting") then

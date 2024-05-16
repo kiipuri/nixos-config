@@ -678,6 +678,22 @@
         "type": "github"
       }
     },
+    "nixos-secrets": {
+      "locked": {
+        "lastModified": 1715815922,
+        "narHash": "sha256-NYHlUcEfN1zxJGtSPn5LG38qcivisH/hcK7KOFF1smo=",
+        "ref": "main",
+        "rev": "edcc3d71edb69b39421c385e65276a77935a29bb",
+        "revCount": 2,
+        "type": "git",
+        "url": "ssh://git@github.com/kiipuri/nixos-secrets"
+      },
+      "original": {
+        "ref": "main",
+        "type": "git",
+        "url": "ssh://git@github.com/kiipuri/nixos-secrets"
+      }
+    },
     "nixpkgs": {
       "locked": {
         "lastModified": 1712439257,
@@ -978,12 +994,12 @@
       },
       "locked": {
         "lastModified": 1,
-        "narHash": "sha256-rgdeGWqRvly4dJbrl77/etns9Lllh8mKrG+68Vx+Vhc=",
-        "path": "/nix/store/qxbwbnirysknz6j8fl8l59k6qq2yajiv-source/home-manager/nvim",
+        "narHash": "sha256-Fw+w+pvdygfjaLq+ueoC+34d1SfSKcUGkPAObjvfUN0=",
+        "path": "/nix/store/7jgl7h2lrs4wpyml1dz1ma7fs35nnwkq-source/home-manager/nvim",
         "type": "path"
       },
       "original": {
-        "path": "/nix/store/qxbwbnirysknz6j8fl8l59k6qq2yajiv-source/home-manager/nvim",
+        "path": "/nix/store/7jgl7h2lrs4wpyml1dz1ma7fs35nnwkq-source/home-manager/nvim",
         "type": "path"
       }
     },
@@ -1040,6 +1056,7 @@
         "home-manager": "home-manager",
         "hyprland": "hyprland",
         "nix-colors": "nix-colors",
+        "nixos-secrets": "nixos-secrets",
         "nixpkgs": "nixpkgs_2",
         "nixpkgs-f2k": "nixpkgs-f2k",
         "nixpkgs-kitty": "nixpkgs-kitty",

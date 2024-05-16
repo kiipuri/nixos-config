@@ -82,6 +82,8 @@ in {
           display_mode = "split",
           no_auto_close = true,
         })
+
+        vim.diagnostic.config({virtual_text = false})
       '';
 
       extraConfigLuaPre = ''

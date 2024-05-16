@@ -76,6 +76,7 @@ in {
       l = "eza -lah --icons";
       cat = "bat";
       lg = "lazygit";
+      modx = "sudo chmod +x";
     };
   };
 }
