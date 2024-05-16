@@ -995,11 +995,11 @@
       "locked": {
         "lastModified": 1,
         "narHash": "sha256-Fw+w+pvdygfjaLq+ueoC+34d1SfSKcUGkPAObjvfUN0=",
-        "path": "/nix/store/7jgl7h2lrs4wpyml1dz1ma7fs35nnwkq-source/home-manager/nvim",
+        "path": "/nix/store/18n2xvrpai8mrnjfsybv03yc9gpz24h5-source/home-manager/nvim",
         "type": "path"
       },
       "original": {
-        "path": "/nix/store/7jgl7h2lrs4wpyml1dz1ma7fs35nnwkq-source/home-manager/nvim",
+        "path": "/nix/store/18n2xvrpai8mrnjfsybv03yc9gpz24h5-source/home-manager/nvim",
         "type": "path"
       }
     },

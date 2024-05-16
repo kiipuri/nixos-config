@@ -43,11 +43,6 @@
     fsType = "ext4";
   };
 
-  fileSystems."/var/lib/docker/overlay2/9427b1580e431c6f7511fc55de4c20ce649d517cdad253b2f1b6f57c9ee3b45d/merged" = {
-    device = "overlay";
-    fsType = "overlay";
-  };
-
   swapDevices = [
     {device = "/dev/disk/by-uuid/7f7e3288-ded6-44e4-820f-766caa8cc7ef";}
   ];
