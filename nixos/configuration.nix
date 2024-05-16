@@ -7,6 +7,7 @@
   timezone,
   locale,
   username,
+  secrets,
   ...
 }: {
   imports = [
@@ -62,7 +63,10 @@
 
   networking = {
     hostName = hostname;
-    networkmanager.enable = true;
+    networkmanager = {
+      enable = true;
+      insertNameservers = [secrets.dns-server "8.8.8.8"];
+    };
   };
 
   sops = {
@@ -181,7 +185,6 @@
       enable = true;
       theme = "tokyo-night-sddm";
     };
-    jellyfin.enable = true;
     pipewire = {
       enable = true;
       alsa.enable = true;

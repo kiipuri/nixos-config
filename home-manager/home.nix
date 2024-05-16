@@ -18,6 +18,7 @@
     ./style/stylix.nix
     ./shell/shell.nix
     ./browser/qutebrowser.nix
+    ./bitwarden/rbw.nix
     ./mpv/mpv.nix
     ./window-managers/hyprland/hyprland.nix
     ./easyeffects/default.nix

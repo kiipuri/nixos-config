@@ -34,6 +34,7 @@
     waybar-git.url = "github:Alexays/Waybar";
 
     nixpkgs-kitty.url = "github:nixos/nixpkgs/0169fd142d9bb36449e432660f0fd9e8d98ecc2c";
+    nixos-secrets.url = "git+ssh://git@github.com/kiipuri/nixos-secrets?ref=main";
   };
 
   outputs = {
@@ -47,6 +48,7 @@
     stylix,
     nixpkgs-kitty,
     nixpkgs-stable,
+    nixos-secrets,
     ...
   } @ inputs: let
     system = "x86_64-linux";
@@ -75,6 +77,8 @@
     cursor = "Bibata-Modern-Ice";
     cursorPkg = pkgs.bibata-cursors;
 
+    secrets = nixos-secrets;
+
     pkgs = import nixpkgs {inherit system;};
   in {
     # NixOS configuration entrypoint
@@ -92,6 +96,7 @@
           inherit themeName;
           inherit font;
           inherit fontPkg;
+          inherit secrets;
           inherit (inputs) stylix;
           inherit (inputs) nixpkgs-f2k;
         }; # Pass flake inputs to our config
@@ -117,6 +122,7 @@
           inherit cursorPkg;
           inherit username;
           inherit hostname;
+          inherit secrets;
           inherit (inputs) stylix;
           inherit (inputs) nix-colors;
           inherit (inputs) hyprland;
