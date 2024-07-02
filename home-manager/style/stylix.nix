@@ -88,6 +88,7 @@ in {
         rofi.enable = true;
         vim.enable = true;
         zellij.enable = true;
+        yazi.enable = true;
       };
     };
   };

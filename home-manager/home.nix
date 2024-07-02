@@ -67,6 +67,7 @@
       picard
       goldendict-ng
       jq
+      nix-output-monitor
     ];
     inherit username;
     homeDirectory = "/home/${username}";
@@ -101,6 +102,18 @@
 
   programs = {
     home-manager.enable = true;
+    yazi = {
+      enable = true;
+      enableZshIntegration = true;
+      settings = {
+        manager = {
+          show_hidden = true;
+          sort_by = "natural";
+          sort_sensitive = false;
+          sort_dir_first = true;
+        };
+      };
+    };
     fzf = {
       enable = true;
       enableZshIntegration = true;
