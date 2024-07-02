@@ -8,6 +8,7 @@
   cursor,
   cursorPkg,
   inputs,
+  pkgs-eww,
   ...
 }: let
   themes = [
@@ -35,6 +36,10 @@
               })
             (import ../window-managers/awesome/awesome.nix {
               inherit font config;
+              theme = inputs.nix-colors.colorSchemes.${mytheme};
+            })
+            (import ../eww/eww.nix {
+              inherit pkgs pkgs-eww;
               theme = inputs.nix-colors.colorSchemes.${mytheme};
             })
           ];

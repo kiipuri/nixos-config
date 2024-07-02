@@ -1,0 +1,19 @@
+#!/bin/sh
+
+bandwidth() {
+    wifi_connected=$(nmcli -g GENERAL.STATE dev show wlp4s0)
+    if echo "$wifi_connected" | grep -q "^100"; then
+        device="wlp4s0"
+    else
+        device="enp5s0"
+    fi
+
+    bytes=$(cat "/sys/class/net/$device/statistics/${1}_bytes")
+    sleep 1
+    new_bytes=$(cat "/sys/class/net/$device/statistics/${1}_bytes")
+    bytes_diff=$((new_bytes - bytes))
+    rate=$(numfmt --to=iec $bytes_diff)
+    echo "$rate/s"
+}
+
+bandwidth "$@"

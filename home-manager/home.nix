@@ -7,6 +7,7 @@
   themeName,
   font,
   pkgs-kitty,
+  pkgs-eww,
   ...
 }: {
   imports = [
@@ -294,6 +295,7 @@
         Service = {
           ExecStart = "${pkgs.writeShellScript "autorun-start" ''
             setsid ${pkgs.lxqt.lxqt-policykit}/bin/lxqt-policykit-agent &
+            ${pkgs-eww.eww}/bin/eww open-many bar-left bar-right
 
             wallpaper=$(cd ~/wallpapers && ${pkgs.coreutils}/bin/ls | \
               ${pkgs.coreutils}/bin/shuf | \

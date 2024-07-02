@@ -710,6 +710,22 @@
         "type": "github"
       }
     },
+    "nixpkgs-eww": {
+      "locked": {
+        "lastModified": 1715919837,
+        "narHash": "sha256-Q5nGUVMnrS23Qwg56WN2lixxCaCJaI/mtJ+GVS/HTXw=",
+        "owner": "nixos",
+        "repo": "nixpkgs",
+        "rev": "5233d62dcc2f4bb3f1747eb65b3ccd3b69e6c1f9",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nixos",
+        "repo": "nixpkgs",
+        "rev": "5233d62dcc2f4bb3f1747eb65b3ccd3b69e6c1f9",
+        "type": "github"
+      }
+    },
     "nixpkgs-f2k": {
       "inputs": {
         "emacs": "emacs",
@@ -994,12 +1010,12 @@
       },
       "locked": {
         "lastModified": 1,
-        "narHash": "sha256-Fw+w+pvdygfjaLq+ueoC+34d1SfSKcUGkPAObjvfUN0=",
-        "path": "/nix/store/18n2xvrpai8mrnjfsybv03yc9gpz24h5-source/home-manager/nvim",
+        "narHash": "sha256-bcJC3ct4wsJWP9Nvlc7i6WW/40RypnSKWadbiSVR6hk=",
+        "path": "/nix/store/pc43b2d918krcdzlkww3dhha45wzm2ik-source/home-manager/nvim",
         "type": "path"
       },
       "original": {
-        "path": "/nix/store/18n2xvrpai8mrnjfsybv03yc9gpz24h5-source/home-manager/nvim",
+        "path": "/nix/store/pc43b2d918krcdzlkww3dhha45wzm2ik-source/home-manager/nvim",
         "type": "path"
       }
     },
@@ -1058,6 +1074,7 @@
         "nix-colors": "nix-colors",
         "nixos-secrets": "nixos-secrets",
         "nixpkgs": "nixpkgs_2",
+        "nixpkgs-eww": "nixpkgs-eww",
         "nixpkgs-f2k": "nixpkgs-f2k",
         "nixpkgs-kitty": "nixpkgs-kitty",
         "nixpkgs-stable": "nixpkgs-stable_2",

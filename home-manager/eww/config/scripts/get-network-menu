@@ -1,0 +1,113 @@
+#!/bin/sh
+
+nmcli dev wifi rescan &
+all_conns=$(nmcli --terse -f NAME,TYPE,ACTIVE,STATE con show)
+wireless_conns=$(nmcli --terse -f SSID,ACTIVE,SECURITY dev wifi | sort | uniq)
+
+menu="(box :orientation 'v' :space-evenly false"
+
+wired_conns_lit=""
+wireless_conns_saved_lit=""
+wireless_conns_lit=""
+vpn_conns_lit=""
+
+IFS=
+
+while read -r conn; do
+    name=$(echo "$conn" | awk -F ':' '{print $1}')
+    type=$(echo "$conn" | awk -F ':' '{print $2}')
+    active=$(echo "$conn" | awk -F ':' '{print $3}')
+    activating=$(echo "$conn" | awk -F ':' '{print $4}')
+
+    echo "$type" | grep -qv "wireless$" && continue
+    echo "$wireless_conns" | rg -q "$name" || continue
+
+    if [ "$active" = "yes" ]; then
+        active_class="active-connection"
+        conn_toggle="down"
+        icon="󰖩"
+    else
+        active_class="inactive-connection"
+        conn_toggle="up"
+        icon="󰖪"
+    fi
+
+    [ "$activating" = "activating" ] &&
+        activating_class="activating-connection"
+
+    wireless_conns_saved_lit="$wireless_conns_saved_lit (eventbox :cursor 'pointer' :class 'network-connection $active_class $activating_class'
+    (button :onclick 'nmcli con $conn_toggle \"$name\"'
+        (box :space-evenly false
+            (label :hexpand true :halign 'start' :text '$name')
+            (label :hexpand true :halign 'end' :text '$icon'))))"
+done <<EOF
+$all_conns
+EOF
+
+while read -r conn; do
+    name=$(echo "$conn" | awk -F ':' '{print $1}')
+    active=$(echo "$conn" | awk -F ':' '{print $2}')
+    security=$(echo "$conn" | awk -F ':' '{print $3}')
+
+    echo "$all_conns" | grep -q "$name" && continue
+
+    [ -n "$security" ] && security_icon=" " || security_icon=""
+
+    active_class="inactive-connection"
+    conn_toggle="up"
+    icon="󰖪"
+
+    wireless_conns_lit="$wireless_conns_lit (eventbox :cursor 'pointer' :class 'network-connection $active_class'
+    (button :timeout '60s'
+        :onclick 'eww update selected-network=\"$name\";
+                  eww open password-dialog'
+        (box :space-evenly false
+            (label :hexpand true :halign 'start' :text '$name')
+            (label :hexpand true :halign 'end' :text '$security_icon$icon'))))
+    "
+done <<EOF
+$wireless_conns
+EOF
+
+while read -r conn; do
+    name=$(echo "$conn" | awk -F ':' '{print $1}')
+    type=$(echo "$conn" | awk -F ':' '{print $2}')
+    active=$(echo "$conn" | awk -F ':' '{print $3}')
+    if [ "$active" = "yes" ]; then
+        active_class="active-connection"
+        conn_toggle="down"
+        icon="󰖩"
+    else
+        active_class="inactive-connection"
+        conn_toggle="up"
+        icon="󰖪"
+    fi
+
+    case "$type" in
+    *"ethernet")
+        wired_conns_lit="$wired_conns_lit (eventbox :cursor 'pointer' :class 'network-connection $active_class'
+        (button :onclick 'nmcli con $conn_toggle \"$name\"'
+            (box :space-evenly false
+                (label :hexpand true :halign 'start' :text '$name')
+                (label :hexpand true :halign 'end' :text '󰈁'))))"
+        ;;
+    "wireguard")
+        vpn_conns_lit="$vpn_conns_lit (eventbox :cursor 'pointer' :class 'network-connection $active_class'
+        (button :onclick 'nmcli con $conn_toggle \"$name\"'
+            (box :space-evenly false
+                (label :hexpand true :halign 'start' :text '$name')
+                (label :hexpand true :halign 'end' :text '󰖂'))))"
+        ;;
+    esac
+done <<EOF
+$all_conns
+EOF
+
+menu="$menu (label :class 'connections-title' :text 'Wired connections') $wired_conns_lit
+(label :class 'connections-title' :text 'Saved connections') $wireless_conns_saved_lit
+(label :class 'connections-title' :text 'Wireless connections') $wireless_conns_lit
+(label :class 'connections-title' :text 'VPN connections') $vpn_conns_lit"
+
+menu="$menu )"
+
+echo "$menu"

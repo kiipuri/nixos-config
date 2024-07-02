@@ -1,0 +1,229 @@
+@use "extra";
+@use "colors";
+
+* {
+    all: unset; //Unsets everything so you can style everything from scratch
+}
+
+$font-size: 22px;
+$font-size-small: 16px;
+$font-size-large: 30px;
+
+@mixin border {
+    border: colors.$border;
+}
+
+@mixin base {
+    margin-left: extra.$margin;
+    background-color: colors.$base-color;
+    border-radius: 10rem;
+    @include border;
+}
+
+.bar {
+    color: colors.$font-color;
+    font-size: $font-size;
+}
+
+.workspaces {
+    @include base;
+
+    button {
+        padding: 10px 20px;
+        border-radius: 10rem;
+
+        &:hover {
+            background-color: colors.$base-color-variant;
+        }
+    }
+}
+
+.system-usage {
+    @include base;
+}
+
+.music {
+    @include base;
+
+    label {
+        font-size: $font-size-small;
+    }
+}
+
+.active-ws {
+    color: red;
+}
+
+.progress trough {
+    background-color: #4e4e4e;
+    border-radius: 50px;
+    min-height: 7px;
+    min-width: 50px;
+    margin-left: 10px;
+    margin-right: 10px;
+
+    progress {
+        background-color: #d35d6e;
+        color: #000000;
+        border-radius: 20px;
+    }
+}
+
+.meter scale trough {
+    background-color: #4e4e4e;
+    border-radius: 50px;
+    min-height: 7px;
+    min-width: 50px;
+    // margin-left: 10px;
+    // margin-right: 10px;
+
+    highlight {
+        background-color: #d35d6e;
+        color: #000000;
+        border-radius: 20px;
+    }
+}
+
+.music-progress trough {
+    margin-left: 0px;
+}
+
+.music-popup-progress scale trough {
+    min-height: 20px;
+    border: colors.$border;
+}
+
+.music-icon {
+    border: colors.$border;
+    border-radius: 10px;
+}
+
+@mixin popup {
+    background-color: colors.$base-color;
+    border: colors.$border;
+    border-radius: extra.$margin;
+    color: colors.$font-color;
+    font-size: $font-size;
+    padding: extra.$margin / 2;
+}
+
+.music-popup,
+.weather {
+    @include popup;
+}
+
+.power-menu button {
+    font-size: $font-size-large;
+}
+
+.right-modules {
+    @include base;
+}
+
+.network {
+    margin-left: extra.$margin;
+    margin-right: extra.$margin * 1.5;
+}
+
+.dialog {
+    @include popup;
+    padding: extra.$margin;
+    font-size: $font-size-small;
+}
+
+.network-menu {
+    @include popup;
+}
+
+.network-connection {
+    button {
+        padding-left: extra.$margin / 2;
+        padding-right: extra.$margin / 2;
+        border-radius: 10px;
+        padding-top: 4px;
+        padding-bottom: 4px;
+
+        &:hover {
+            background-color: colors.$base-color-variant;
+        }
+    }
+}
+
+.connections-title {
+    margin-top: extra.$margin / 2;
+    margin-bottom: extra.$margin / 2;
+}
+
+.active-connection {
+    color: green;
+}
+
+.inactive-connection {
+    color: red;
+}
+
+.activating-connection {
+    color: yellow;
+}
+
+.volume {
+    padding-left: extra.$margin;
+    padding-right: extra.$margin;
+
+    label {
+        padding-right: extra.$margin;
+    }
+
+    scale trough {
+        margin-left: extra.$margin / 2;
+        margin-right: 0;
+    }
+}
+
+.button-icon {
+    font-size: 36px;
+}
+
+.button {
+    border: colors.$border;
+    border-width: 1px;
+    border-radius: 5px;
+    padding: extra.$margin / 2;
+    margin: extra.$margin / 2;
+    font-size: $font-size-small;
+
+    &:hover {
+        background-color: colors.$base-color-variant;
+    }
+}
+
+.systray {
+    widget {
+        image {
+            margin-right: 0.5rem;
+        }
+
+        &:last-child image {
+            margin-right: 0;
+        }
+    }
+
+    menu {
+        background-color: colors.$base-color;
+        border-radius: 10px;
+        font-size: $font-size-small;
+
+        menuitem {
+            padding: 4px extra.$margin;
+            border-radius: 10px;
+
+            &:hover {
+                background-color: colors.$base-color-variant;
+            }
+        }
+    }
+}
+
+.module-separator {
+    border-right: colors.$border;
+}

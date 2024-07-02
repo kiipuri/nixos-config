@@ -1,0 +1,37 @@
+$margin: 20px;
+
+.mg-top {
+  margin-top: $margin;
+}
+
+.mg-top-half {
+  margin-top: $margin / 2;
+}
+
+.mg-bottom {
+  margin-bottom: $margin;
+}
+
+.mg-bottom-half {
+  margin-bottom: $margin / 2;
+}
+
+.mg-left {
+  margin-left: $margin;
+}
+
+.mg-left-half {
+  margin-left: $margin / 2;
+}
+
+.mg-right {
+  margin-right: $margin;
+}
+
+.mg-right-half {
+  margin-right: $margin / 2;
+}
+
+.pd-right {
+  padding-right: $margin / 2;
+}

@@ -1,0 +1,6 @@
+#!/bin/sh
+
+length=$(($(playerctl metadata mpris:length) / 1000000))
+pos=$(playerctl position)
+progress=$(echo "$pos * 100 / $length" | bc)
+echo "$progress"

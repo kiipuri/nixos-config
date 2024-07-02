@@ -1,0 +1,370 @@
+;; VARIABLES
+
+(deflisten workspaces-left-lit "scripts/get-workspaces 1")
+(deflisten workspaces-right-lit "scripts/get-workspaces 0")
+(deflisten music-icon "scripts/get-music-icon")
+(defpoll music-progress :interval "1s" "scripts/get-music-progress")
+(deflisten music-title :initial ""
+  "playerctl --player Sonixd --follow metadata title")
+(deflisten music-artist :initial ""
+  "playerctl --player Sonixd --follow metadata artist")
+(deflisten music-paused "
+  playerctl --follow status --player Sonixd 2>/dev/null |
+  while read -r status; do
+    if [ $status = 'Paused' ]; then echo 'true';
+    else echo 'false'; fi
+  done
+")
+(deflisten music-visible "
+  echo false
+  playerctl --follow status --player Sonixd 2>/dev/null |
+  while read -r status; do
+    if [ \"$status\" = 'Paused' ] || [ \"$status\" = 'Playing' ]; then echo 'true';
+    else echo 'false'; fi
+  done
+")
+;; (defpoll music-paused :interval "10000s" "
+;;   if [ $(playerctl status) = 'Paused' ]; then echo 'true';
+;;   else echo 'false'; fi")
+;; (defpoll music-volume :interval "10000s" "echo \"$(playerctl volume) * 100\" | bc")
+
+(deflisten music-volume "
+  playerctl --follow volume --player Sonixd 2>/dev/null |
+  while read -r volume; do
+    echo \"$(playerctl volume) * 100\" | bc
+  done
+")
+(defvar open-music-popup true)
+(defpoll time :interval "5s" "date +%H:%M")
+(defvar reveal-power false)
+(defvar reveal-volume false)
+(defvar reveal-network false)
+(defvar reveal-date false)
+(defpoll bandwidth-up :interval "0s" "scripts/get-bandwidth tx")
+(defpoll bandwidth-down :interval "0s" "scripts/get-bandwidth rx")
+(defpoll current-volume :interval "10000s" "pamixer --get-volume")
+(defpoll network-menu-lit :interval "3s" "scripts/get-network-menu")
+(defpoll current-date :interval "1min" "date '+%d %b'")
+(defvar open-network-menu true)
+(defvar open-weather true)
+(defvar input-value "")
+(defvar selected-network "")
+(defpoll weather :interval "10min" "scripts/get-weather")
+(defpoll weather-module :interval "10min" "scripts/get-weather-module")
+
+
+;; WIDGETS
+
+(defwidget module-separator []
+  (box :class "module-separator"))
+
+(defwidget bar-left []
+  (box :orientation "h" :class "bar"
+    (centerbox :orientation "h"
+      (box :orientation "h" :space-evenly false :halign "start"
+        (workspaces-left)
+        (system-usage))
+      (music)
+      (box :orientation "h" :space-evenly false :halign "end" :class "mg-right"
+        (box :orientation "h" :space-evenly false :halign "end" :class "right-modules"
+          (systray :class "mg-left mg-right-half systray" :space-evenly false)
+          (literal :content weather-module)
+          (network)
+          (module-separator)
+          (volume))
+        (box :orientation "h" :space-evenly false :halign "end" :class "right-modules"
+          (time)
+          (module-separator)
+          (power-menu))))))
+
+(defwidget bar-right []
+  (box :orientation "h" :class "bar"
+    (centerbox :orientation "h"
+      (box :orientation "h" :space-evenly false :halign "start"
+        (workspaces-right)
+        (system-usage))
+      (music)
+      (box :orientation "h" :space-evenly false :halign "end" :class "right-modules mg-right"
+        (time)
+        (module-separator)
+        (power-menu)))))
+
+(defwidget workspaces-left []
+    (literal :content workspaces-left-lit))
+
+(defwidget workspaces-right []
+    (literal :content workspaces-right-lit))
+
+(defwidget system-usage []
+    (box :class "system-usage" :space-evenly false :halign "start"
+        (tooltip
+            (label :text "CPU usage: ${round(EWW_CPU.avg, 0)}%")
+            (box :space-evenly false :class "mg-left"
+                (image :path "icons/cpu.png"
+                  :image-width 32
+                  :image-height 32)
+                (progressbar :value {EWW_CPU.avg})))
+        (tooltip
+            (label :text "Memory usage: ${round(EWW_RAM.used_mem_perc, 0)}%")
+            (box :space-evenly false
+                (image :path "icons/ram_chip.png"
+                  :image-width 32
+                  :image-height 32)
+                (progressbar :value {EWW_RAM.used_mem_perc})))
+        (tooltip
+            (label :text "Space usage: ${round(EWW_DISK["/"].used_perc, 0)}%")
+            (box :space-evenly false :class "mg-right-half"
+                (image :path "icons/hard-drive.png"
+                  :image-width 32
+                  :image-height 32)
+                (progressbar :value {round((1 - (EWW_DISK["/"].free / EWW_DISK["/"].total)) * 100, 0)})))))
+
+(defwidget music []
+  (box :class "music" :orientation "h" :space-evenly false :visible music-visible
+    (image :class "mg-left" :path  music-icon :image-width 49 :image-height 49)
+      (eventbox :cursor "pointer"
+        (button :onclick "scripts/toggle-closer-window music-popup"
+          (box :orientation "v" :class "mg-left-half mg-right-half"
+            (label :class "mg-right" :text music-title :limit-width 20)
+            (progressbar :class "music-progress" :value music-progress))))))
+
+(defwidget time []
+  (eventbox :class "time base0C"
+    :onhover "eww update reveal-date=true"
+    :onhoverlost "eww update reveal-date=false"
+    (box :orientation "h" :space-evenly false :halign "end"
+      :class "mg-left-half mg-right-half"
+      (label :class "mg-left-half mg-right-half" :text time)
+      (revealer :transition "slideleft" :reveal reveal-date
+        (label :class "mg-right-half" :text current-date)))))
+
+(defwidget volume []
+  (eventbox :onhover "eww update reveal-volume=true"
+            :onhoverlost "eww update reveal-volume=false"
+    (box :class "volume button-icon base0D" :orientation "h" :space-evenly false :halign "end"
+      (label :text "${current-volume >= 50 ? "": ""}")
+      (revealer :transition "slideleft" :reveal reveal-volume
+        (meter :value current-volume
+               :class "base0D"
+               :onchange "eww update current-volume={} &&
+                          pamixer --set-volume {}")))))
+
+(defwidget power-menu []
+  (eventbox :halign "end"
+    :onhover "eww update reveal-power=true"
+    :onhoverlost "eww update reveal-power=false"
+    :cursor "pointer"
+    (box :class "mg-left mg-right power-menu" :orientation "h" :space-evenly false :halign "start"
+      (revealer :transition "slideright" :reveal reveal-power
+        (box :orientation "h" :space-evenly false :halign "start"
+          (button :class "mg-right base0B" :onclick "eww open confirm-dialog-reboot" "")
+          (button :class "mg-right base0A" :onclick "eww open confirm-dialog-logout" "")
+          (button :class "mg-right-half base09" :onclick "eww open confirm-dialog-suspend" "󰤄")))
+      (button :class "base08" :onclick "eww open confirm-dialog-shutdown" "󰐥"))))
+
+(defwidget network []
+  (eventbox :onhover "eww update reveal-network=true"
+            :onhoverlost "eww update reveal-network=false"
+            :onclick "scripts/toggle-closer-window network-menu"
+            :class "base0E"
+    (box :class "network" :orientation "h" :space-evenly false :halign "end"
+      (label :class "button-icon" :text "󱂇")
+      (revealer :transition "slideleft" :reveal reveal-network
+        (box :orientation "h" :space-evenly false :halign "end"
+          (label :class "mg-left mg-right" :text "${bandwidth-down} ")
+          (label :style "margin-right: 4px" :text "${bandwidth-up} "))))))
+
+(defwidget music-popup []
+  (box :orientation "v" :space-evenly false :visible music-visible
+    (box :class "mg-bottom-half" :space-evenly false :width 500
+      (box :class "music-icon" :vexpand true
+           :style "background-image: url('${music-icon}'); background-size: cover;"
+           :width 180
+           :height 180)
+      (box :orientation "v" :hexpand true :class "mg-left-half mg-right-half" :width 300
+        (label :text music-title :halign "start" :class "mg-left-half" :truncate true)
+        (label :text music-artist :halign "start" :class "mg-left-half mg-right-half" :style "color: #a6adc8; font-size: 16px;" :truncate true)
+        (box :halign "fill" :hexpand true
+        (box :halign "start"
+          (eventbox :cursor "pointer"
+            (button :class "button-icon" :onclick "playerctl previous" "󰙣"))
+          (eventbox :cursor "pointer"
+            (button :class "button-icon mg-left-half mg-right-half"
+                    :onclick "playerctl play-pause"
+              "${music-paused ? "" : ""}"))
+          (eventbox :cursor "pointer"
+            (button :class "button-icon" :onclick "playerctl next" "󰙡")))
+          (box :space-evenly false
+            (label :text "" :class "mg-right")
+            (meter :value music-volume :onchange "
+              playerctl volume $(echo \"scale=2; {} / 100\" | bc)")))))
+    (meter :value music-progress
+      :class "music-popup-progress"
+      :onchange "scripts/set-music-progress {}")))
+
+
+(defwidget network-menu []
+  (literal :class "network-menu" :content network-menu-lit))
+
+(defwidget password-dialog []
+  (box :orientation "v" :class "dialog"
+    (label :class "mg-bottom-half" :text "Enter password")
+    (input :timeout "180s" :password true :onaccept "scripts/save-connection {} &")))
+
+(defwidget meter [value ?class ?onchange]
+  (box :class "meter ${class}" :hexpand true
+    (scale
+      :value value
+      :min 0
+      :timeout "1s"
+      :onchange onchange)))
+
+(defwidget progressbar [value ?class]
+  (progress :class "progress ${class}" :value value :valign "center"))
+
+(defwidget closer [window]
+  (eventbox :onclick "scripts/toggle-closer-window ${window}"))
+
+(defwidget confirm-dialog [text command window]
+  (box :orientation "v" :class "dialog" :width 20
+    (label :class "mg-bottom-half" :wrap true :truncate false :show-truncated false :halign "center" :justify "center" :text text)
+    (box :space-evenly true
+      (button :class "button" :onclick "eww close confirm-dialog-${window} && ${command}" "Yes")
+      (button :class "button" :onclick "eww close confirm-dialog-${window}" "Cancel"))))
+
+(defwidget weather []
+  (literal :content weather))
+
+;; WINDOWS
+
+(defwindow music-popup
+  :monitor 1
+  :exclusive false
+  :geometry (geometry :x "0%"
+                      :y "20px"
+                      :width "500px"
+                      :height "0"
+                      :anchor "top center")
+  (music-popup))
+
+(defwindow music-popup-closer
+  :monitor 1
+  :exclusive false
+  :geometry (geometry :width "100%"
+                      :height "100%"
+                      :anchor "top center")
+  (closer :window "music-popup"))
+
+(defwindow network-menu
+  :monitor 1
+  :exclusive false
+  :geometry (geometry :x "20px"
+                      :y "20px"
+                      :width "400px"
+                      :height "0"
+                      :anchor "top right")
+  (network-menu))
+
+(defwindow network-menu-closer
+  :monitor 1
+  :exclusive false
+  :geometry (geometry :width "100%"
+                      :height "100%"
+                      :anchor "top center")
+  (closer :window "network-menu"))
+
+
+(defwindow bar-right
+  :monitor 0
+  :exclusive true
+  :geometry (geometry :x "0%"
+                      :y "20px"
+                      :width "100%"
+                      :height "20px"
+                      :anchor "top center")
+  (bar-right))
+
+(defwindow bar-left
+  :monitor 1
+  :exclusive true
+  :geometry (geometry :x "0%"
+                      :y "20px"
+                      :width "100%"
+                      :height "20px"
+                      :anchor "top center")
+  (bar-left))
+
+(defwindow password-dialog
+  :monitor 1
+  :focusable true
+  :geometry (geometry :x "0%"
+                      :y "0"
+                      :width "400px"
+                      :height "0"
+                      :anchor "center center")
+  (password-dialog))
+
+(defwindow confirm-dialog-suspend
+  :monitor 1
+  :geometry (geometry :x "0%"
+                      :y "0"
+                      :width "400px"
+                      :height "0"
+                      :anchor "center center")
+  (confirm-dialog
+    :text "Do you want to suspend the computer?"
+    :command "systemctl suspend"
+    :window "suspend"))
+
+(defwindow confirm-dialog-logout
+  :monitor 1
+  :geometry (geometry :x "0%"
+                      :y "0"
+                      :width "400px"
+                      :height "0"
+                      :anchor "center center")
+  (confirm-dialog
+    :text "Do you want to logout?"
+    :command "loginctl kill-session $XDG_SESSION_ID"
+    :window "logout"))
+
+(defwindow confirm-dialog-reboot
+  :monitor 1
+  :geometry (geometry :x "0%"
+                      :y "0"
+                      :width "400px"
+                      :height "0"
+                      :anchor "center center")
+  (confirm-dialog
+    :text "Do you want to reboot?"
+    :command "reboot"
+    :window "reboot"))
+
+(defwindow confirm-dialog-shutdown
+  :monitor 1
+  :geometry (geometry :x "0%"
+                      :y "0"
+                      :width "400px"
+                      :height "0"
+                      :anchor "center center")
+  (confirm-dialog
+    :text "Do you want to shutdown?"
+    :command "shutdown now"
+    :window "shutdown"))
+
+(defwindow weather
+  :monitor 1
+  :geometry (geometry :x "20px"
+                      :y "20px"
+                      :width "400px"
+                      :height "100px"
+                      :anchor "top right")
+  (weather))
+
+(defwindow weather-closer
+  :monitor 1
+  :exclusive false
+  :geometry (geometry :width "100%"
+                      :height "100%"
+                      :anchor "top center")
+  (closer :window "weather"))

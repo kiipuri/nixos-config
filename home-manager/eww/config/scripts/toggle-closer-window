@@ -1,0 +1,11 @@
+#!/bin/sh
+
+window=$1
+if [ "$(eww get open-"$window")" = true ]; then
+    eww update open-"$window"="false"
+    eww open-many "$window"-closer "$window"
+else
+    eww update open-"$window"="true"
+    eww close "$window"
+    eww close "$window"-closer
+fi

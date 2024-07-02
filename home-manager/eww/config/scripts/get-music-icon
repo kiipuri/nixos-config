@@ -1,0 +1,17 @@
+#!/bin/sh
+
+playerctl --follow metadata mpris:artUrl --player Sonixd 2>/dev/null |
+    while read -r arturl; do
+        if [ -z "$arturl" ]; then
+            echo "icons/album-cover-design.png"
+        else
+            tmp_path="/tmp/album-icon.png"
+            arturl=${arturl%&size=150}
+            echo "$arturl"
+            curl -s "$arturl" -o $tmp_path
+            hash=$(sha256sum $tmp_path | awk '{print $1}')
+            new_path="/tmp/$hash.png"
+            mv $tmp_path "$new_path"
+            echo "$new_path"
+        fi
+    done

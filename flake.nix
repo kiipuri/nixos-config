@@ -34,6 +34,7 @@
     waybar-git.url = "github:Alexays/Waybar";
 
     nixpkgs-kitty.url = "github:nixos/nixpkgs/0169fd142d9bb36449e432660f0fd9e8d98ecc2c";
+    nixpkgs-eww.url = "github:nixos/nixpkgs/5233d62dcc2f4bb3f1747eb65b3ccd3b69e6c1f9";
     nixos-secrets.url = "git+ssh://git@github.com/kiipuri/nixos-secrets?ref=main";
   };
 
@@ -47,6 +48,7 @@
     waybar-git,
     stylix,
     nixpkgs-kitty,
+    nixpkgs-eww,
     nixpkgs-stable,
     nixos-secrets,
     ...
@@ -119,6 +121,7 @@
           inherit (inputs) split-monitor-workspaces;
           pkgs-kitty = import nixpkgs-kitty {inherit system;};
           pkgs-stable = import nixpkgs-stable {inherit system;};
+          pkgs-eww = import nixpkgs-eww {inherit system;};
         }; # Pass flake inputs to our config
         # > Our main home-manager configuration file <
         modules = [

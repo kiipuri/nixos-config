@@ -1,0 +1,99 @@
+#!/bin/sh
+
+# coords=$(curl -s "https://geocoding-api.open-meteo.com/v1/search?name=$(cat /run/user/1000/secrets/city)&count=1" | jq '.results .[0] | .latitude, .longitude')
+# weather_data_path=~/.cache/weather_data
+#
+# [ ! -f $weather_data_path ] ||
+#     [ ! "$(date -d "$(cat $weather_data_path | jq -r ".hourly .time [0]")" +%Y-%m-%d)" = "$(date +%Y-%m-%d)" ] &&
+#     curl -s "https://api.open-meteo.com/v1/forecast?latitude=$(echo "$coords" | sed '1q;d')&longitude=$(echo "$coords" | sed '2q;d')&hourly=temperature_2m,precipitation_probability,precipitation,weather_code,is_day&start_date=$(date +%Y-%m-%d)&end_date=$(date +%Y-%m-%d)" -o $weather_data_path
+# weather_data=$(cat $weather_data_path)
+#
+# hour=$(date +%H)
+# temperature=$(echo "$weather_data" | jq -r "[(.hourly .temperature_2m [$hour] | floor), .hourly_units .temperature_2m] | join(\"\")")
+#
+# weather_description_path=~/.cache/weather_description
+# [ -f ~/.cache/weather_description ] ||
+#     curl -s "https://gist.githubusercontent.com/stellasphere/9490c195ed2b53c707087c8c2db4ec0c/raw/76b0cb0ef0bfd8a2ec988aa54e30ecd1b483495d/descriptions.json" -o $weather_description_path
+#
+# descriptions=$(cat $weather_description_path)
+# day_or_night=$([ "$(echo "$weather_data" | jq -r "(.hourly .is_day [$hour])")" ] && echo "day" || echo "night")
+# weather_code=$(echo "$weather_data" | jq -r "(.hourly .weather_code [$hour])")
+# weather_image_url=$(echo "$descriptions" | jq -r '."'"$weather_code"'" ."'"$day_or_night"'" .image')
+#
+# weather_icon_path=/tmp/weather-icon.png
+# curl -s "$weather_image_url" -o $weather_icon_path
+#
+# module_lit="(eventbox :cursor 'pointer'
+#     :onclick 'scripts/toggle-closer-window weather'
+#     :valign 'center'
+#     :vexpand true
+#     (box :space-evenly false
+#         (box :halign 'start'
+#              :style 'background-image: url(\"$weather_icon_path\"); background-size: cover;'
+#              :width 40
+#              :height 40)
+#         (label
+#             :class 'pd-left-half'
+#             :text '$temperature')))"
+#
+# echo "$module_lit"
+
+current_hour=$(date +%H)
+
+get_coordinates() {
+    city=$(cat /run/user/1000/secrets/city)
+    coordinates=$(curl -s "https://geocoding-api.open-meteo.com/v1/search?name=${city}&count=1" | jq '.results .[0] | .latitude, .longitude')
+    echo "$coordinates"
+}
+
+get_weather_data() {
+    weather_data_path=$HOME/.cache/weather_data
+
+    if [ ! -f "$weather_data_path" ] || [ "$(date -d "$(jq -r ".hourly .time [0]" "$weather_data_path")" +%Y-%m-%d)" != "$(date +%Y-%m-%d)" ]; then
+        curl -s "https://api.open-meteo.com/v1/forecast?latitude=$(get_coordinates | sed '1q;d')&longitude=$(get_coordinates | sed '2q;d')&hourly=temperature_2m,precipitation_probability,precipitation,weather_code,is_day&start_date=$(date +%Y-%m-%d)&end_date=$(date +%Y-%m-%d)" -o "$weather_data_path"
+    fi
+
+    cat "$weather_data_path"
+}
+
+get_temperature() {
+    temperature=$(get_weather_data | jq -r "[(.hourly .temperature_2m [$current_hour] | floor), .hourly_units .temperature_2m] | join(\"\")")
+    echo "$temperature"
+}
+
+get_weather_description() {
+    weather_description_path=$HOME/.cache/weather_description
+    if [ ! -f "$weather_description_path" ]; then
+        curl -s "https://gist.githubusercontent.com/stellasphere/9490c195ed2b53c707087c8c2db4ec0c/raw/76b0cb0ef0bfd8a2ec988aa54e30ecd1b483495d/descriptions.json" -o "$weather_description_path"
+    fi
+
+    cat "$weather_description_path"
+}
+
+get_weather_icon() {
+    weather_code=$(get_weather_data | jq -r ".hourly .weather_code [$current_hour]")
+    day_or_night=$([ "$(get_weather_data | jq -r ".hourly .is_day [$current_hour]")" ] && echo "day" || echo "night")
+    weather_image_url=$(get_weather_description | jq -r '."'"$weather_code"'" ."'"$day_or_night"'" .image')
+    weather_icon_path=$HOME/.cache/weather_icon.png
+    curl -s "$weather_image_url" -o "$weather_icon_path"
+    echo "$weather_icon_path"
+}
+
+get_module_lit() {
+    module_lit="(eventbox :cursor 'pointer'
+    :onclick 'scripts/toggle-closer-window weather'
+    :valign 'center'
+    :vexpand true
+    (box :space-evenly false
+        (box :halign 'start'
+        :style 'background-image: url(\"$(get_weather_icon)\"); background-size: cover;'
+             :width 40
+             :height 40)
+        (label
+            :class 'pd-left-half base0F'
+            :text '$(get_temperature)')))"
+
+    echo "$module_lit"
+}
+
+get_module_lit

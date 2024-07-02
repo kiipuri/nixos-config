@@ -1,0 +1,4 @@
+#!/bin/sh
+
+length=$(($(playerctl -p Sonixd metadata mpris:length) / 1000000))
+playerctl -p Sonixd position $(($1 * length / 100))

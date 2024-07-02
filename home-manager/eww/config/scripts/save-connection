@@ -1,0 +1,9 @@
+#!/bin/sh
+
+eww close password-dialog
+
+if pkexec nmcli dev wifi connect "$(eww get selected-network)" password "$1"; then
+    notify-send "Connected to $(eww get selected-network)"
+else
+    notify-send "Error connecting to $(eww get selected-network)"
+fi
