@@ -111,13 +111,16 @@ in {
         settings.autocmd.enabled = true;
       };
       nvim-autopairs.enable = true;
-      rest.enable = true;
       inc-rename.enable = true;
       illuminate.enable = true;
       trouble.enable = true;
       which-key.enable = true;
       nvim-colorizer.enable = true;
       surround.enable = true;
+      rustaceanvim = {
+        enable = true;
+        settings.rust-analyzer.check.command = "clippy";
+      };
       neo-tree = {
         enable = true;
         popupBorderStyle = "rounded";

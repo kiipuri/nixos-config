@@ -1,18 +1,21 @@
 {...}: {
   programs.nixvim.plugins = {
-    efmls-configs = {
+    lsp-format.enable = true;
+    none-ls = {
       enable = true;
-      setup = {
-        nix = {
-          formatter = "alejandra";
-          linter = "statix";
+      sources = {
+        code_actions = {
+          statix.enable = true;
         };
-        sh = {
-          formatter = "shfmt";
-          linter = "shellcheck";
+        diagnostics = {
+          statix.enable = true;
         };
-        typescript.formatter = "prettier_d";
-        python.formatter = "black";
+        formatting = {
+          shfmt.enable = true;
+          shfmt.withArgs = "{ args = {'-i', 4} }";
+          alejandra.enable = true;
+          black.enable = true;
+        };
       };
     };
 
@@ -21,9 +24,8 @@
       servers = {
         nixd = {
           enable = false;
-          settings.formatting.command = "nixpkgs-fmt";
+          settings.formatting.command = ["nixpkgs-fmt"];
         };
-        efm.extraOptions.init_options.documentFormatting = true;
         nil_ls = {
           enable = true;
           settings = {
@@ -39,6 +41,7 @@
         pylsp.enable = true;
         pyright.enable = true;
         cssls.enable = true;
+        svelte.enable = true;
       };
       onAttach = ''
         if client.supports_method("textDocument/formatting") then
