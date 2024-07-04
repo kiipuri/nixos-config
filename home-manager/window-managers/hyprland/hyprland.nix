@@ -68,7 +68,7 @@
         preserve_split = true;
       };
       master = {
-        new_is_master = true;
+        new_status = "master";
       };
       gestures = {
         workspace_swipe = false;
@@ -108,8 +108,6 @@
         "bind = $mainMod, J, movefocus, d"
 
         # pyprland binds
-        # "$mainMod, M, exec, pypr toggle_minimized"
-        "$mainMod, M, exec, hyprctl dispatch togglespecialworkspace minimized"
         "$mainMod SHIFT, Z, exec, pypr zoom"
         "$mainMod SHIFT, L, exec, pypr toggle_dpms"
         "$mainMod, T, exec, pypr toggle term && hyprctl dispatch bringactivetotop"

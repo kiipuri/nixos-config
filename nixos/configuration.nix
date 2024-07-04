@@ -34,7 +34,7 @@
       experimental-features = "nix-command flakes";
       # Deduplicate and optimize nix store
       auto-optimise-store = true;
-      # use-xdg-base-directories = true;
+      use-xdg-base-directories = false;
       substituters = [
         "https://cuda-maintainers.cachix.org"
       ];
@@ -64,6 +64,7 @@
 
   networking = {
     hostName = hostname;
+    firewall.enable = false;
     networkmanager = {
       enable = true;
       insertNameservers = [secrets.dns-server "8.8.8.8"];
@@ -101,7 +102,7 @@
   };
 
   hardware = {
-    opengl.enable = true;
+    graphics.enable = true;
     nvidia = {
       package = config.boot.kernelPackages.nvidiaPackages.production;
       modesetting.enable = true;
@@ -135,7 +136,7 @@
 
   services = {
     ollama = {
-      enable = true;
+      enable = false;
       acceleration = "cuda";
     };
     flatpak.enable = true;
@@ -187,6 +188,7 @@
     gamemode.enable = true;
     noisetorch.enable = true;
     droidcam.enable = true;
+    virt-manager.enable = true;
     zsh.enable = true;
     command-not-found.enable = false;
     nix-index = {
@@ -217,10 +219,9 @@
   fonts = {
     enableDefaultPackages = true;
     packages = with pkgs; [
-      nerdfonts
+      (nerdfonts.override {fonts = ["JetBrainsMono" "FiraCode"];})
       noto-fonts
       noto-fonts-cjk
-      cascadia-code
       terminus_font
     ];
     fontconfig = {
@@ -266,7 +267,6 @@
       trash-cli
       unzip
       vim
-      virt-manager
       wget
       wl-clipboard
       wofi
@@ -276,6 +276,7 @@
     variables = {
       EDITOR = "nvim";
       WLR_NO_HARDWARE_CURSORS = "1";
+      NIXPKGS_ALLOW_UNFREE = "1";
     };
   };
 

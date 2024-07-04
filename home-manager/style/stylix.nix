@@ -51,6 +51,7 @@ in {
   config = {
     specialisation = themeSpecialisations;
     stylix = {
+      enable = true;
       autoEnable = false;
 
       base16Scheme = lib.mkDefault "${pkgs.base16-schemes}/share/themes/${themeName}.yaml";

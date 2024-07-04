@@ -30,6 +30,7 @@
       DEFAULT = "https://searx.kiipuri.dev/search?q={}";
       w = "https://en.wikipedia.org/wiki/Special:Search?search={}&go=Go&ns0=1";
       y = "https://www.youtube.com/results?search_query={}";
+      wi = "https://en.wiktionary.org/wiki/{}";
     };
     extraConfig = ''
       config.unbind("<Ctrl+q>", mode="normal")
@@ -53,13 +54,13 @@
       (
         pkgs.fetchurl {
           url = "https://raw.githubusercontent.com/hoothin/UserScripts/cb96fec2e7ef4106dee0400219767a1484856323/Pagetual/pagetualRules.json";
-          sha256 = "sha256-HdVNKpKiPs4lQwlqBlDnvonPkQJof/g0Pz03JfNcaj0=";
+          sha256 = "sha256-wf6ACluZlEu5rQmkG84F35NWLVpTspfEouUE77UAWAI=";
         }
       )
       (
         pkgs.fetchurl {
           url = "https://update.greasyfork.org/scripts/383093/1331790/Twitch%20-%20Disable%20automatic%20video%20downscale.user.js";
-          sha256 = "sha256-RJj236f5Kd0oDSUiO+D9O/k3eJOI2gMpyxzGjQupNd4=";
+          sha256 = "sha256-wkfrXB0K4EnvKFD89ZNjKX7+mAWvnG/xsB1xMc0c9OY=";
         }
       )
       (
@@ -71,7 +72,7 @@
       (
         pkgs.fetchurl {
           url = "https://userscripts.adtidy.org/release/adguard-extra/1.0/adguard-extra.user.js";
-          sha256 = "0xrrbj0wzwdgzdl69slnzc1mjh563sqdidyb2y3711zay7lx7iz8";
+          sha256 = "sha256-l3gLtB9kOa3NjComO0bqo1YJKEqzKmE86dxLZnQTI+8=";
         }
       )
     ];

@@ -38,7 +38,7 @@ run_right() {
     echo "$workspaces_literal"
 }
 
-socat -u UNIX-CONNECT:/tmp/hypr/"$HYPRLAND_INSTANCE_SIGNATURE"/.socket2.sock - | while read -r _; do
+socat -u UNIX-CONNECT:"$XDG_RUNTIME_DIR"/hypr/"$HYPRLAND_INSTANCE_SIGNATURE"/.socket2.sock - | while read -r _; do
     if [ "$1" = 0 ]; then
         run_right
     elif [ "$1" = 1 ]; then

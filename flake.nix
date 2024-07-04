@@ -25,7 +25,11 @@
 
     sops-nix.url = "github:Mic92/sops-nix";
 
-    hyprland.url = "github:hyprwm/Hyprland";
+    hyprland = {
+      type = "git";
+      url = "https://github.com/hyprwm/Hyprland";
+      submodules = true;
+    };
     split-monitor-workspaces = {
       url = "github:Duckonaut/split-monitor-workspaces";
       inputs.hyprland.follows = "hyprland";
@@ -35,7 +39,7 @@
 
     nixpkgs-kitty.url = "github:nixos/nixpkgs/0169fd142d9bb36449e432660f0fd9e8d98ecc2c";
     nixpkgs-eww.url = "github:nixos/nixpkgs/5233d62dcc2f4bb3f1747eb65b3ccd3b69e6c1f9";
-    nixos-secrets.url = "git+ssh://git@github.com/kiipuri/nixos-secrets?ref=main";
+    nixos-secrets.url = "git+ssh://git@github.com/kiipuri/nixos-secrets";
   };
 
   outputs = {
