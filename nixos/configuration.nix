@@ -17,6 +17,7 @@
   nixpkgs = {
     config = {
       allowUnfree = true;
+      rocmSupport = true;
     };
   };
 
@@ -35,12 +36,6 @@
       # Deduplicate and optimize nix store
       auto-optimise-store = true;
       use-xdg-base-directories = false;
-      substituters = [
-        "https://cuda-maintainers.cachix.org"
-      ];
-      trusted-public-keys = [
-        "cuda-maintainers.cachix.org-1:0dq3bujKpuEPMCX6U4WylrUDZ9JyUG0VpVZa7CNfq5E="
-      ];
     };
   };
 
@@ -53,6 +48,9 @@
     loader.systemd-boot.enable = true;
     loader.efi.canTouchEfiVariables = true;
     resumeDevice = "/dev/disk/by-partlabel/SWAP";
+
+    initrd.kernelModules = ["amdgpu"];
+    # initrd.systemd.enable = true;
   };
 
   # boot.loader.grub.enable = true;
@@ -64,6 +62,7 @@
 
   networking = {
     hostName = hostname;
+    firewall.checkReversePath = "loose";
     firewall.enable = false;
     networkmanager = {
       enable = true;
@@ -87,9 +86,10 @@
   i18n = {
     defaultLocale = locale;
     inputMethod = {
-      enabled = "fcitx5";
+      enable = true;
+      type = "fcitx5";
       fcitx5.addons = with pkgs; [
-        fcitx5-mozc
+        # fcitx5-mozc
         fcitx5-gtk
       ];
     };
@@ -103,12 +103,7 @@
 
   hardware = {
     graphics.enable = true;
-    nvidia = {
-      package = config.boot.kernelPackages.nvidiaPackages.production;
-      modesetting.enable = true;
-      nvidiaPersistenced = true;
-      powerManagement.enable = true;
-    };
+    amdgpu.opencl.enable = true;
     opentabletdriver = {
       enable = true;
       daemon.enable = true;
@@ -119,15 +114,12 @@
     rtkit.enable = true;
     polkit.enable = true;
     protectKernelImage = false;
-    pam.services.swaylock.text = ''
-      auth include login
-    '';
 
     sudo.enable = false;
     doas.enable = true;
     doas.extraRules = [
       {
-        users = ["kiipuri"];
+        users = [username];
         keepEnv = true;
         persist = true;
       }
@@ -135,18 +127,29 @@
   };
 
   services = {
+    # xserver.desktopManager.cinnamon.enable = true;
+    rsyncd.enable = true;
+    # headscale = {
+    #   enable = true;
+    #   address = "0.0.0.0";
+    #   port = 5072;
+    # };
+    # tailscale.enable = true;
+    spice-vdagentd.enable = true;
     ollama = {
-      enable = false;
-      acceleration = "cuda";
+      enable = true;
+      acceleration = "rocm";
+      rocmOverrideGfx = "11.0.0";
     };
     flatpak.enable = true;
     transmission = {
       enable = true;
       home = "/home/${username}";
       user = username;
+      package = pkgs.transmission_4;
       settings = {
         download-dir = "/mnt/hdd/Torrents";
-        incomplete-dir = "/home/${username}/Downloads";
+        incomplete-dir = config.services.transmission.settings.download-dir;
       };
     };
     openssh = {
@@ -160,7 +163,7 @@
         layout = "us";
         options = "caps:escape";
       };
-      videoDrivers = ["nvidia"];
+      videoDrivers = ["amdgpu"];
       windowManager = {
         awesome = {
           enable = true;
@@ -169,8 +172,11 @@
       };
     };
     displayManager.sddm = {
+      wayland.enable = true;
       enable = true;
-      theme = "tokyo-night-sddm";
+      # theme = "tokyo-night-sddm";
+      theme = "catppuccin-mocha";
+      package = pkgs.kdePackages.sddm;
     };
     pipewire = {
       enable = true;
@@ -178,15 +184,20 @@
       alsa.support32Bit = true;
       pulse.enable = true;
     };
+    gnome.gnome-keyring.enable = true;
   };
 
   programs = {
+    adb.enable = true;
     dconf.enable = true;
     hyprland = {
       enable = true;
     };
+    appimage = {
+      enable = true;
+      binfmt = true;
+    };
     gamemode.enable = true;
-    noisetorch.enable = true;
     droidcam.enable = true;
     virt-manager.enable = true;
     zsh.enable = true;
@@ -198,30 +209,31 @@
     steam.enable = true;
   };
 
-  nixpkgs.config.packageOverrides = pkgs: {
-    steam = pkgs.steam.override {
-      extraPkgs = pkgs:
-        with pkgs; [
-          xorg.libXcursor
-          xorg.libXi
-          xorg.libXinerama
-          xorg.libXScrnSaver
-          libpng
-          libpulseaudio
-          libvorbis
-          stdenv.cc.cc.lib
-          libkrb5
-          keyutils
-        ];
-    };
-  };
+  # nixpkgs.config.packageOverrides = pkgs: {
+  #   steam = pkgs.steam.override {
+  #     extraPkgs = pkgs:
+  #       with pkgs; [
+  #         xorg.libXcursor
+  #         xorg.libXi
+  #         xorg.libXinerama
+  #         xorg.libXScrnSaver
+  #         libpng
+  #         libpulseaudio
+  #         libvorbis
+  #         stdenv.cc.cc.lib
+  #         libkrb5
+  #         keyutils
+  #       ];
+  #   };
+  # };
 
   fonts = {
     enableDefaultPackages = true;
     packages = with pkgs; [
-      (nerdfonts.override {fonts = ["JetBrainsMono" "FiraCode"];})
+      nerd-fonts.jetbrains-mono
+      nerd-fonts.fira-code
       noto-fonts
-      noto-fonts-cjk
+      noto-fonts-cjk-sans
       terminus_font
     ];
     fontconfig = {
@@ -236,7 +248,13 @@
   environment = {
     systemPackages = with pkgs; [
       (libsForQt5.callPackage ../derivatives/tokyo-night-sddm.nix {})
+      where-is-my-sddm-theme
+      (catppuccin-sddm.override
+        {
+          flavor = "mocha";
+        })
       alsa-utils
+      btop
       comma
       docker-compose
       dunst
@@ -247,20 +265,18 @@
       git
       home-manager
       htop
-      jellyfin-mpv-shim
       killall
       lf
       libnotify
-      libsForQt5.fcitx5-qt
-      libsForQt5.qt5.qtbase
-      libsForQt5.qt5.qtgraphicaleffects
-      libsForQt5.qt5.qtquickcontrols2
-      libsForQt5.qt5.qtsvg
+      # libsForQt5.fcitx5-qt
+      # libsForQt5.qt5.qtbase
+      # libsForQt5.qt5.qtgraphicaleffects
+      # libsForQt5.qt5.qtquickcontrols2
+      # libsForQt5.qt5.qtsvg
       lua5_4_compat
       neovim
       nh
       pavucontrol
-      picom
       ripgrep
       swaybg
       sxhkd
@@ -280,14 +296,6 @@
     };
   };
 
-  sound = {
-    enable = true;
-    extraConfig = ''
-      defaults.pcm.!card "Wireless"
-      defaults.ctl.!card "Wireless"
-    '';
-  };
-
   users = {
     mutableUsers = false;
     users.root.hashedPassword = "$y$j9T$orXQD6ZLWsh8O8p0fyrsL1$eSwLvuV/xbCJC3Uq7pHw6SWS9pLC7vLOuqjeJzo1Nd3";
@@ -295,7 +303,7 @@
       isNormalUser = true;
       shell = pkgs.zsh;
       hashedPassword = "$y$j9T$99Ie.QqXuV29Pgasvfpfa0$x4yJlYAvWERYxw3Vbbo8.xqHfvSUkzueJqOMUtpT9V1";
-      extraGroups = ["wheel"];
+      extraGroups = ["wheel" "dialout" "adbusers" "kvm"];
     };
   };
 

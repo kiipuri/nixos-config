@@ -41,7 +41,7 @@ in {
 
   config = {
     programs.nixvim = {
-      options = {
+      opts = {
         termguicolors = true;
         number = true;
         relativenumber = true;
@@ -57,9 +57,10 @@ in {
         listchars = "tab:>-,lead:·,nbsp:␣,trail:•";
         timeout = true;
         timeoutlen = 300;
-        clipboard = "unnamedplus";
         bg = "light";
       };
+
+      clipboard.register = "unnamedplus";
 
       globals.mapleader = " ";
 

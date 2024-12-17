@@ -38,7 +38,7 @@ in {
           undo = {
             enable = true;
             sideBySide = true;
-            mappings = {
+            settings.mappings = {
               i = {
                 "<cr>" = "yank_additions";
                 "<S-cr>" = "yank_deletions";
@@ -116,7 +116,7 @@ in {
       trouble.enable = true;
       which-key.enable = true;
       nvim-colorizer.enable = true;
-      surround.enable = true;
+      nvim-surround.enable = true;
       rustaceanvim = {
         enable = true;
         settings.rust-analyzer.check.command = "clippy";
@@ -136,6 +136,7 @@ in {
           cursor_scrolls_alone = false;
         };
       };
+      yazi.enable = true;
       cmp = {
         enable = true;
         settings = {

@@ -15,23 +15,6 @@
 
     add-zsh-hook precmd nix-shell-prompt
   '';
-  lf = ''
-    lf() {
-      set +m
-
-      tmp="$(${pkgs.toybox}/bin/mktemp)"
-      ${pkgs.lf}/bin/lf --last-dir-path="$tmp" "$@"
-      if [ -f "$tmp" ]; then
-        dir="$(${pkgs.toybox}/bin/cat "$tmp")"
-        rm -f "$tmp"
-        if [ -d "$dir" ]; then
-          if [ "$dir" != "$(pwd)" ]; then
-            cd "$dir" || exit
-          fi
-        fi
-      fi
-    }
-  '';
   initExtra = ''
     autoload -U colors && colors
     zstyle ':completion:*' matcher-list ''' 'm:{a-zA-Z}={A-Za-z}' 'r:|=*' 'l:|=* r:|=*'
@@ -56,7 +39,6 @@
     compinit -d "$XDG_CACHE_HOME"/zsh/zcompdump-"$ZSH_VERSION"
 
     ${nix-shell-prompt}
-    ${lf}
   '';
 in {
   programs.zsh = {

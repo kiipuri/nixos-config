@@ -626,6 +626,7 @@
     package.loaded["naughty.dbus"] = {}
   '';
 in {
+  imports = [../picom.nix];
   xdg.configFile = {
     "awesome/rc.lua".text = "${configText}";
     "awesome/scratch.lua".source = ./scratch.lua;

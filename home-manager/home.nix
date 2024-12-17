@@ -6,20 +6,17 @@
   username,
   themeName,
   font,
-  pkgs-kitty,
-  pkgs-eww,
   ...
 }: {
   imports = [
     inputs.nix-colors.homeManagerModule
     inputs.nvim.inputs.nixvim.homeManagerModules.nixvim
 
-    ./config/lf.nix
     ./config/rofi.nix
     ./style/stylix.nix
-    ./shell/shell.nix
-    ./browser/qutebrowser.nix
-    ./bitwarden/rbw.nix
+    ./shell/default.nix
+    # ./browser/qutebrowser.nix
+# ./bitwarden/rbw.nix
     ./mpv/mpv.nix
     ./window-managers/hyprland/hyprland.nix
     ./easyeffects/default.nix
@@ -27,18 +24,10 @@
 
   colorScheme = inputs.nix-colors.colorSchemes.${themeName};
 
-  sops = {
-    defaultSopsFile = ../secrets/secrets.yaml;
-    defaultSopsFormat = "yaml";
-    age.keyFile = "${config.xdg.configHome}/sops/age/keys.txt";
-    defaultSymlinkPath = "/run/user/1000/secrets";
-    secrets = {
-      city = {};
-    };
-  };
-
   home = {
+    enableNixpkgsReleaseCheck = false;
     packages = with pkgs; [
+      just
       anki-bin
       btop
       webcord-vencord
@@ -48,17 +37,12 @@
       gucharmap
       gimp
       firefox
-      keepassxc
-      lxsession
       lazygit
       librewolf
       neofetch
-      nvtopPackages.nvidia
       magic-wormhole
-      pyprland
       qalculate-gtk
       slurp
-      sonixd
       osu-lazer-bin
       onlyoffice-bin
       transmission-remote-gtk
@@ -118,56 +102,6 @@
       enable = true;
       enableZshIntegration = true;
     };
-    wlogout = {
-      enable = true;
-      layout = [
-        {
-          label = "lock";
-          action = "swaylock";
-          text = "Lock";
-          keybind = "l";
-        }
-        {
-          label = "hibernate";
-          action = "${pkgs.systemd}/bin/systemctl hibernate";
-          text = "Hibernate";
-          keybind = "h";
-        }
-        {
-          label = "logout";
-          action = "hyprctl dispatch exit";
-          text = "Logout";
-          keybind = "e";
-        }
-        {
-          label = "shutdown";
-          action = "${pkgs.systemd}/bin/systemctl poweroff";
-          text = "Shutdown";
-          keybind = "s";
-        }
-        {
-          label = "suspend";
-          action = "${pkgs.systemd}/bin/systemctl suspend";
-          text = "Suspend";
-          keybind = "u";
-        }
-        {
-          label = "reboot";
-          action = "${pkgs.systemd}/bin/systemctl reboot";
-          text = "Reboot";
-          keybind = "r";
-        }
-      ];
-    };
-    starship = {
-      enable = true;
-      enableZshIntegration = true;
-      settings = {
-        add_newline = false;
-        python.symbol = "󰌠 ";
-        lua.symbol = "󰢱 ";
-      };
-    };
     zellij.enable = true;
     direnv = {
       enable = true;
@@ -185,7 +119,7 @@
       userName = "kiipuri";
       userEmail = "kiipuri@proton.me";
     };
-    imv.enable = true;
+    imv.enable = true; # image viewer
     broot.enable = true;
     bat.enable = true;
     nixvim.enable = true;
@@ -199,23 +133,6 @@
       enable = true;
       enableZshIntegration = true;
     };
-    kitty = {
-      enable = true;
-      package = pkgs-kitty.kitty;
-      extraConfig = ''
-        map f1 launch --cwd=current --type=background kitty
-      '';
-      settings = {
-        window_padding_width = 10;
-        font_size = 16;
-        confirm_os_window_close = 0;
-        enable_audio_bell = "no";
-      };
-      shellIntegration = {
-        enableZshIntegration = true;
-        mode = "no-sudo";
-      };
-    };
     mangohud.enable = true;
   };
 
@@ -226,7 +143,7 @@
 
   qt = {
     enable = true;
-    platformTheme = "gtk3";
+    platformTheme.name = "gtk3";
     style.name = "adwaita-dark";
     style.package = pkgs.adwaita-qt;
   };
@@ -238,9 +155,7 @@
   };
 
   nixpkgs = {
-    overlays = [
-      (import ./overlays/btop.nix)
-    ];
+    overlays = [];
     config = {
       allowUnfree = true;
       allowUnfreePredicate = _: true;
@@ -270,16 +185,16 @@
         "video/mp4" = "mpv.desktop";
       };
     };
-    configFile = {
-      picom = {
-        source = ./config/picom;
-        recursive = true;
-      };
-      dunst = {
-        source = ./config/dunst;
-        recursive = true;
-      };
-    };
+    # configFile = {
+    #   picom = {
+    #     source = ./config/picom;
+    #     recursive = true;
+    #   };
+    #   dunst = {
+    #     source = ./config/dunst;
+    #     recursive = true;
+    #   };
+    # };
   };
 
   services.mako = {
@@ -308,7 +223,7 @@
         Service = {
           ExecStart = "${pkgs.writeShellScript "autorun-start" ''
             setsid ${pkgs.lxqt.lxqt-policykit}/bin/lxqt-policykit-agent &
-            ${pkgs-eww.eww}/bin/eww open-many bar-left bar-right
+            ${pkgs.eww}/bin/eww open-many bar-left bar-right
 
             wallpaper=$(cd ~/wallpapers && ${pkgs.coreutils}/bin/ls | \
               ${pkgs.coreutils}/bin/shuf | \

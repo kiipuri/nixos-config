@@ -1,4 +1,6 @@
-#!/bin/sh
+#!/usr/bin/env nix-shell
+#! nix-shell -i bash --pure
+#! nix-shell -p networkmanager coreutils socat bc netcat playerctl pamixer curl gawk gnugrep jq
 
 # coords=$(curl -s "https://geocoding-api.open-meteo.com/v1/search?name=$(cat /run/user/1000/secrets/city)&count=1" | jq '.results .[0] | .latitude, .longitude')
 # weather_data_path=~/.cache/weather_data

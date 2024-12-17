@@ -1,4 +1,6 @@
-#!/bin/sh
+#!/usr/bin/env nix-shell
+#! nix-shell -i bash --pure
+#! nix-shell -p networkmanager coreutils socat bc netcat playerctl pamixer curl
 
 length=$(($(playerctl metadata mpris:length) / 1000000))
 pos=$(playerctl position)

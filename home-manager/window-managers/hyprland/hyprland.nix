@@ -3,7 +3,31 @@
   hyprland,
   inputs,
   ...
-}: {
+}: let
+  pyprland-wrapper = final: prev: {
+    my-pyprland = prev.pyprland.overrideAttrs (old: {
+      # doCheck = true;
+      postFixup = ''
+        wrapProgram $out/bin/pypr \
+        --set PATH ${prev.lib.makeBinPath [prev.kitty]}
+      '';
+    });
+  };
+  # pyprland-wrapper = pkgs.symlinkJoin {
+  #   name = "pyprland";
+  #   paths = with pkgs; [pyprland kitty];
+  # };
+  # pyprland-wrapper = pkgs.stdenv.mkDerivation {
+  #   name = "pyprland";
+  #   dontUnpack = true;
+  #   buildInputs = with pkgs; [kitty];
+  #   buildPhase = ''
+  #     export PATH="${pkgs.kitty}/bin:$PATH"
+  #   '';
+  # };
+in {
+  # nixpkgs.overlays = [pyprland-wrapper];
+  imports = [./pyprland.nix];
   wayland.windowManager.hyprland = {
     enable = true;
     package = hyprland.packages.${pkgs.system}.default;
@@ -18,9 +42,9 @@
         "HDMI-A-2,preferred,auto-right,1"
       ];
       exec-once = [
-        "pypr"
-        "fcitx5"
-        "${pkgs.swayidle}/bin/swayidle -w timeout 900 'hyprctl dispatch dpms off' resume 'hyprctl dispatch dpms on'"
+        "${pkgs.pyprland}/bin/pypr"
+        # "${pkgs.my-pyprland}/bin/pypr"
+        "${pkgs.fcitx5}/bin/fcitx5"
       ];
       input = {
         kb_layout = "us";
@@ -46,10 +70,12 @@
           brightness = 1.1;
           noise = 0.2;
         };
-        drop_shadow = true;
-        shadow_range = 20;
-        shadow_render_power = 2;
-        "col.shadow" = "rgba(1a1a1aee)";
+        shadow = {
+          enabled = true;
+          range = 20;
+          render_power = 2;
+          color = "rgba(1a1a1aee)";
+        };
       };
       animations = {
         enabled = true;
@@ -78,7 +104,7 @@
         "float, qalculate-gtk"
       ];
       "$scratchpad" = "class:^(kitty-dropterm)$";
-      "$pavucontrol" = "class:^(pavucontrol)$";
+      "$pavucontrol" = "class:^(org.pulseaudio.pavucontrol)$";
       windowrulev2 = [
         "opacity 0.9, class:(kitty)"
         "float, $scratchpad"
@@ -88,11 +114,11 @@
         "workspace special silent, $pavucontrol"
       ];
       bind = [
-        "$mainMod, Return, exec, kitty"
+        "$mainMod, Return, exec, ${pkgs.kitty}/bin/kitty"
         "$mainMod SHIFT, C, killactive,"
         "$mainMod SHIFT, Q, exit,"
         "$mainMod, G, togglefloating,"
-        "$mainMod, P, exec, rofi -show drun"
+        "$mainMod, P, exec, ${pkgs.rofi-wayland}/bin/rofi -show drun"
         "$mainMod, H, resizeactive, -100 0"
         "$mainMod, L, resizeactive, 100 0"
         "$mainMod CONTROL, H, movewindow, l"
@@ -108,14 +134,14 @@
         "bind = $mainMod, J, movefocus, d"
 
         # pyprland binds
-        "$mainMod SHIFT, Z, exec, pypr zoom"
-        "$mainMod SHIFT, L, exec, pypr toggle_dpms"
-        "$mainMod, T, exec, pypr toggle term && hyprctl dispatch bringactivetotop"
-        "$mainMod, Y, exec, pypr toggle volume && hyprctl dispatch bringactivetotop"
-        "$mainMod, O, exec, pypr toggle music && hyprctl dispatch bringactivetotop"
-        "$mainMod, C, exec, pypr toggle calc && hyprctl dispatch bringactivetotop"
+        "$mainMod SHIFT, Z, exec, ${pkgs.pyprland}/bin/pypr zoom"
+        "$mainMod SHIFT, L, exec, ${pkgs.pyprland}/bin/pypr toggle_dpms"
+        "$mainMod, T, exec, ${pkgs.pyprland}/bin/pypr toggle term && hyprctl dispatch bringactivetotop"
+        "$mainMod, Y, exec, ${pkgs.pyprland}/bin/pypr toggle volume && hyprctl dispatch bringactivetotop"
+        "$mainMod, O, exec, ${pkgs.pyprland}/bin/pypr toggle music && hyprctl dispatch bringactivetotop"
+        "$mainMod, C, exec, ${pkgs.pyprland}/bin/pypr toggle calc && hyprctl dispatch bringactivetotop"
 
-        ", Print, exec, grim -g \"$(slurp -ow 0)\" - | wl-copy"
+        ", Print, exec, ${pkgs.grim}/bin/grim -g \"$(slurp -ow 0)\" - | wl-copy"
 
         # Switch workspaces with mainMod + [0-9]
         "$mainMod, 1, split-workspace, 1"
@@ -156,13 +182,30 @@
       ];
     };
   };
-  xdg = {
+  home.packages = with pkgs; [pyprland];
+  # xdg = {
+  #   enable = true;
+  #   configFile = {
+  #     pypr = {
+  #       source = ./pyprland.toml;
+  #       # text = builtins.readFile ./pyprland.toml;
+  #       target = "hypr/pyprland.toml";
+  #     };
+  #   };
+  # };
+  services.hypridle = {
     enable = true;
-    configFile = {
-      pypr = {
-        source = ./pyprland.toml;
-        target = "hypr/pyprland.toml";
+    settings = {
+      general = {
+        after_sleep_cmd = "hyprctl dispatch dpms on";
       };
+      listener = [
+        {
+          timeout = 600;
+          on-timeout = "hyprctl dispatch dpms off";
+          on-resume = "hyprctl dispatch dpms on";
+        }
+      ];
     };
   };
 }

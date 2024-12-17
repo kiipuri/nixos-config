@@ -35,10 +35,7 @@
       inputs.hyprland.follows = "hyprland";
     };
     stylix.url = "github:danth/stylix";
-    waybar-git.url = "github:Alexays/Waybar";
 
-    nixpkgs-kitty.url = "github:nixos/nixpkgs/0169fd142d9bb36449e432660f0fd9e8d98ecc2c";
-    nixpkgs-eww.url = "github:nixos/nixpkgs/5233d62dcc2f4bb3f1747eb65b3ccd3b69e6c1f9";
     nixos-secrets.url = "git+ssh://git@github.com/kiipuri/nixos-secrets";
   };
 
@@ -49,10 +46,7 @@
     hyprland,
     nixpkgs-f2k,
     split-monitor-workspaces,
-    waybar-git,
     stylix,
-    nixpkgs-kitty,
-    nixpkgs-eww,
     nixpkgs-stable,
     nixos-secrets,
     ...
@@ -80,7 +74,6 @@
     # NixOS configuration entrypoint
     # Available through 'nixos-rebuild --flake .#your-hostname'
     nixosConfigurations = {
-      # FIXME replace with your hostname
       ${hostname} = nixpkgs.lib.nixosSystem {
         specialArgs = {
           inherit inputs;
@@ -123,9 +116,7 @@
           inherit (inputs) nix-colors;
           inherit (inputs) hyprland;
           inherit (inputs) split-monitor-workspaces;
-          pkgs-kitty = import nixpkgs-kitty {inherit system;};
           pkgs-stable = import nixpkgs-stable {inherit system;};
-          pkgs-eww = import nixpkgs-eww {inherit system;};
         }; # Pass flake inputs to our config
         # > Our main home-manager configuration file <
         modules = [

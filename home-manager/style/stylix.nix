@@ -8,14 +8,13 @@
   cursor,
   cursorPkg,
   inputs,
-  pkgs-eww,
   ...
 }: let
   themes = [
     "catppuccin-mocha"
-    "gruvbox-light-hard"
-    "rose-pine-moon"
-    "sakura"
+    # "gruvbox-light-hard"
+    # "rose-pine-moon"
+    # "sakura"
   ];
 
   themeSpecialisations = builtins.listToAttrs (map (mytheme: {
@@ -24,11 +23,11 @@
         configuration = {
           stylix.base16Scheme = "${pkgs.base16-schemes}/share/themes/${mytheme}.yaml";
           imports = [
-            (import ../config/waybar.nix
-              {
-                inherit font fontPkg pkgs config lib;
-                theme = inputs.nix-colors.colorSchemes.${mytheme};
-              })
+            # (import ../config/waybar.nix
+            #   {
+            #     inherit font fontPkg pkgs config lib;
+            #     theme = inputs.nix-colors.colorSchemes.${mytheme};
+            #   })
             (import ../nvim
               {
                 inherit font fontPkg pkgs config lib inputs;
@@ -39,7 +38,7 @@
               theme = inputs.nix-colors.colorSchemes.${mytheme};
             })
             (import ../eww/eww.nix {
-              inherit pkgs pkgs-eww;
+              inherit pkgs;
               theme = inputs.nix-colors.colorSchemes.${mytheme};
             })
           ];

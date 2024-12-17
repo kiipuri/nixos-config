@@ -112,7 +112,7 @@
     }
     {
       key = "<leader>n";
-      action = "<cmd>Neotree toggle float<cr>";
+      action = "<cmd>Yazi<cr>";
       mode = "n";
     }
     {

@@ -1,6 +1,8 @@
-#!/bin/sh
+#!/usr/bin/env nix-shell
+#! nix-shell -i bash --pure
+#! nix-shell -p networkmanager coreutils socat bc netcat playerctl pamixer curl
 
-playerctl --follow metadata mpris:artUrl --player Sonixd 2>/dev/null |
+playerctl --follow metadata mpris:artUrl --player feishin 2>/dev/null |
     while read -r arturl; do
         if [ -z "$arturl" ]; then
             echo "icons/album-cover-design.png"

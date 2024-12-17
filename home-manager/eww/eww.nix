@@ -1,6 +1,5 @@
 {
   pkgs,
-  pkgs-eww,
   theme,
   ...
 }: let
@@ -67,7 +66,6 @@ in {
   home.packages = with pkgs; [socat bc netcat playerctl pamixer];
   programs.eww = {
     enable = true;
-    package = pkgs-eww.eww;
     configDir = ./config;
   };
   # xdg.configFile."eww/colors.scss".text = colors;

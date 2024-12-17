@@ -1,8 +1,0 @@
-Print
-    cd ~/scripts/ && ./screenshot
-
-shift + Print
-    cd ~/scripts/ && ./audio
-
-alt + p
-    cd ~/scripts/ && ./rofi-shutdown

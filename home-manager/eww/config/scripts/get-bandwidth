@@ -1,4 +1,6 @@
-#!/bin/sh
+#!/usr/bin/env nix-shell
+#! nix-shell -i bash --pure
+#! nix-shell -p networkmanager coreutils socat bc netcat playerctl pamixer
 
 bandwidth() {
     wifi_connected=$(nmcli -g GENERAL.STATE dev show wlp4s0)

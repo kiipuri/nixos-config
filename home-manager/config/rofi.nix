@@ -8,14 +8,15 @@
   theme = config.colorScheme;
   inherit (theme) palette;
 in {
-  home.packages = [(pkgs.callPackage ../derivatives/vpn.nix {})];
+  # home.packages = [(pkgs.callPackage ../derivatives/vpn.nix {})];
 
   programs.rofi = {
     enable = true;
     package = pkgs.rofi-wayland;
-    plugins = [pkgs.rofi-vpn];
+    # plugins = [pkgs.rofi-vpn];
     extraConfig = {
-      modi = "run,drun,vpn:vpn";
+      # modi = "run,drun,vpn:vpn";
+      modi = "run,drun";
       icon-theme = "Oranchelo";
       show-icons = true;
       terminal = "kitty";
