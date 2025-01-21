@@ -265,6 +265,7 @@
       # libsForQt5.qt5.qtquickcontrols2
       # libsForQt5.qt5.qtsvg
       lua5_4_compat
+      update-nix-fetchgit
       neovim
       nh
       pavucontrol

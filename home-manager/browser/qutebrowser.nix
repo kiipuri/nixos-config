@@ -53,8 +53,8 @@
     greasemonkey = [
       (
         pkgs.fetchurl {
-          url = "https://raw.githubusercontent.com/hoothin/UserScripts/cb96fec2e7ef4106dee0400219767a1484856323/Pagetual/pagetualRules.json";
-          sha256 = "sha256-wf6ACluZlEu5rQmkG84F35NWLVpTspfEouUE77UAWAI=";
+          url = "https://raw.githubusercontent.com/hoothin/UserScripts/cb96fec2e7ef4106dee0400219767a1484856323/Pagetual/pagetualRules.json"; # update for update-nix-fetchgit
+          sha256 = "00jq02syy175lb29gcjkb8nmd4yz0p71p909mnwlp54rbc581zn1";
         }
       )
       (
@@ -65,14 +65,14 @@
       )
       (
         pkgs.fetchurl {
-          url = "https://update.greasyfork.org/scripts/486931/1324997/FrankerFaceZ.user.js";
-          sha256 = "sha256-+FzGOmBOKeJs7Ce3NJbVpSwNmoucyVu95lyqGbUCuMM=";
+          url = "https://update.greasyfork.org/scripts/486931/1468000/FrankerFaceZ.user.js"; # update for update-nix-fetchgit
+          sha256 = "115031mbjl466s2vhiqj04yydwzg8pgg0z1fsn53qc1zsnfsjaj0";
         }
       )
       (
         pkgs.fetchurl {
-          url = "https://userscripts.adtidy.org/release/adguard-extra/1.0/adguard-extra.user.js";
-          sha256 = "sha256-l3gLtB9kOa3NjComO0bqo1YJKEqzKmE86dxLZnQTI+8=";
+          url = "https://userscripts.adtidy.org/release/adguard-extra/1.0/adguard-extra.user.js"; # update for update-nix-fetchgit
+          sha256 = "1rjd9psm5s7hh6l8czkbq6swnvsy3x7x17qc4dhym5ps5lxfrp71";
         }
       )
     ];
