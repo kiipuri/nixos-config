@@ -10,11 +10,11 @@ in {
     plugins = {
       auto-session = {
         enable = true;
-        autoSave.enabled = true;
-        autoRestore.enabled = true;
-        autoSession = {
-          enabled = true;
-          suppressDirs = [config.home.homeDirectory];
+        settings = {
+          enable = true;
+          auto_restore = true;
+          auto_save = true;
+          suppressed_dirs = [config.home.homeDirectory];
         };
       };
       floaterm.enable = true;
@@ -29,30 +29,33 @@ in {
       };
       ts-autotag = {
         enable = true;
-        extraOptions.enable_close_on_slash = false;
+        settings.enable_close_on_slash = false;
       };
+      web-devicons.enable = true;
       telescope = {
         enable = true;
         enabledExtensions = ["ui-select"];
         extensions = {
           undo = {
             enable = true;
-            sideBySide = true;
-            settings.mappings = {
-              i = {
-                "<cr>" = "yank_additions";
-                "<S-cr>" = "yank_deletions";
-                "<C-cr>" = "restore";
-              };
-              n = {
-                "<cr>" = "yank_additions";
-                "<S-cr>" = "yank_deletions";
-                "<C-cr>" = "restore";
+            settings = {
+              side_by_side = true;
+              mappings = {
+                i = {
+                  "<cr>" = "yank_additions";
+                  "<S-cr>" = "yank_deletions";
+                  "<C-cr>" = "restore";
+                };
+                n = {
+                  "<cr>" = "yank_additions";
+                  "<S-cr>" = "yank_deletions";
+                  "<C-cr>" = "restore";
+                };
               };
             };
           };
         };
-        extraOptions = {
+        settings = {
           defaults.layout_strategy = "vertical";
           undo = {
             layout_strategy = "horizontal";
@@ -64,7 +67,7 @@ in {
       };
       treesitter = {
         enable = true;
-        indent = true;
+        settings.indent.enable = true;
         nixvimInjections = true;
       };
       treesitter-refactor = {
@@ -74,23 +77,29 @@ in {
       };
       treesitter-context = {
         enable = false;
-        maxLines = 2;
-        trimScope = "outer";
+        settings = {
+          max_lines = 2;
+          trim_scope = "outer";
+        };
       };
       noice = {
         enable = true;
-        lsp.signature.enabled = false;
-        lsp.override = {
-          "vim.lsp.util.convert_input_to_markdown_lines" = true;
-          "vim.lsp.util.stylize_markdown" = true;
-          "cmp.entry.get_documentation" = true;
-        };
-        presets = {
-          bottom_search = true;
-          command_palette = true;
-          long_message_to_split = true;
-          inc_rename = true;
-          lsp_doc_border = false;
+        settings = {
+          lsp = {
+            signature.enabled = false;
+            override = {
+              "vim.lsp.util.convert_input_to_markdown_lines" = true;
+              "vim.lsp.util.stylize_markdown" = true;
+              "cmp.entry.get_documentation" = true;
+            };
+          };
+          presets = {
+            bottom_search = true;
+            command_palette = true;
+            long_message_to_split = true;
+            inc_rename = true;
+            lsp_doc_border = false;
+          };
         };
       };
       harpoon.enable = true;
@@ -104,7 +113,7 @@ in {
           sha256 = "sha256-pSnFx5fg1llNlpTCV4hoo3Pf1KWnAJDRVSe+88N4HXM=";
         };
       };
-      comment-nvim.enable = true;
+      comment.enable = true;
       indent-blankline.enable = true;
       nvim-lightbulb = {
         enable = true;

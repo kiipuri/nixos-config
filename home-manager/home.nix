@@ -15,8 +15,8 @@
     ./config/rofi.nix
     ./style/stylix.nix
     ./shell/default.nix
-    # ./browser/qutebrowser.nix
-# ./bitwarden/rbw.nix
+    ./browser/qutebrowser.nix
+    ./bitwarden/rbw.nix
     ./mpv/mpv.nix
     ./window-managers/hyprland/hyprland.nix
     ./easyeffects/default.nix
@@ -118,6 +118,7 @@
       enable = true;
       userName = "kiipuri";
       userEmail = "kiipuri@proton.me";
+      extraConfig.safe.directory = "*";
     };
     imv.enable = true; # image viewer
     broot.enable = true;

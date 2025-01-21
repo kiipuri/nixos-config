@@ -4,7 +4,7 @@
   inputs = {
     # Nixpkgs
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
-    nixpkgs-stable.url = "github:nixos/nixpkgs/nixos-23.11";
+    nixpkgs-stable.url = "github:nixos/nixpkgs/nixos-24.11";
 
     # Home manager
     home-manager = {
@@ -27,11 +27,15 @@
 
     hyprland = {
       type = "git";
-      url = "https://github.com/hyprwm/Hyprland";
+      url = "https://github.com/hyprwm/Hyprland?rev=12f9a0d0b93f691d4d9923716557154d74777b0a";
       submodules = true;
     };
     split-monitor-workspaces = {
       url = "github:Duckonaut/split-monitor-workspaces";
+      inputs.hyprland.follows = "hyprland";
+    };
+    hyprsplit = {
+      url = "github:shezdy/hyprsplit/main";
       inputs.hyprland.follows = "hyprland";
     };
     stylix.url = "github:danth/stylix";
@@ -46,6 +50,7 @@
     hyprland,
     nixpkgs-f2k,
     split-monitor-workspaces,
+    hyprsplit,
     stylix,
     nixpkgs-stable,
     nixos-secrets,
@@ -88,6 +93,7 @@
           inherit secrets;
           inherit (inputs) stylix;
           inherit (inputs) nixpkgs-f2k;
+          pkgs-stable = import nixpkgs-stable {inherit system;};
         }; # Pass flake inputs to our config
         # > Our main nixos configuration file <
         modules = [
@@ -116,6 +122,7 @@
           inherit (inputs) nix-colors;
           inherit (inputs) hyprland;
           inherit (inputs) split-monitor-workspaces;
+          inherit (inputs) hyprsplit;
           pkgs-stable = import nixpkgs-stable {inherit system;};
         }; # Pass flake inputs to our config
         # > Our main home-manager configuration file <

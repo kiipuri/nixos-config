@@ -12,7 +12,7 @@
         };
         formatting = {
           shfmt.enable = true;
-          shfmt.withArgs = "{ args = {'-i', 4} }";
+          shfmt.settings.args = "{'-i', 4}";
           alejandra.enable = true;
           black.enable = true;
         };
@@ -34,10 +34,10 @@
         };
         bashls.enable = true;
         eslint.enable = true;
-        tsserver.enable = true;
-        lua-ls.enable = true;
+        ts_ls.enable = true;
+        lua_ls.enable = true;
         omnisharp.enable = true;
-        csharp-ls.enable = true;
+        csharp_ls.enable = true;
         pylsp.enable = true;
         pyright.enable = true;
         cssls.enable = true;

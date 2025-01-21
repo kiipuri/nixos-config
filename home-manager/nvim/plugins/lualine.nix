@@ -1,7 +1,7 @@
 {theme, ...}: let
   inherit (theme) palette;
   component_left_sep = {
-    __unkeyed-1.__raw = ''
+    __unkeyed-1 = ''
       (function()
         return ""
       end)()
@@ -11,9 +11,13 @@
       bg = "NONE";
     };
     padding = 0;
+    separator = {
+      left.__raw = "nil";
+      right.__raw = "nil";
+    };
   };
   component_right_sep = {
-    __unkeyed-1.__raw = ''
+    __unkeyed-1 = ''
       (function()
         return ""
       end)()
@@ -23,9 +27,13 @@
       bg = "NONE";
     };
     padding = 0;
+    separator = {
+      left.__raw = "nil";
+      right.__raw = "nil";
+    };
   };
   space = {
-    __unkeyed-1.__raw = ''
+    __unkeyed-1 = ''
       (function()
         return " "
       end)()
@@ -86,105 +94,111 @@ in {
       // highlightAttrs;
     plugins.lualine = {
       enable = true;
-      globalstatus = true;
-      componentSeparators = {
-        left = "";
-        right = "";
+      settings = {
+        options.globalstatus = true;
+        componentSeparators = {
+          left = "";
+          right = "";
+        };
+        sectionSeparators = {
+          left = "";
+          right = "";
+        };
+        sections = {
+          lualine_a =
+            surroundWithSeparators
+            {
+              c = {
+                __unkeyed-1 = "diagnostics";
+                sources = ["nvim_diagnostic"];
+                sections = ["error" "warn"];
+                symbols = {
+                  error = "%#SLError#" + "" + "%*" + " ";
+                  warn = "%#SLWarning#" + "" + "%*" + " ";
+                };
+                colored = false;
+                update_in_insert = false;
+                always_visible = true;
+                padding = 0;
+                color.fg = "#${palette.base0B}";
+              };
+              s = true;
+            };
+          lualine_b = surroundWithSeparators {
+            c = {
+              __unkeyed-1 = "hostname";
+              padding = 0;
+              color.fg = "#${palette.base0B}";
+            };
+          };
+          lualine_c = surroundWithSeparators {
+            c = {
+              __unkeyed-1 = "filename";
+              padding = 0;
+              color = {
+                bg = "#${palette.base02}";
+                fg = "#${palette.base0A}";
+              };
+            };
+          };
+
+          lualine_x = surroundWithSeparators {
+            c = {
+              __unkeyed-1 = ''
+                (function()
+                  local clients = vim.lsp.buf_get_clients()
+                  local client_names = ""
+                  for k, c in pairs(clients) do
+                    client_names = client_names .. c.config.name .. " "
+                  end
+
+                  if client_names ~= "" then
+                    client_names = client_names:sub(1, -2)
+                  end
+
+                  return client_names
+                end)()
+              '';
+              padding = 0;
+              color = {
+                fg = "#${palette.base0C}";
+                bg = "#${palette.base02}";
+              };
+            };
+          };
+          lualine_y = surroundWithSeparators {
+            c = {
+              __unkeyed-1 = "filetype";
+              padding = 0;
+              color.fg = "#${palette.base09}";
+              separator = {
+                left.__raw = "nil";
+                right.__raw = "nil";
+              };
+            };
+          };
+          lualine_z =
+            surroundWithSeparators
+            {
+              c = {
+                __unkeyed-1 = ''
+                  (function()
+                    return "%P/%L"
+                  end)()
+                '';
+                color = {
+                  fg = "#${palette.base08}";
+                  bg = "#${palette.base02}";
+                };
+                padding = 0;
+                separator = {
+                  left.__raw = "nil";
+                  right.__raw = "nil";
+                };
+              };
+            };
+        };
       };
-      sectionSeparators = {
-        left = "";
-        right = "";
-      };
-      # sections = {
-      #   lualine_a =
-      #     surroundWithSeparators
-      #     {
-      #       c = [
-      #         "diagnostics"
-      #         # {
-      #         #   color.fg = "#${palette.base0B}";
-      #         # extraConfig = {
-      #         #   sources = ["nvim_diagnostic"];
-      #         #   sections = ["error" "warn"];
-      #         #   symbols = {
-      #         #     error = "%#SLError#" + "" + "%*" + " ";
-      #         #     warn = "%#SLWarning#" + "" + "%*" + " ";
-      #         #   };
-      #         #   colored = false;
-      #         #   update_in_insert = false;
-      #         #   always_visible = true;
-      #         #   padding = 0;
-      #         # };
-      #         # }
-      #       ];
-      #       s = true;
-      #     };
-      #   # lualine_b = surroundWithSeparators {
-      #   #   c = {
-      #   #     name = "hostname";
-      #   #     extraConfig.padding = 0;
-      #   #     color.fg = "#${palette.base0B}";
-      #   #   };
-      #   # };
-      #   # lualine_c = surroundWithSeparators {
-      #   #   c = {
-      #   #     name = "filename";
-      #   #     extraConfig.padding = 0;
-      #   #     color = {
-      #   #       bg = "#${palette.base02}";
-      #   #       fg = "#${palette.base0A}";
-      #   #     };
-      #   #   };
-      #   # };
-      #   #
-      #   # lualine_x = surroundWithSeparators {
-      #   #   c = {
-      #   #     name = ''
-      #   #       (function()
-      #   #         local clients = vim.lsp.buf_get_clients()
-      #   #         local client_names = ""
-      #   #         for k, c in pairs(clients) do
-      #   #           client_names = client_names .. c.config.name .. " "
-      #   #         end
-      #   #
-      #   #         if client_names ~= "" then
-      #   #           client_names = client_names:sub(1, -2)
-      #   #         end
-      #   #
-      #   #         return client_names
-      #   #       end)()
-      #   #     '';
-      #   #     extraConfig.padding = 0;
-      #   #     color = {
-      #   #       fg = "#${palette.base0C}";
-      #   #       bg = "#${palette.base02}";
-      #   #     };
-      #   #   };
-      #   # };
-      #   # lualine_y = surroundWithSeparators {
-      #   #   c = {
-      #   #     name = "filetype";
-      #   #     extraConfig.padding = 0;
-      #   #     color.fg = "#${palette.base09}";
-      #   #   };
-      #   # };
-      #   # lualine_z =
-      #   #   surroundWithSeparators
-      #   #   {
-      #   #     c = {
-      #   #       name = ''
-      #   #         (function()
-      #   #           return "%P/%L"
-      #   #         end)()
-      #   #       '';
-      #   #       color = {
-      #   #         fg = "#${palette.base08}";
-      #   #         bg = "#${palette.base02}";
-      #   #       };
-      #   #       extraConfig.padding = 0;
-      #   #     };
-      #   #   };
-      # };
     };
   };
 }

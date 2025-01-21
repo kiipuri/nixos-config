@@ -8,6 +8,7 @@
   locale,
   username,
   secrets,
+  pkgs-stable,
   ...
 }: {
   imports = [
@@ -67,17 +68,6 @@
     networkmanager = {
       enable = true;
       insertNameservers = [secrets.dns-server "8.8.8.8"];
-    };
-  };
-
-  sops = {
-    defaultSopsFile = ../secrets/secrets.yaml;
-    defaultSopsFormat = "yaml";
-    age.keyFile = "/home/${username}/.config/sops/age/keys.txt";
-    secrets = {
-      vpn = {
-        path = "/etc/NetworkManager/system-connections/vpn.nmconnection";
-      };
     };
   };
 
@@ -192,6 +182,7 @@
     dconf.enable = true;
     hyprland = {
       enable = true;
+      package = pkgs-stable.hyprland;
     };
     appimage = {
       enable = true;

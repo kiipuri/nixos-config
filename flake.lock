@@ -567,19 +567,19 @@
         "xdph": "xdph"
       },
       "locked": {
-        "lastModified": 1734401739,
-        "narHash": "sha256-UKgTjtuPZ87TbsKER6igE58QZWwzUnXj6AnBGtEh30o=",
+        "lastModified": 1735514352,
+        "narHash": "sha256-guBp/FwjjsRGMjD9U0Lt6C7ad6oupA8wrFWupyKpC38=",
         "ref": "refs/heads/main",
-        "rev": "7ae79205729c9648474c32bbd69f6e7e893855d3",
-        "revCount": 5557,
+        "rev": "cb211d83f68542e9fbf7567d57bdf528286cbf7e",
+        "revCount": 5603,
         "submodules": true,
         "type": "git",
-        "url": "https://github.com/hyprwm/Hyprland"
+        "url": "https://github.com/hyprwm/Hyprland?rev=12f9a0d0b93f691d4d9923716557154d74777b0a"
       },
       "original": {
         "submodules": true,
         "type": "git",
-        "url": "https://github.com/hyprwm/Hyprland"
+        "url": "https://github.com/hyprwm/Hyprland?rev=12f9a0d0b93f691d4d9923716557154d74777b0a"
       }
     },
     "hyprland-protocols": {
@@ -662,6 +662,27 @@
       "original": {
         "owner": "hyprwm",
         "repo": "hyprlang",
+        "type": "github"
+      }
+    },
+    "hyprsplit": {
+      "inputs": {
+        "hyprland": [
+          "hyprland"
+        ]
+      },
+      "locked": {
+        "lastModified": 1734629004,
+        "narHash": "sha256-VvNMtaogoB3k8+NsVEZW9IfOBz37Fo7uXlaaBchYAEU=",
+        "owner": "shezdy",
+        "repo": "hyprsplit",
+        "rev": "65a14abf4fe10e0f3119a3ef195e9787ada29e88",
+        "type": "github"
+      },
+      "original": {
+        "owner": "shezdy",
+        "ref": "main",
+        "repo": "hyprsplit",
         "type": "github"
       }
     },
@@ -801,6 +822,21 @@
         "type": "github"
       }
     },
+    "nixos-secrets": {
+      "locked": {
+        "lastModified": 1727261331,
+        "narHash": "sha256-Z7kWZ2fQox3slPVGCahOtGmS8K7za3b3GGoc5GFtoV4=",
+        "ref": "refs/heads/main",
+        "rev": "ef05a40d0c049bfeca918418ee1c44fe5a1c8ebb",
+        "revCount": 3,
+        "type": "git",
+        "url": "ssh://git@github.com/kiipuri/nixos-secrets"
+      },
+      "original": {
+        "type": "git",
+        "url": "ssh://git@github.com/kiipuri/nixos-secrets"
+      }
+    },
     "nixpkgs": {
       "locked": {
         "lastModified": 1734119587,
@@ -922,16 +958,16 @@
     },
     "nixpkgs-stable_3": {
       "locked": {
-        "lastModified": 1720535198,
-        "narHash": "sha256-zwVvxrdIzralnSbcpghA92tWu2DV2lwv89xZc8MTrbg=",
+        "lastModified": 1735412871,
+        "narHash": "sha256-Qoz0ow6jDGUIBHxduc7Y1cjYFS71tvEGJV5Src/mj98=",
         "owner": "nixos",
         "repo": "nixpkgs",
-        "rev": "205fd4226592cc83fd4c0885a3e4c9c400efabb5",
+        "rev": "9f94733f93e4fe6e82f516efae007096e4ab5a21",
         "type": "github"
       },
       "original": {
         "owner": "nixos",
-        "ref": "nixos-23.11",
+        "ref": "nixos-24.11",
         "repo": "nixpkgs",
         "type": "github"
       }
@@ -1089,12 +1125,12 @@
       },
       "locked": {
         "lastModified": 1,
-        "narHash": "sha256-Kea9CEalEJyswQEfwI+pSAnbtAifUYudUjeWa/FwzYc=",
-        "path": "/nix/store/6ppf0fjgpx4gi9m91qmvqm953rbwa52c-source/home-manager/nvim",
+        "narHash": "sha256-UPY/0azDob1csuitXuDWsZb3NOOYmd73GiLLSWh5XKE=",
+        "path": "/nix/store/v2z2jwwapj7sqg5mb1lljglcw5i50ddd-source/home-manager/nvim",
         "type": "path"
       },
       "original": {
-        "path": "/nix/store/6ppf0fjgpx4gi9m91qmvqm953rbwa52c-source/home-manager/nvim",
+        "path": "/nix/store/v2z2jwwapj7sqg5mb1lljglcw5i50ddd-source/home-manager/nvim",
         "type": "path"
       }
     },
@@ -1144,7 +1180,9 @@
       "inputs": {
         "home-manager": "home-manager",
         "hyprland": "hyprland",
+        "hyprsplit": "hyprsplit",
         "nix-colors": "nix-colors",
+        "nixos-secrets": "nixos-secrets",
         "nixpkgs": "nixpkgs_2",
         "nixpkgs-f2k": "nixpkgs-f2k",
         "nixpkgs-stable": "nixpkgs-stable_3",

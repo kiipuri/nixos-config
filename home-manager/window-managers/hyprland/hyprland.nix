@@ -1,39 +1,15 @@
 {
   pkgs,
-  hyprland,
-  inputs,
+  pkgs-stable,
   ...
-}: let
-  pyprland-wrapper = final: prev: {
-    my-pyprland = prev.pyprland.overrideAttrs (old: {
-      # doCheck = true;
-      postFixup = ''
-        wrapProgram $out/bin/pypr \
-        --set PATH ${prev.lib.makeBinPath [prev.kitty]}
-      '';
-    });
-  };
-  # pyprland-wrapper = pkgs.symlinkJoin {
-  #   name = "pyprland";
-  #   paths = with pkgs; [pyprland kitty];
-  # };
-  # pyprland-wrapper = pkgs.stdenv.mkDerivation {
-  #   name = "pyprland";
-  #   dontUnpack = true;
-  #   buildInputs = with pkgs; [kitty];
-  #   buildPhase = ''
-  #     export PATH="${pkgs.kitty}/bin:$PATH"
-  #   '';
-  # };
-in {
-  # nixpkgs.overlays = [pyprland-wrapper];
+}: {
   imports = [./pyprland.nix];
   wayland.windowManager.hyprland = {
     enable = true;
-    package = hyprland.packages.${pkgs.system}.default;
+    package = pkgs-stable.hyprland;
     systemd.enable = true;
     plugins = [
-      inputs.split-monitor-workspaces.packages.${pkgs.system}.split-monitor-workspaces
+      pkgs-stable.hyprlandPlugins.hyprsplit
     ];
     settings = {
       workspace = [1 2 3 4 5 6 7 8 9];
@@ -43,7 +19,6 @@ in {
       ];
       exec-once = [
         "${pkgs.pyprland}/bin/pypr"
-        # "${pkgs.my-pyprland}/bin/pypr"
         "${pkgs.fcitx5}/bin/fcitx5"
       ];
       input = {
@@ -144,26 +119,26 @@ in {
         ", Print, exec, ${pkgs.grim}/bin/grim -g \"$(slurp -ow 0)\" - | wl-copy"
 
         # Switch workspaces with mainMod + [0-9]
-        "$mainMod, 1, split-workspace, 1"
-        "$mainMod, 2, split-workspace, 2"
-        "$mainMod, 3, split-workspace, 3"
-        "$mainMod, 4, split-workspace, 4"
-        "$mainMod, 5, split-workspace, 5"
-        "$mainMod, 6, split-workspace, 6"
-        "$mainMod, 7, split-workspace, 7"
-        "$mainMod, 8, split-workspace, 8"
-        "$mainMod, 9, split-workspace, 9"
+        "$mainMod, 1, split:workspace, 1"
+        "$mainMod, 2, split:workspace, 2"
+        "$mainMod, 3, split:workspace, 3"
+        "$mainMod, 4, split:workspace, 4"
+        "$mainMod, 5, split:workspace, 5"
+        "$mainMod, 6, split:workspace, 6"
+        "$mainMod, 7, split:workspace, 7"
+        "$mainMod, 8, split:workspace, 8"
+        "$mainMod, 9, split:workspace, 9"
 
         # Move active window to a workspace with mainMod + SHIFT + [0-9]
-        "$mainMod SHIFT, 1, split-movetoworkspacesilent, 1"
-        "$mainMod SHIFT, 2, split-movetoworkspacesilent, 2"
-        "$mainMod SHIFT, 3, split-movetoworkspacesilent, 3"
-        "$mainMod SHIFT, 4, split-movetoworkspacesilent, 4"
-        "$mainMod SHIFT, 5, split-movetoworkspacesilent, 5"
-        "$mainMod SHIFT, 6, split-movetoworkspacesilent, 6"
-        "$mainMod SHIFT, 7, split-movetoworkspacesilent, 7"
-        "$mainMod SHIFT, 8, split-movetoworkspacesilent, 8"
-        "$mainMod SHIFT, 9, split-movetoworkspacesilent, 9"
+        "$mainMod SHIFT, 1, split:movetoworkspacesilent, 1"
+        "$mainMod SHIFT, 2, split:movetoworkspacesilent, 2"
+        "$mainMod SHIFT, 3, split:movetoworkspacesilent, 3"
+        "$mainMod SHIFT, 4, split:movetoworkspacesilent, 4"
+        "$mainMod SHIFT, 5, split:movetoworkspacesilent, 5"
+        "$mainMod SHIFT, 6, split:movetoworkspacesilent, 6"
+        "$mainMod SHIFT, 7, split:movetoworkspacesilent, 7"
+        "$mainMod SHIFT, 8, split:movetoworkspacesilent, 8"
+        "$mainMod SHIFT, 9, split:movetoworkspacesilent, 9"
 
         # Scroll through existing workspaces with mainMod + scroll
         "bind = $mainMod, mouse_down, workspace, e+1"
@@ -183,16 +158,6 @@ in {
     };
   };
   home.packages = with pkgs; [pyprland];
-  # xdg = {
-  #   enable = true;
-  #   configFile = {
-  #     pypr = {
-  #       source = ./pyprland.toml;
-  #       # text = builtins.readFile ./pyprland.toml;
-  #       target = "hypr/pyprland.toml";
-  #     };
-  #   };
-  # };
   services.hypridle = {
     enable = true;
     settings = {
