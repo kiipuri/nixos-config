@@ -5,7 +5,17 @@
       "scratchpads",
       "monitors",
       "toggle_dpms",
+      "monitors",
     ]
+
+    [monitors.placement."AOC"]
+    rate = 143.91
+    resolution = "2560x1440"
+
+    [monitors.placement."Ancor Communications Inc"]
+    rate = 60
+    resolution = "1920x1080"
+    rightOf = "AOC"
 
     [workspaces_follow_focus]
     max_workspaces = 9
@@ -41,6 +51,10 @@
     class = "feishin"
     size = "80% 80%"
     margin = 150
+
+    [wallpapers]
+    path = "~/wallpapers"
+    unique = true
   '';
 in {
   xdg = {

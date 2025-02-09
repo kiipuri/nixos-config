@@ -221,44 +221,6 @@ in {
     user = {
       # Nicely reload system units when changing configs
       startServices = "sd-switch";
-
-      services.autorun = {
-        Install.WantedBy = ["graphical-session.target"];
-        Unit = {
-          PartOf = ["graphical-session.target"];
-          After = ["graphical-session.target"];
-        };
-        Service = {
-          ExecStart = "${pkgs.writeShellScript "autorun-start" ''
-            setsid ${pkgs.lxqt.lxqt-policykit}/bin/lxqt-policykit-agent &
-            ${pkgs.eww}/bin/eww open-many bar-left bar-right
-
-            wallpaper=$(cd ~/wallpapers && ${pkgs.coreutils}/bin/ls | \
-              ${pkgs.coreutils}/bin/shuf | \
-              ${pkgs.coreutils}/bin/head -n1 | \
-              ${pkgs.findutils}/bin/xargs \
-              ${pkgs.coreutils}/bin/realpath)
-
-            environ=$(printenv)
-            if [[ $environ == *"DISPLAY=:0"* ]]; then
-              ${pkgs.feh}/bin/feh --no-fehbg --bg-fill $wallpaper &
-            else
-              ${pkgs.swaybg}/bin/swaybg -i $wallpaper -m fill &
-            fi
-          ''}";
-
-          ExecStop = "${pkgs.writeShellScript "autorun-stop" ''
-            ${pkgs.procps}/bin/pkill -f ${pkgs.swaybg}/bin/swaybg
-            ${pkgs.procps}/bin/pkill -f ${pkgs.feh}/bin/feh
-            ${pkgs.procps}/bin/pkill -f ${pkgs.fcitx5}/bin/fcitx5
-            ${pkgs.procps}/bin/pkill -f ${pkgs.lxqt.lxqt-policykit}/bin/lxqt-policykit-agent
-          ''}";
-
-          Type = "forking";
-          Restart = "always";
-          StartLimitBurst = "60";
-        };
-      };
     };
   };
 

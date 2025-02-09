@@ -14,12 +14,12 @@
     settings = {
       workspace = [1 2 3 4 5 6 7 8 9];
       monitor = [
-        "DP-3,preferred,0x0,1"
-        "HDMI-A-2,preferred,auto-right,1"
       ];
       exec-once = [
         "${pkgs.pyprland}/bin/pypr"
         "${pkgs.fcitx5}/bin/fcitx5"
+        "${pkgs.lxqt.lxqt-policykit}/bin/lxqt-policykit-agent"
+        "${pkgs.eww}/bin/eww open-many bar-left bar-right"
         "hyprctl setcursor Remilia-hypr 64"
       ];
       input = {
@@ -78,6 +78,7 @@
       "$mainMod" = "SUPER";
       windowrule = [
         "float, qalculate-gtk"
+        "float, title:Authentication Required"
       ];
       "$scratchpad" = "class:^(kitty-dropterm)$";
       "$pavucontrol" = "class:^(org.pulseaudio.pavucontrol)$";
@@ -95,8 +96,8 @@
         "$mainMod SHIFT, Q, exit,"
         "$mainMod, G, togglefloating,"
         "$mainMod, P, exec, ${pkgs.rofi-wayland}/bin/rofi -show drun"
-        "$mainMod, H, resizeactive, -100 0"
-        "$mainMod, L, resizeactive, 100 0"
+        "$mainMod SHIFT, P, exec, ${pkgs.rofi-rbw-wayland}/bin/rofi-rbw --no-help --no-folder"
+
         "$mainMod CONTROL, H, movewindow, l"
         "$mainMod CONTROL, L, movewindow, r"
         "$mainMod CONTROL, K, movewindow, u"
@@ -104,10 +105,10 @@
         "$mainMod, F, fullscreen"
 
         # Move focus with mainMod + arrow keys
-        "bind = $mainMod, H, movefocus, l"
-        "bind = $mainMod, L, movefocus, r"
-        "bind = $mainMod, K, movefocus, u"
-        "bind = $mainMod, J, movefocus, d"
+        "$mainMod, H, movefocus, l"
+        "$mainMod, L, movefocus, r"
+        "$mainMod, K, movefocus, u"
+        "$mainMod, J, movefocus, d"
 
         # pyprland binds
         "$mainMod SHIFT, Z, exec, ${pkgs.pyprland}/bin/pypr zoom"
@@ -117,7 +118,8 @@
         "$mainMod, O, exec, ${pkgs.pyprland}/bin/pypr toggle music && hyprctl dispatch bringactivetotop"
         "$mainMod, C, exec, ${pkgs.pyprland}/bin/pypr toggle calc && hyprctl dispatch bringactivetotop"
 
-        ", Print, exec, ${pkgs.grim}/bin/grim -g \"$(slurp -ow 0)\" - | wl-copy"
+        ", Print, exec, hyprshot -m region --clipboard-only"
+        "Control, Print, exec, hyprshot -m window --clipboard-only"
 
         # Switch workspaces with mainMod + [0-9]
         "$mainMod, 1, split:workspace, 1"
@@ -142,14 +144,14 @@
         "$mainMod SHIFT, 9, split:movetoworkspacesilent, 9"
 
         # Scroll through existing workspaces with mainMod + scroll
-        "bind = $mainMod, mouse_down, workspace, e+1"
-        "bind = $mainMod, mouse_up, workspace, e-1"
+        "$mainMod, mouse_down, workspace, e+1"
+        "$mainMod, mouse_up, workspace, e-1"
 
-        "bind = $mainMod, N, workspace, r+1"
-        "bind = $mainMod, V, workspace, r-1"
+        "$mainMod, N, workspace, r+1"
+        "$mainMod, V, workspace, r-1"
 
-        "bind = $mainMod, comma, focusmonitor, 1"
-        "bind = $mainMod, period, focusmonitor, 0"
+        "$mainMod, comma, focusmonitor, 0"
+        "$mainMod, period, focusmonitor, 1"
       ];
       bindm = [
         # Move/resize windows with mainMod + LMB/RMB and dragging

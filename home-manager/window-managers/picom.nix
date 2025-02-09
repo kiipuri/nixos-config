@@ -1,6 +1,6 @@
 {...}: {
   services.picom = {
-    enable = true;
+    enable = false;
     shadow = true;
     backend = "glx";
     vSync = true;
