@@ -20,6 +20,7 @@
       exec-once = [
         "${pkgs.pyprland}/bin/pypr"
         "${pkgs.fcitx5}/bin/fcitx5"
+        "hyprctl setcursor Remilia-hypr 64"
       ];
       input = {
         kb_layout = "us";

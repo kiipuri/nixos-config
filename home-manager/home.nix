@@ -7,7 +7,9 @@
   themeName,
   font,
   ...
-}: {
+}: let
+  touhou-cursors = pkgs.callPackage ./derivatives/touhou-cursors.nix {};
+in {
   imports = [
     inputs.nix-colors.homeManagerModule
     inputs.nvim.inputs.nixvim.homeManagerModules.nixvim
@@ -25,6 +27,10 @@
   colorScheme = inputs.nix-colors.colorSchemes.${themeName};
 
   home = {
+    file.".local" = {
+      source = touhou-cursors;
+      recursive = true;
+    };
     enableNixpkgsReleaseCheck = false;
     packages = with pkgs; [
       just
