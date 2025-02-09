@@ -60,12 +60,12 @@ in {
           name = font;
         };
         sansSerif = {
-          package = fontPkg;
-          name = font;
+          package = pkgs.noto-fonts.override {suffix = "-sans";};
+          name = "Noto Sans";
         };
         serif = {
-          package = fontPkg;
-          name = font;
+          name = "Noto Sans Serif";
+          package = pkgs.noto-fonts.override {suffix = "-serif";};
         };
         emoji = {
           package = pkgs.noto-fonts-emoji;

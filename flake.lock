@@ -1126,11 +1126,11 @@
       "locked": {
         "lastModified": 1,
         "narHash": "sha256-PgPhhlszO+gNrxKkHZcY24ehmSEyfaZve/xTNbyqRtM=",
-        "path": "/nix/store/q7angsnqx86j8alpmd6bkp4h83r0xhmp-source/home-manager/nvim",
+        "path": "/nix/store/d0wwmsfag6wpw4fwn0cv9jzqkr7hi9ip-source/home-manager/nvim",
         "type": "path"
       },
       "original": {
-        "path": "/nix/store/q7angsnqx86j8alpmd6bkp4h83r0xhmp-source/home-manager/nvim",
+        "path": "/nix/store/d0wwmsfag6wpw4fwn0cv9jzqkr7hi9ip-source/home-manager/nvim",
         "type": "path"
       }
     },

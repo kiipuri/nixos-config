@@ -72,7 +72,7 @@
       (
         pkgs.fetchurl {
           url = "https://userscripts.adtidy.org/release/adguard-extra/1.0/adguard-extra.user.js"; # update for update-nix-fetchgit
-          sha256 = "1rjd9psm5s7hh6l8czkbq6swnvsy3x7x17qc4dhym5ps5lxfrp71";
+          sha256 = "0pjj5m4xk92n8ajjmxyy0054lpc1m81xggg48naimrlm4dxfm11r";
         }
       )
     ];

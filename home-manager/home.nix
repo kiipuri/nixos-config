@@ -39,10 +39,14 @@ in {
       btop
       webcord-vencord
       vesktop
+      orca-slicer
+      freecad
+      freetube
       ungoogled-chromium
       rofi-rbw-wayland
       gucharmap
       gimp
+      arduino-ide
       firefox
       lazygit
       librewolf
@@ -51,7 +55,6 @@ in {
       qalculate-gtk
       slurp
       osu-lazer-bin
-      onlyoffice-bin
       transmission-remote-gtk
       grim
       yt-dlp
@@ -134,7 +137,7 @@ in {
     zathura = {
       enable = true;
       options = {
-        selection_clipboard = "clipboard";
+        selection-clipboard = "clipboard";
       };
     };
     zoxide = {
