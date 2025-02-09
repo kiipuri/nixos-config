@@ -22,6 +22,7 @@ in {
     ./mpv/mpv.nix
     ./window-managers/hyprland/hyprland.nix
     ./easyeffects/default.nix
+    ./tex/texlive.nix
   ];
 
   colorScheme = inputs.nix-colors.colorSchemes.${themeName};
