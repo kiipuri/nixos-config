@@ -23,6 +23,7 @@ in {
     ./window-managers/hyprland/hyprland.nix
     ./easyeffects/default.nix
     ./tex/texlive.nix
+    ./yazi/yazi.nix
   ];
 
   colorScheme = inputs.nix-colors.colorSchemes.${themeName};
@@ -96,18 +97,6 @@ in {
 
   programs = {
     home-manager.enable = true;
-    yazi = {
-      enable = true;
-      enableZshIntegration = true;
-      settings = {
-        manager = {
-          show_hidden = true;
-          sort_by = "natural";
-          sort_sensitive = false;
-          sort_dir_first = true;
-        };
-      };
-    };
     fzf = {
       enable = true;
       enableZshIntegration = true;
