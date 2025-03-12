@@ -147,8 +147,22 @@
         "$mainMod, mouse_down, workspace, e+1"
         "$mainMod, mouse_up, workspace, e-1"
 
-        "$mainMod, N, workspace, r+1"
-        "$mainMod, V, workspace, r-1"
+        ("$mainMod, N, exec, "
+          + pkgs.writeShellScript "next-workspace" ''
+            id=$(hyprctl activeworkspace -j | ${pkgs.jq}/bin/jq -r '.id')
+            last_digit=$(echo $id | ${pkgs.coreutils}/bin/tail -c -2)
+
+            [ $last_digit = 9 ] && workspace=$((id - 8)) || workspace=$((id + 1))
+            hyprctl dispatch workspace $workspace
+          '')
+        ("$mainMod, V, exec, "
+          + pkgs.writeShellScript "prev-workspace" ''
+            id=$(hyprctl activeworkspace -j | ${pkgs.jq}/bin/jq -r '.id')
+            last_digit=$(echo $id | ${pkgs.coreutils}/bin/tail -c -2)
+
+            [ $last_digit = 1 ] && workspace=$((id + 8)) || workspace=$((id - 1))
+            hyprctl dispatch workspace $workspace
+          '')
 
         "$mainMod, comma, focusmonitor, 0"
         "$mainMod, period, focusmonitor, 1"
