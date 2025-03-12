@@ -118,8 +118,8 @@
         "$mainMod, O, exec, ${pkgs.pyprland}/bin/pypr toggle music && hyprctl dispatch bringactivetotop"
         "$mainMod, C, exec, ${pkgs.pyprland}/bin/pypr toggle calc && hyprctl dispatch bringactivetotop"
 
-        ", Print, exec, hyprshot -m region --clipboard-only"
-        "Control, Print, exec, hyprshot -m window --clipboard-only"
+        ", Print, exec, ${pkgs.hyprshot}/bin/hyprshot -m region --clipboard-only"
+        "Control, Print, exec, ${pkgs.hyprshot}/bin/hyprshot -m window --clipboard-only"
 
         # Switch workspaces with mainMod + [0-9]
         "$mainMod, 1, split:workspace, 1"
