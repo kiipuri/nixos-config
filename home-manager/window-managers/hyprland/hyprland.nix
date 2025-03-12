@@ -17,7 +17,7 @@
       ];
       exec-once = [
         "${pkgs.pyprland}/bin/pypr"
-        "${pkgs.fcitx5}/bin/fcitx5"
+        "fcitx5"
         "${pkgs.lxqt.lxqt-policykit}/bin/lxqt-policykit-agent"
         "${pkgs.eww}/bin/eww open-many bar-left bar-right"
         "hyprctl setcursor Remilia-hypr 64"
