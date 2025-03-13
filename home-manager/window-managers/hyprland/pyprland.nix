@@ -1,4 +1,8 @@
-{pkgs, ...}: let
+{
+  pkgs,
+  config,
+  ...
+}: let
   pyprland-config = ''
     [pyprland]
     plugins = [
@@ -48,7 +52,7 @@
 
     [scratchpads.music]
     animation = "fromTop"
-    command = "${pkgs.feishin}/bin/feishin"
+    command = "${config.home.profileDirectory}/bin/feishin"
     class = "feishin"
     size = "80% 80%"
     margin = 150

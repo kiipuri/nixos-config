@@ -35,6 +35,16 @@ in {
     };
     enableNixpkgsReleaseCheck = false;
     packages = with pkgs; [
+      (pkgs.symlinkJoin
+        {
+          name = "feishin";
+          paths = [pkgs.feishin];
+          buildInputs = [pkgs.makeWrapper];
+          postBuild = ''
+            wrapProgram $out/bin/feishin \
+              --add-flags "--password-store='gnome-libsecret' --enable-wayland-ime"
+          '';
+        })
       just
       anki-bin
       btop
