@@ -6,6 +6,7 @@
       "monitors",
       "toggle_dpms",
       "monitors",
+      "wallpapers",
     ]
 
     [monitors.placement."AOC"]
