@@ -1,6 +1,4 @@
-#!/usr/bin/env nix-shell
-#! nix-shell -i bash --pure
-#! nix-shell -p networkmanager coreutils socat bc netcat playerctl pamixer curl gawk gnugrep jq hyprland libnotify eww polkit
+#!/usr/bin/env bash
 
 length=$(($(playerctl -p feishin metadata mpris:length) / 1000000))
 playerctl -p feishin position $(($1 * length / 100))

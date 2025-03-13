@@ -19,7 +19,8 @@
         "${pkgs.pyprland}/bin/pypr"
         "fcitx5"
         "${pkgs.lxqt.lxqt-policykit}/bin/lxqt-policykit-agent"
-        "${pkgs.eww}/bin/eww open-many bar-left bar-right"
+        "${pkgs.eww}/bin/eww open bar-left --arg monitor=AG271QG4"
+        "${pkgs.eww}/bin/eww open bar-right --arg monitor=VE247"
         "hyprctl setcursor Remilia-hypr 64"
       ];
       input = {

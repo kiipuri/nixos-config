@@ -1,6 +1,4 @@
-#!/usr/bin/env nix-shell
-#! nix-shell -i bash --pure
-#! nix-shell -p networkmanager coreutils socat bc netcat playerctl pamixer curl
+#!/usr/bin/env bash
 
 playerctl --follow metadata mpris:artUrl --player feishin 2>/dev/null |
     while read -r arturl; do

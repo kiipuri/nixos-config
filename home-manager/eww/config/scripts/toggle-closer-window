@@ -1,6 +1,4 @@
-#!/usr/bin/env nix-shell
-#! nix-shell -i bash --pure
-#! nix-shell -p networkmanager coreutils socat bc netcat playerctl pamixer curl gawk gnugrep jq hyprland libnotify eww polkit
+#!/usr/bin/env bash
 
 window=$1
 if [ "$(eww get open-"$window")" = true ]; then

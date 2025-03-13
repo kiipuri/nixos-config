@@ -1,13 +1,14 @@
-#!/usr/bin/env nix-shell
-#! nix-shell -i bash --pure
-#! nix-shell -p networkmanager coreutils socat bc netcat playerctl pamixer
+#!/usr/bin/env bash
 
 bandwidth() {
-    wifi_connected=$(nmcli -g GENERAL.STATE dev show wlp4s0)
+    ethernet_if=$(ip -br addr show | sed -n '/enp/p' | sed 's/\ .*//' | head -n1)
+    wifi_if=$(ip -br addr show | sed -n '/wlp/p' | sed 's/\ .*//' | head -n1)
+
+    wifi_connected=$(nmcli -g GENERAL.STATE dev show "$wifi_if")
     if echo "$wifi_connected" | grep -q "^100"; then
-        device="wlp4s0"
+        device="$wifi_if"
     else
-        device="enp5s0"
+        device="$ethernet_if"
     fi
 
     bytes=$(cat "/sys/class/net/$device/statistics/${1}_bytes")

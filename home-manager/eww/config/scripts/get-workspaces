@@ -1,8 +1,6 @@
-#!/usr/bin/env nix-shell
-#! nix-shell -i bash --pure
-#! nix-shell -p networkmanager coreutils socat bc netcat playerctl pamixer curl gawk gnugrep jq hyprland
+#!/usr/bin/env bash
 
-run_left() {
+run() {
     occupied_tags=$(hyprctl workspaces -j | jq -r '.[] | select(.windows != 0) | .id | tostring | select(startswith("-") | not)')
     active_tag=$(hyprctl activeworkspace -j | jq -r '.id')
 
@@ -10,7 +8,8 @@ run_left() {
         :orientation \"h\" \
         :space-evenly true \
         :halign \"start\""
-    for workspace in $(seq 11 19); do
+
+    for workspace in $(seq "$1" "$2"); do
         if echo "$occupied_tags" | grep -q "^$workspace$" || [ "$workspace" = "$active_tag" ]; then
             [ "$workspace" = "$active_tag" ] && active="active-ws" || active=""
             workspaces_literal="$workspaces_literal (button :class \"$active\" :onclick \"hyprctl dispatch workspace $workspace\" ${workspace#"${workspace%?}"}) "
@@ -21,29 +20,12 @@ run_left() {
     echo "$workspaces_literal"
 }
 
-run_right() {
-    occupied_tags=$(hyprctl workspaces -j | jq -r '.[] | select(.windows != 0) | .id | tostring | select(startswith("-") | not)')
-    active_tag=$(hyprctl activeworkspace -j | jq -r '.id')
-
-    workspaces_literal="(box :class \"workspaces\" \
-        :orientation \"h\" \
-        :space-evenly true \
-        :halign \"start\""
-    for workspace in $(seq 1 9); do
-        if echo "$occupied_tags" | grep -q "^$workspace$" || [ "$workspace" = "$active_tag" ]; then
-            [ "$workspace" = "$active_tag" ] && active="active-ws" || active=""
-            workspaces_literal="$workspaces_literal (button :class \"$active\" :onclick \"hyprctl dispatch workspace $workspace\" $workspace) "
-        fi
-    done
-    workspaces_literal="$workspaces_literal )"
-
-    echo "$workspaces_literal"
-}
-
 socat -u UNIX-CONNECT:"$XDG_RUNTIME_DIR"/hypr/"$HYPRLAND_INSTANCE_SIGNATURE"/.socket2.sock - | while read -r _; do
+    # run left monitor bar
     if [ "$1" = 0 ]; then
-        run_right
+        run 1 9
+    # run right monitor bar
     elif [ "$1" = 1 ]; then
-        run_left
+        run 11 19
     fi
 done

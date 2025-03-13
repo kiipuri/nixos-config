@@ -1,7 +1,7 @@
 ;; VARIABLES
 
-(deflisten workspaces-left-lit "scripts/get-workspaces 1")
-(deflisten workspaces-right-lit "scripts/get-workspaces 0")
+(deflisten workspaces-left-lit "scripts/get-workspaces 0")
+(deflisten workspaces-right-lit "scripts/get-workspaces 1")
 (deflisten music-icon "scripts/get-music-icon")
 (defpoll music-progress :interval "1s" "scripts/get-music-progress")
 (deflisten music-title :initial ""
@@ -220,7 +220,7 @@
       :onchange onchange)))
 
 (defwidget progressbar [value ?class]
-  (progress :class "progress ${class}" :value value :valign "center"))
+  (progress :class "progress ${class}" :value 0 :valign "center"))
 
 (defwidget closer [window]
   (eventbox :onclick "scripts/toggle-closer-window ${window}"))
@@ -274,8 +274,8 @@
   (closer :window "network-menu"))
 
 
-(defwindow bar-right
-  :monitor 0
+(defwindow bar-right [monitor]
+  :monitor monitor
   :exclusive true
   :geometry (geometry :x "0%"
                       :y "20px"
@@ -284,8 +284,8 @@
                       :anchor "top center")
   (bar-right))
 
-(defwindow bar-left
-  :monitor 1
+(defwindow bar-left [monitor]
+  :monitor monitor
   :exclusive true
   :geometry (geometry :x "0%"
                       :y "20px"
